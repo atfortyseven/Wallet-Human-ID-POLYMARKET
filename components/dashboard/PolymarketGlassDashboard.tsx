@@ -9,11 +9,17 @@ import {
     ArrowDownLeft,
     Activity,
     ShieldCheck,
-    AlertTriangle
+    AlertTriangle,
+    Loader2
 } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useMarketData } from "@/hooks/useMarketData";
 import { usePolymarketSession } from "@/hooks/usePolymarketSession";
+import { usePolymarketOrderbook } from "@/hooks/usePolymarketOrderbook";
+import { usePolymarketTrade } from "@/hooks/usePolymarketTrade";
+import SendModal from "@/components/wallet/SendModal";
+import ReceiveModal from "@/components/wallet/ReceiveModal";
+import { Toaster } from "sonner";
 
 // --- ANIMATION VARIANTS (Strict Typing) ---
 const containerVariants: Variants = {
@@ -40,13 +46,36 @@ const itemVariants: Variants = {
     },
 };
 
+// MARKET ID for "Will Trump Win?" (Example) or pass as prop
+const MARKET_ID = "21742633143463906290569050155826241533067272736897614950488156847949938836455";
+const TOKEN_ID_YES = "21742633143463906290569050155826241533067272736897614950488156847949938836455"; // Usually calculated (conditionId + index)
+const TOKEN_ID_NO = "21742633143463906290569050155826241533067272736897614950488156847949938836456";
+
 export default function PolymarketGlassDashboard() {
     const { address } = useAccount();
     const { isProxyEnabled, login } = usePolymarketSession();
-    const { portfolioValue, usdcBalance, orderBook } = useMarketData();
+    const { portfolioValue, usdcBalance } = useMarketData(); // Keep visual data from here for now
+
+    // Real Data Hooks
+    const { orderBook, isLoading: isBookLoading } = usePolymarketOrderbook(MARKET_ID);
+    const { trade, status: tradeStatus } = usePolymarketTrade();
 
     const [side, setSide] = useState<"YES" | "NO">("YES");
     const [amount, setAmount] = useState("");
+
+    // Modals
+    const [isSendOpen, setIsSendOpen] = useState(false);
+    const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+
+    const handleTrade = () => {
+        const tokenId = side === "YES" ? TOKEN_ID_YES : TOKEN_ID_NO;
+        // Current best price logic (simplified)
+        const bestPrice = side === "YES"
+            ? (orderBook.asks[0]?.price || 0.5)
+            : (1 - (orderBook.bids[0]?.price || 0.5)); // Approx
+
+        trade("BUY", amount, bestPrice, tokenId);
+    };
 
     return (
         <motion.div
@@ -55,6 +84,10 @@ export default function PolymarketGlassDashboard() {
             variants={containerVariants}
             className="min-h-screen w-full p-4 md:p-8 text-white font-sans selection:bg-indigo-500/30"
         >
+            <Toaster position="bottom-right" theme="dark" richColors />
+
+            <SendModal isOpen={isSendOpen} onClose={() => setIsSendOpen(false)} />
+            <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} />
 
             {/* A. THE GLASS HEADER */}
             <motion.header
@@ -96,14 +129,26 @@ export default function PolymarketGlassDashboard() {
                             </span>
                         </div>
 
-                        <div className="mt-8 flex space-x-8">
-                            <div>
+                        <div className="mt-8 flex space-x-8 items-end">
+                            <div className="flex-1">
                                 <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Available USDC</p>
                                 <p className="text-xl font-medium text-emerald-400">${usdcBalance}</p>
                             </div>
-                            <div>
-                                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">In Positions</p>
-                                <p className="text-xl font-medium text-blue-400">$8,220.50</p>
+
+                            {/* NEW: Send/Receive Buttons */}
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={() => setIsSendOpen(true)}
+                                    className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center gap-2 font-bold transition-all hover:scale-105"
+                                >
+                                    <ArrowUpRight className="w-4 h-4" /> Send
+                                </button>
+                                <button
+                                    onClick={() => setIsReceiveOpen(true)}
+                                    className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center gap-2 font-bold shadow-lg shadow-indigo-500/20 transition-all hover:scale-105"
+                                >
+                                    <ArrowDownLeft className="w-4 h-4" /> Receive
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -124,7 +169,10 @@ export default function PolymarketGlassDashboard() {
                             <div>
                                 <h3 className="text-sm font-bold text-amber-500">Trading Disabled</h3>
                                 <p className="text-xs text-white/60 mt-1 mb-2">You need a Proxy Wallet to trade on Polymarket.</p>
-                                <button className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-lg transition-colors">
+                                <button
+                                    onClick={login}
+                                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-lg transition-colors"
+                                >
                                     Enable Trading
                                 </button>
                             </div>
@@ -139,11 +187,15 @@ export default function PolymarketGlassDashboard() {
 
                         {/* VISUAL ORDERBOOK */}
                         <div className="space-y-1 mb-8 font-mono text-sm">
+                            {(isBookLoading && orderBook.asks.length === 0) && (
+                                <div className="text-center py-4 text-white/30">Loading Market Data...</div>
+                            )}
+
                             {/* ASKS (SELLERS) - RED */}
                             <div className="space-y-1 bg-red-500/5 p-2 rounded-xl">
                                 {orderBook.asks.slice(0, 3).reverse().map((ask, i) => (
                                     <div key={i} className="flex justify-between text-rose-400 relative">
-                                        <span className="z-10">{ask.price.toFixed(2)}</span>
+                                        <span className="z-10">{parseFloat(ask.price.toString()).toFixed(2)}</span>
                                         <span className="z-10 text-white/40">{ask.size}</span>
                                         <div
                                             className="absolute right-0 top-0 h-full bg-rose-500/10 rounded-l-md"
@@ -159,7 +211,7 @@ export default function PolymarketGlassDashboard() {
                             <div className="space-y-1 bg-emerald-500/5 p-2 rounded-xl">
                                 {orderBook.bids.slice(0, 3).map((bid, i) => (
                                     <div key={i} className="flex justify-between text-emerald-400 relative">
-                                        <span className="z-10">{bid.price.toFixed(2)}</span>
+                                        <span className="z-10">{parseFloat(bid.price.toString()).toFixed(2)}</span>
                                         <span className="z-10 text-white/40">{bid.size}</span>
                                         <div
                                             className="absolute right-0 top-0 h-full bg-emerald-500/10 rounded-l-md"
@@ -208,8 +260,16 @@ export default function PolymarketGlassDashboard() {
                                 <span className="text-white font-mono">{amount ? (parseFloat(amount) / 0.65).toFixed(2) : "0.00"}</span>
                             </div>
 
-                            <button className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.98]">
-                                Place Order
+                            <button
+                                onClick={handleTrade}
+                                disabled={tradeStatus === "APPROVING" || tradeStatus === "SIGNING" || tradeStatus === "POSTING" || !amount}
+                                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                            >
+                                {tradeStatus === "APPROVING" && <><Loader2 className="animate-spin w-5 h-5" /> Approving...</>}
+                                {tradeStatus === "SIGNING" && <><Loader2 className="animate-spin w-5 h-5" /> Sign Order...</>}
+                                {tradeStatus === "POSTING" && <><Loader2 className="animate-spin w-5 h-5" /> Placing...</>}
+                                {tradeStatus === "SUCCESS" && "Success!"}
+                                {tradeStatus === "IDLE" && "Place Order"}
                             </button>
                         </div>
 
