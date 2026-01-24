@@ -1,14 +1,19 @@
 import { useAccount, useSignMessage, useReadContract } from "wagmi";
 import { useState, useEffect } from "react";
-import { parseAbi } from "viem";
 
 // Placeholder for Polymarket/Gnosis Proxy Factory on Polygon
-const PROXY_FACTORY_ADDRESS = "0xa584D285F5D0992300D775D4E680E7B28E8C0468"; // Gnosis Safe Proxy Factory 1.3.0 (Polygon)
-const CTF_EXCHANGE = "0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E";
+const PROXY_FACTORY_ADDRESS = "0xa584D285F5D0992300D775D4E680E7B28E8C0468";
 
-const FACTORY_ABI = parseAbi([
-    "function isInstantiation(address _user) view returns (bool)"
-]);
+// Using JSON ABI instead of parseAbi to avoid potential runtime parsing issues in edge environments
+const FACTORY_ABI = [
+    {
+        inputs: [{ name: "_user", type: "address" }],
+        name: "isInstantiation",
+        outputs: [{ name: "", type: "bool" }],
+        stateMutability: "view",
+        type: "function",
+    },
+] as const;
 
 export function usePolymarketSession() {
     const { address, isConnected } = useAccount();
@@ -19,20 +24,19 @@ export function usePolymarketSession() {
     const [sessionLoading, setSessionLoading] = useState(false);
 
     // 1. Check if user has a Proxy Wallet deployed
-    // This is a simplified check. Real Polymarket implementation might check a mapping in a Registry contract.
     const { data: hasProxy, isLoading: isProxyCheckLoading } = useReadContract({
         address: PROXY_FACTORY_ADDRESS,
         abi: FACTORY_ABI,
         functionName: "isInstantiation",
         args: address ? [address] : undefined,
         query: {
-            enabled: !!address
+            enabled: !!address // Only run if address is defined
         }
     });
 
     useEffect(() => {
         if (hasProxy) {
-            setIsProxyEnabled(true);
+            setIsProxyEnabled(Boolean(hasProxy));
         }
     }, [hasProxy]);
 
@@ -44,8 +48,10 @@ export function usePolymarketSession() {
             const message = `Log in to Polymarket Clone\nTime: ${Date.now()}`;
             const signature = await signMessageAsync({ message });
 
-            // Setup API Headers here (Mock)
-            localStorage.setItem("polymarket_auth", signature);
+            // Setup API Headers here (Dummy)
+            if (typeof window !== 'undefined') {
+                localStorage.setItem("polymarket_auth", signature);
+            }
             setIsAuthenticated(true);
         } catch (error) {
             console.error("Login failed", error);
@@ -59,7 +65,8 @@ export function usePolymarketSession() {
         isConnected,
         isProxyEnabled,
         isAuthenticated,
-        isSessionLoading: sessionLoading || isProxyCheckLoading,
+        // Add null checks for loading states to prevent hydration mismatches if possible
+        isSessionLoading: sessionLoading || (!!address && isProxyCheckLoading),
         login
     };
 }
