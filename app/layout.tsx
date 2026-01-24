@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css"; // <--- ESTO ES VITAL para que se vea el fondo oscuro
+import { Inter, Merriweather } from "next/font/google";
+import "./globals.css";
 
 import Providers from "@/components/Providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const merriweather = Merriweather({
+    subsets: ["latin"],
+    weight: ["300", "400", "700", "900"],
+    variable: "--font-merriweather"
+});
 
 export const metadata: Metadata = {
-    title: "Polymarket Login",
-    description: "Auth with World ID",
+    title: "The Crystalline Ledger",
+    description: "Financial Intelligence & Decentralized Finance",
 };
 
 export default function RootLayout({
@@ -18,7 +23,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <body className={`${inter.variable} ${merriweather.variable} font-sans`}>
                 <Providers>
                     {children}
                 </Providers>

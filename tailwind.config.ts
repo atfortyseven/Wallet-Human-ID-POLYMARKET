@@ -8,10 +8,17 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ["var(--font-inter)"],
+                serif: ["var(--font-merriweather)"],
+            },
+            colors: {
+                "glass-border": "rgba(255, 255, 255, 0.08)",
+                "glass-surface": "rgba(255, 255, 255, 0.03)",
+                "deep-void": "#0a0a0c",
+            },
             backgroundImage: {
-                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-                "gradient-conic":
-                    "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+                "crystalline-gradient": "radial-gradient(circle at 50% 0%, #1a1b26 0%, #050505 100%)",
             },
         },
     },

@@ -1,7 +1,7 @@
 "use client";
 
-import PolymarketGlassDashboard from "@/components/dashboard/PolymarketGlassDashboard";
+import CrystallineDashboard from "@/components/crystalline/CrystallineDashboard";
 
 export default function DashboardPage() {
-    return <PolymarketGlassDashboard />;
+    return <CrystallineDashboard />;
 }

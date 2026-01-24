@@ -53,7 +53,7 @@ const MARKET_ID = "2174263314346390629056905015582624153306727273689761495048815
 const TOKEN_ID_YES = "21742633143463906290569050155826241533067272736897614950488156847949938836455"; // Usually calculated (conditionId + index)
 const TOKEN_ID_NO = "21742633143463906290569050155826241533067272736897614950488156847949938836456";
 
-export default function PolymarketGlassDashboard() {
+export default function PolymarketGlassDashboard({ embedded = false }: { embedded?: boolean }) {
     const { address } = useAccount();
     const chainId = useChainId();
     const isPolygon = chainId === polygon.id;
@@ -88,39 +88,41 @@ export default function PolymarketGlassDashboard() {
             initial="hidden"
             animate="show"
             variants={containerVariants}
-            className="min-h-screen w-full p-4 md:p-8 text-white font-sans selection:bg-indigo-500/30"
+            className={`w-full text-white font-sans selection:bg-indigo-500/30 ${embedded ? '' : 'min-h-screen p-4 md:p-8'}`}
         >
             <Toaster position="bottom-right" theme="dark" richColors />
 
             <SendModal isOpen={isSendOpen} onClose={() => setIsSendOpen(false)} />
             <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} />
 
-            {/* A. THE GLASS HEADER */}
-            <motion.header
-                variants={itemVariants}
-                className="sticky top-4 z-50 mb-8 w-full max-w-7xl mx-auto"
-            >
-                <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
-                    <div className="flex items-center space-x-4">
-                        <NetworkSwitcher />
-                        <div className="hidden md:flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${isPolygon ? 'bg-emerald-500 animate-pulse' : 'bg-gray-500'}`}></div>
-                            <span className="text-sm font-medium tracking-wide text-white/90">
-                                {isPolygon ? "Polymarket Live" : "Wallet Mode"}
-                            </span>
+            {/* A. THE GLASS HEADER (Only show if NOT embedded) */}
+            {!embedded && (
+                <motion.header
+                    variants={itemVariants}
+                    className="sticky top-4 z-50 mb-8 w-full max-w-7xl mx-auto"
+                >
+                    <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+                        <div className="flex items-center space-x-4">
+                            <NetworkSwitcher />
+                            <div className="hidden md:flex items-center space-x-2">
+                                <div className={`w-2 h-2 rounded-full ${isPolygon ? 'bg-emerald-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                                <span className="text-sm font-medium tracking-wide text-white/90">
+                                    {isPolygon ? "Polymarket Live" : "Wallet Mode"}
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-black/20 border border-white/5">
-                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                            <span className="text-xs font-mono text-white/70">
-                                {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Not Connected"}
-                            </span>
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-black/20 border border-white/5">
+                                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                                <span className="text-xs font-mono text-white/70">
+                                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Not Connected"}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </motion.header>
+                </motion.header>
+            )}
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
