@@ -2,7 +2,7 @@ import GlassLogin from "@/components/GlassLogin";
 
 export default function Home() {
     return (
-        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black">
+        <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-black">
 
             {/* 1. EL BACKGROUND (GIF) */}
             <div className="absolute inset-0 z-0">
