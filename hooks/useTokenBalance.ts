@@ -38,7 +38,7 @@ export function useTokenBalance(tokenAddress: `0x${string}`) {
         functionName: "decimals",
     });
 
-    const formatted = (balanceData && decimals)
+    const formatted = (typeof balanceData === 'bigint' && typeof decimals === 'number')
         ? formatUnits(balanceData, decimals)
         : "0.00";
 
