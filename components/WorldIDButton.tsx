@@ -10,6 +10,10 @@ export default function WorldIDButton() {
   const onSuccess = (result: any) => {
     console.log("Verified successfully", result);
     setDone(true);
+    // Redirect to dashboard after 1.5s
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 1500);
   };
 
   const handleVerify = async (proof: any) => {
