@@ -6,9 +6,13 @@ const nextConfig = {
             { protocol: 'https', hostname: 'images.unsplash.com' },
             { protocol: 'https', hostname: 'plus.unsplash.com' },
             { protocol: 'https', hostname: 'source.unsplash.com' },
+            { protocol: 'https', hostname: 'images.unsplash.com' },
+            { protocol: 'https', hostname: 'loremflickr.com' },
+            // AÑADIDO: Necesario para los avatares reales del Leaderboard
+            { protocol: 'https', hostname: 'i.pravatar.cc' },
         ],
     },
-    // Esta parte soluciona los errores de dependencias de MetaMask y WalletConnect
+    // ESTA PARTE ES SAGRADA: Mantiene viva la conexión Web3
     webpack: (config) => {
         config.resolve.fallback = { fs: false, net: false, tls: false };
         config.resolve.alias = {

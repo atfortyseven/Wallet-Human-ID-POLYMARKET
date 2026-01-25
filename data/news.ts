@@ -151,7 +151,7 @@ const generateNews = (): NewsItem[] => {
                 category: category,
                 time: `${Math.floor(Math.random() * 23) + 1}h ago`,
                 source: "Polymarket News",
-                imageUrl: `https://source.unsplash.com/800x600/?${encodeURIComponent(keyword)}&sig=${displayId}`
+                imageUrl: `https://loremflickr.com/800/600/${encodeURIComponent(keyword)}?lock=${displayId}`
             });
             idCounter++;
         }
