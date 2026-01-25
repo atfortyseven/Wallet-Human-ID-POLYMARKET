@@ -41,7 +41,9 @@ export default function CrystallineDashboard() {
                         >
                             {/* Reuse the verified Dashboard, wrapped in the new aesthetic context if needed */}
                             <div className="max-w-7xl mx-auto">
-                                <PolymarketGlassDashboard embedded={true} />
+                                <div className="max-w-7xl mx-auto">
+                                    <WalletDashboard />
+                                </div>
                             </div>
                         </motion.div>
                     )}

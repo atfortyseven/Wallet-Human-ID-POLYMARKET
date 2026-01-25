@@ -22,7 +22,7 @@ export default function GlassDock({ activeTab, onTabChange }: GlassDockProps) {
                     isActive={activeTab === "NEWS"}
                     onClick={() => onTabChange("NEWS")}
                     icon={<Newspaper className="w-4 h-4" />}
-                    label="MERCADOS & WHALES"
+                    label="NEWS"
                 />
 
                 <div className="w-[1px] bg-white/5 mx-1 my-2" />
@@ -31,7 +31,7 @@ export default function GlassDock({ activeTab, onTabChange }: GlassDockProps) {
                     isActive={activeTab === "WALLET"}
                     onClick={() => onTabChange("WALLET")}
                     icon={<Wallet className="w-4 h-4" />}
-                    label="MI BILLETERA"
+                    label="WALLET"
                 />
             </motion.div>
         </div>

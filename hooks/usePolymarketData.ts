@@ -1,16 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { getTopMarkets, Market } from '@/lib/polymarket';
+import { useUSDCBalance } from './useUSDCBalance';
+import { usePolymarketPositions } from './usePolymarketPositions';
 
 export function usePolymarketData() {
-    const { data: markets, isLoading, error } = useQuery<Market[]>({
-        queryKey: ['polymarket-top'],
-        queryFn: () => getTopMarkets(6),
-        refetchInterval: 30000, // Refresh every 30s
-    });
+    const { balance: usdcBalance, isLoading: isBalanceLoading } = useUSDCBalance();
+    const { positions, totalPositionsValue, isLoading: isPositionsLoading } = usePolymarketPositions();
+
+    // Suma total: USDC + Valor de Posiciones
+    const totalPortfolioValue = (parseFloat(usdcBalance) + totalPositionsValue).toFixed(2);
 
     return {
-        markets,
-        isLoading,
-        error
+        usdcBalance,
+        positions,
+        totalPortfolioValue,
+        isLoading: isBalanceLoading || isPositionsLoading
     };
 }
