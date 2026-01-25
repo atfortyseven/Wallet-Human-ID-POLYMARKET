@@ -15,9 +15,9 @@ export default function CrystallineDashboard() {
     const [activeTab, setActiveTab] = useState<"NEWS" | "WALLET" | "LEADERBOARD">("NEWS");
 
     return (
-        <main className="min-h-screen text-white font-sans selection:bg-indigo-500/30">
-            <Background />
-            <Masthead />
+        <main className="min-h-screen text-white font-sans selection:bg-indigo-500/30 bg-transparent">
+            {/* Background handled by layout */}
+            {/* Masthead handled by layout */}
 
             <GlassDock activeTab={activeTab} onTabChange={setActiveTab} />
 
