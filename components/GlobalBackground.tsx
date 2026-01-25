@@ -18,10 +18,13 @@ const GlobalBackground = () => {
 
     return (
         <div className={styles.backgroundContainer}>
-            <img
-                src="/background.gif" // Using the GIF file as requested (mapping 'globe-background.gif' request to actual file 'background.gif')
-                alt="Globe Background"
-                className={styles.globeVideo} // Reusing the class for styling
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                src="/background2.mp4"
+                className={styles.globeVideo}
             />
         </div>
     );
