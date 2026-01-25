@@ -11,6 +11,9 @@ export interface NewsItem {
     time: string;
     source: string;
     imageUrl: string;
+    // New fields for processing
+    date?: string;
+    url?: string;
 }
 
 // --- CONFIG ---
