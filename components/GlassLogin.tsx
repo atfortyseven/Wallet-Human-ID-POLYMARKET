@@ -9,10 +9,11 @@ import { useRouter } from "next/navigation";
 import WorldIDButton from "./WorldIDButton";
 
 export default function GlassLogin() {
-    const [isDiving, setIsDiving] = useState(false);
-    const router = useRouter();
+    // const [isDiving, setIsDiving] = useState(false);
+    // const router = useRouter();
 
     // Esta función se ejecuta DENTRO del widget de World ID (loading state)
+    /*
     const verifyProof = async (proof: any) => {
         try {
             const res = await fetch("/api/auth/verify-world-id", {
@@ -40,8 +41,10 @@ export default function GlassLogin() {
             throw new Error(error.message || "Verification Failed"); // El widget mostrará error
         }
     };
+    */
 
     // Esta función se ejecuta DESPUÉS de que el widget muestre éxito
+    /*
     const onWidgetSuccess = () => {
         toast.dismiss();
         toast.success("Identity Verified: Human confirmed");
@@ -54,6 +57,7 @@ export default function GlassLogin() {
             router.push("/mercados");
         }, 1500);
     };
+    */
 
     const diveVariants = {
         initial: {
@@ -79,7 +83,7 @@ export default function GlassLogin() {
         <motion.div
             variants={diveVariants}
             initial="initial"
-            animate={isDiving ? "diving" : "animate"}
+            animate="animate"
             className="relative w-full max-w-[340px] overflow-hidden rounded-3xl border border-white/10 bg-gray-900/30 backdrop-blur-2xl shadow-2xl ring-1 ring-white/5"
         >
             {/* Efecto de brillo superior */}
@@ -108,10 +112,8 @@ export default function GlassLogin() {
 
                 {/* Tu Botón de World ID */}
                 <div className="w-full">
-                    <WorldIDButton
-                        verifyProof={verifyProof}
-                        onVerificationSuccess={onWidgetSuccess}
-                    />
+                    {/* Versión Debug sin props */}
+                    <WorldIDButton />
                 </div>
 
                 {/* Footer pequeño */}
