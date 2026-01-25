@@ -79,8 +79,9 @@ export class NewsDataService {
     }
 
     private static async fetchRaw(params: URLSearchParams): Promise<{ articles: NewsArticle[], nextPage: string | null }> {
-        // Warning: Direct caching here might be tricky if we want fresh news per category
-        // But revalidate: 900 (15 min) is reasonable.
+        // Enforce images from API side if possible
+        params.append('image', '1');
+
         const response = await fetch(`${this.BASE_URL}?${params.toString()}`, {
             next: { revalidate: 900 },
         });
@@ -92,17 +93,20 @@ export class NewsDataService {
             return { articles: [], nextPage: null };
         }
 
-        const articles = (data.results as any[] || []).map((article: any) => ({
-            id: article.article_id,
-            title: article.title,
-            link: article.link,
-            description: article.description || "Sin descripción disponible.",
-            content: article.content || article.description || "",
-            pubDate: article.pubDate,
-            source: article.source_id,
-            imageUrl: article.image_url || null,
-            category: article.category || [],
-        }));
+        const articles = (data.results as any[] || [])
+            .map((article: any) => ({
+                id: article.article_id,
+                title: article.title,
+                link: article.link,
+                description: article.description || "Sin descripción disponible.",
+                content: article.content || article.description || "",
+                pubDate: article.pubDate,
+                source: article.source_id,
+                imageUrl: article.image_url || null,
+                category: article.category || [],
+            }))
+            // Strict Filter: Remove any article without an image
+            .filter((article: NewsArticle) => article.imageUrl !== null && article.imageUrl !== "");
 
         return { articles, nextPage: data.nextPage };
     }
