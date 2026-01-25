@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, ArrowRight, Wallet, AlertCircle, Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
-import { useSendTransaction, useWriteContract, useEstimateGas, useBalance, useAccount, useChainId } from "wagmi";
+import { useSendTransaction, useWriteContract, useEstimateGas, useBalance, useAccount, useChainId, useConnect } from "wagmi";
 import { parseEther, parseUnits, isAddress, formatEther, formatUnits } from "viem";
 import { toast } from "sonner";
 import { getUsdcAddress } from "@/config/tokens";
@@ -115,7 +115,14 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
         }
     };
 
+    const { connect, connectors } = useConnect();
+
     const handleSend = async () => {
+        if (!address) {
+            toast.info("Connecting wallet...");
+            connect({ connector: connectors[0] }); // Try injected
+            return;
+        }
         if (!isAddress(recipient)) {
             toast.error("Invalid recipient address");
             return;
@@ -291,20 +298,21 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
 
                                         {/* Action Button */}
                                         <button
-                                            disabled={status === "SIGNING" || status === "SENDING" || !amount || !recipient}
+                                            disabled={status === "SIGNING" || status === "SENDING" || !amount || !recipient || !address}
                                             onClick={handleSend}
                                             className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-white shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                         >
-                                            {status === "SIGNING" || status === "SENDING" ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    {status === "SIGNING" ? "Check Wallet..." : "Sending..."}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Send Assets <ArrowRight className="w-5 h-5" />
-                                                </>
-                                            )}
+                                            {!address ? "Connect Wallet" :
+                                                status === "SIGNING" || status === "SENDING" ? (
+                                                    <>
+                                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                                        {status === "SIGNING" ? "Check Wallet..." : "Sending..."}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Send Assets <ArrowRight className="w-5 h-5" />
+                                                    </>
+                                                )}
                                         </button>
                                     </>
                                 )}

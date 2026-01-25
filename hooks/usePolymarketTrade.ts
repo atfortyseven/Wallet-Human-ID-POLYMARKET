@@ -66,7 +66,8 @@ export function usePolymarketTrade() {
 
     const trade = async (side: "BUY" | "SELL", amount: string, price: number, tokenId: string) => {
         if (!address) {
-            toast.error("Wallet not connected");
+            toast.error("Please connect your wallet first");
+            // Optionally try to auto-connect here if you have access to connectors
             return;
         }
 
