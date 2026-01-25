@@ -7,7 +7,7 @@
                 "node"
             ],
             "variables": {
-                "NIXPACKS_NODE_VERSION": "22.13.0"
+                "NIXPACKS_NODE_VERSION": "20.12.0"
             }
         }
     },
