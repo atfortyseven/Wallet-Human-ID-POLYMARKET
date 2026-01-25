@@ -32,17 +32,19 @@ export async function POST(req: Request) {
         }
 
         // 2. Verificar la prueba con la API de Worldcoin (Server-to-Server)
-        const app_id = process.env.WLD_APP_ID || process.env.NEXT_PUBLIC_WLD_APP_ID;
-        const action_id = process.env.NEXT_PUBLIC_WLD_ACTION || "";
+        // Usamos trim() para evitar errores por espacios en blanco accidentales al copiar/pegar
+        const raw_app_id = process.env.WLD_APP_ID || process.env.NEXT_PUBLIC_WLD_APP_ID || "";
+        const app_id = raw_app_id.trim();
+        const action_id = (process.env.NEXT_PUBLIC_WLD_ACTION || "").trim();
 
         // DEBUG: Logging para encontrar el error en Railway
         console.log("--- World ID Verification Debug ---");
-        console.log("App ID from Env:", app_id ? `${app_id.substring(0, 5)}...` : "UNDEFINED");
-        console.log("Action ID from Env:", action_id);
-        console.log("Payload Proof:", proof ? "Present" : "Missing");
+        console.log("App ID (processed):", app_id ? `${app_id.substring(0, 6)}...` : "UNDEFINED");
+        console.log("Action ID (processed):", action_id);
+        console.log("Target URL:", `https://developer.worldcoin.org/api/v1/verify/${app_id}`);
 
         if (!app_id) {
-            console.error("CRITICAL: WLD_APP_ID is missing in server environment variables.");
+            console.error("CRITICAL: WLD_APP_ID is missing or empty.");
             return NextResponse.json(
                 { error: "Server Configuration Error: Missing WLD_APP_ID" },
                 { status: 500 }
@@ -68,12 +70,29 @@ export async function POST(req: Request) {
             }
         );
 
-        const wldResponse = await verifyRes.json();
+        // LEEMOS TEXTO PRIMERO (Para evitar el crash "Unexpected token <")
+        const rawBody = await verifyRes.text();
+        console.log("Worldcoin API Raw Status:", verifyRes.status);
+
+        let wldResponse;
+        try {
+            wldResponse = JSON.parse(rawBody);
+        } catch (e) {
+            console.error("CRITICAL: Worldcoin API returned non-JSON. Likely HTML error page.");
+            console.error("Raw Body Preview:", rawBody.slice(0, 500));
+            return NextResponse.json(
+                {
+                    error: "Upstream API Error (Non-JSON)",
+                    details: "The Worldcoin API returned HTML instead of JSON. Check App ID.",
+                    raw_preview: rawBody.slice(0, 200),
+                    status: verifyRes.status
+                },
+                { status: 502 }
+            );
+        }
 
         if (!verifyRes.ok) {
-            console.error("Worldcoin API Error Response:", JSON.stringify(wldResponse, null, 2));
-            console.error("Status:", verifyRes.status, verifyRes.statusText);
-
+            console.error("Worldcoin API Error Response (Parsed):", JSON.stringify(wldResponse, null, 2));
             return NextResponse.json(
                 {
                     error: "Worldcoin Verification Failed",
