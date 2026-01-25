@@ -28,7 +28,7 @@ export function useUSDCBalance() {
         }
     });
 
-    const balance = data ? parseFloat(formatUnits(data, 6)).toFixed(2) : '0.00';
+    const balance = data ? parseFloat(formatUnits(data as bigint, 6)).toFixed(2) : '0.00';
 
     return { balance, isLoading, isError };
 }
