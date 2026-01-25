@@ -14,7 +14,9 @@ const GlobalBackground = () => {
     // Check if current path starts with any of the allowed routes to handle sub-paths if necessary, 
     // or exact match. The user logic used '.includes', which is broad. 
     // I'll stick to 'includes' to match their logic, but safe-guard against null pathname.
+    console.log("[GlobalBackground] Current path:", pathname);
     const mostrarGlobo = pathname ? rutasConGlobo.some(ruta => pathname.includes(ruta)) : false;
+    console.log("[GlobalBackground] Show Globe:", mostrarGlobo);
 
     if (!mostrarGlobo) {
         return null;

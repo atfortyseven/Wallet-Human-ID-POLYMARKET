@@ -42,7 +42,9 @@ export default function RootLayout({
                 >
                     <Web3Provider initialState={initialState}>
                         <GlobalBackground />
-                        {children}
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                            {children}
+                        </div>
                     </Web3Provider>
                 </ThemeProvider>
             </body>

@@ -2,11 +2,14 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9); /* Empieza un poco más pequeño y transparente */
+    transform: translate(-50%, -50%) scale(0.9);
+    /* Empieza un poco más pequeño y transparente */
   }
+
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1); /* Termina a tamaño normal y opaco */
+    transform: translate(-50%, -50%) scale(1);
+    /* Termina a tamaño normal y opaco */
   }
 }
 
@@ -15,9 +18,12 @@
   0% {
     transform: scale(1);
   }
+
   50% {
-    transform: scale(1.01); /* Muy ligero zoom */
+    transform: scale(1.01);
+    /* Muy ligero zoom */
   }
+
   100% {
     transform: scale(1);
   }
@@ -29,26 +35,34 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #000; /* Fondo negro puro */
-  z-index: -1;
+  background-color: #000;
+  /* Fondo negro puro */
+  z-index: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  pointer-events: none; /* No bloquea interacción con los elementos de la UI */
+  pointer-events: none;
+  /* No bloquea interacción con los elementos de la UI */
 }
 
 .globeVideo {
-  width: 350px; /* Tamaño fijo, "más alejado" */
-  max-width: 40vw; /* Responsivo para pantallas más pequeñas */
+  width: 350px;
+  /* Tamaño fijo, "más alejado" */
+  max-width: 40vw;
+  /* Responsivo para pantallas más pequeñas */
   height: auto;
-  filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.4)) /* Sombra de neón azul-cian */
-          drop-shadow(0 0 50px rgba(128, 0, 128, 0.2)); /* Sombra púrpura para profundidad */
-  
+  filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.4))
+    /* Sombra de neón azul-cian */
+    drop-shadow(0 0 50px rgba(128, 0, 128, 0.2));
+  /* Sombra púrpura para profundidad */
+
   /* Aplicar las animaciones */
-  animation: 
-    fadeIn 1.5s ease-out forwards, /* 1.5 segundos de fundido al cargar */
-    pulse 5s ease-in-out infinite alternate; /* Pulsación infinita, alternando */
+  animation:
+    fadeIn 1.5s ease-out forwards,
+    /* 1.5 segundos de fundido al cargar */
+    pulse 5s ease-in-out infinite alternate;
+  /* Pulsación infinita, alternando */
 }
 
 /* Para navegadores que pueden necesitar prefijos */
