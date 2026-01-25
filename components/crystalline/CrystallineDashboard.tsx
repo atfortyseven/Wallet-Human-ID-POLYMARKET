@@ -8,7 +8,7 @@ import GlassDock from "./GlassDock";
 import NewsFeed from "./NewsFeed";
 import PolymarketGlassDashboard from "@/components/dashboard/PolymarketGlassDashboard";
 import WalletDashboard from "@/components/dashboard/WalletDashboard";
-import Leaderboard from "@/components/crystalline/Leaderboard";
+import { Leaderboard } from "@/components/crystalline/Leaderboard";
 import { Trophy } from "lucide-react";
 
 export default function CrystallineDashboard() {
