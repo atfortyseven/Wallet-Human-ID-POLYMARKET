@@ -26,13 +26,13 @@ export default function Leaderboard() {
     return (
         <div className="w-full max-w-5xl mx-auto space-y-8 pb-32 px-2 md:px-0">
             {/* HEADER SECTION */}
-            <div className="relative flex flex-col md:flex-row md:items-center justify-end gap-6 px-2 md:px-0 pt-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 md:px-0 pt-8">
 
                 {/* Titles */}
                 {/* Titles */}
-                <div className="space-y-4 w-full md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 text-center">
-                    <h2 className="flex items-center justify-center gap-3 text-3xl md:text-5xl font-serif text-white tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
-                        <Trophy className="w-8 h-8 text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+                {/* Titles */}
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-serif text-white tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
                         Global Leaderboard
                     </h2>
                     <p className="text-white/40 text-[10px] font-sans tracking-[0.15em] uppercase">
