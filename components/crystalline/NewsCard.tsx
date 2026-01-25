@@ -1,6 +1,9 @@
-import { ExternalLink, Clock, TrendingUp, TrendingDown } from 'lucide-react';
-import { useState } from 'react';
+```
+import { ExternalLink, Clock, TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { RelatedMarket } from './RelatedMarket';
+import { useWatchlist } from '@/lib/watchlist-store';
+import { toast } from 'sonner';
 
 interface NewsCardProps {
     title: string;
@@ -14,6 +17,26 @@ interface NewsCardProps {
 
 export const NewsCard = ({ title, image, url, source, timeAgo, isGradient = false, description }: NewsCardProps) => {
     const [imgError, setImgError] = useState(false);
+    const { isSaved, toggleItem } = useWatchlist();
+    // Hydration fix for zustand persist (optional but recommended)
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    const isFav = isSaved(url); // Using URL as unique ID for news
+
+    const handleFav = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleItem({
+            id: url,
+            type: 'news',
+            title: title,
+            meta: image
+        });
+        toast(isFav ? "Eliminado de favoritos" : "Añadido a favoritos", {
+            icon: isFav ? <Star size={16} /> : <Star size={16} fill="#EAB308" className="text-yellow-500" />
+        });
+    };
 
     // Formateo limpio de fecha
     const dateStr = timeAgo.includes('T')
@@ -33,16 +56,35 @@ export const NewsCard = ({ title, image, url, source, timeAgo, isGradient = fals
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col h-full bg-[#0D0D12] dark:bg-[#0D0D12] bg-white border border-black/5 dark:border-white/5 hover:border-blue-500/30 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-1"
+            className="group flex flex-col h-full bg-[#0D0D12] dark:bg-[#0D0D12] bg-white border border-black/5 dark:border-white/5 hover:border-blue-500/30 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-1 relative"
         >
+            {/* FAVORITE BUTTON (Top Right) */}
+            <button
+                onClick={handleFav}
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-black/60 transition-colors"
+            >
+                {mounted && (
+                    <Star
+                        size={16}
+                        className={`transition - colors duration - 300 ${ isFav ? 'text-yellow-500 fill-yellow-500' : 'text-white/60 hover:text-white' } `}
+                    />
+                )}
+            </button>
+
             {/* ZONA DE IMAGEN - Prioridad Visual Total */}
             <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-900">
-                {/* Sentiment Badge */}
+                {/* Sentiment Badge - Moved to Top Left below source or adjusted positioning if conflicting */}
+                {/* Let's keep sentiment Top/Right but shift it down or left? Or let the Star take priority top-right and move sentiment to top-left next to source? */}
+                {/* Actually, let's keep Sentiment Top Right but lower it, or put it bottom right of image? */}
+                {/* Simplified: Put Star Top Right. Put Sentiment Top Left next to Source Badge? Or Bottom Left of image? */}
+                {/* Decision: Put Sentiment Bottom Right of Image. */}
+                
                 {sentiment !== 'neutral' && (
-                    <div className={`absolute top-3 right-3 z-10 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border ${sentiment === 'bullish'
-                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                            : 'bg-red-500/20 text-red-400 border-red-500/30'
-                        }`}>
+                    <div className={`absolute bottom - 3 right - 3 z - 10 px - 2 py - 1 rounded text - [10px] font - bold uppercase tracking - wider backdrop - blur - md border ${
+    sentiment === 'bullish'
+        ? 'bg-green-500/80 text-white border-green-400/50'
+        : 'bg-red-500/80 text-white border-red-400/50'
+} `}>
                         <div className="flex items-center gap-1">
                             {sentiment === 'bullish' ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                             {sentiment}
