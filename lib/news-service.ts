@@ -93,20 +93,24 @@ export class NewsDataService {
             return { articles: [], nextPage: null };
         }
 
-        const articles = (data.results as any[] || [])
+        const rawResults = data.results as any[] || [];
+        console.log(`[DEBUG] Received ${rawResults.length} articles. Item 0 keys:`, rawResults.length > 0 ? Object.keys(rawResults[0]) : "Empty");
+
+        const articles = rawResults
             .map((article: any) => ({
                 id: article.article_id,
                 title: article.title,
-                link: article.link,
+                link: article.link || article.url,
                 description: article.description || "Sin descripción disponible.",
                 content: article.content || article.description || "",
                 pubDate: article.pubDate,
                 source: article.source_id,
-                imageUrl: article.image_url || null,
+                // ROBUST MAPPING: Check all common keys
+                imageUrl: article.image_url || article.urlToImage || article.image || article.cover || null,
                 category: article.category || [],
             }))
-            // Strict Filter: Remove any article without an image
-            .filter((article: NewsArticle) => article.imageUrl !== null && article.imageUrl !== "");
+            // RELAXED FILTER: Keep article even if image is null (SafeImage will handle fallback)
+            .filter((article: NewsArticle) => article.title && article.link);
 
         return { articles, nextPage: data.nextPage };
     }
