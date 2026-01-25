@@ -60,17 +60,17 @@ export async function POST(req: Request) {
             );
         }
 
-        // URL de verificación oficial de Worldcoin
+        // URL de verificación oficial de Worldcoin (V2)
         const verifyRes = await fetch(
-            `https://developer.worldcoin.org/api/v1/verify/${app_id}`,
+            `https://developer.worldcoin.org/api/v2/verify/${app_id}`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    action: action_id, // Asegúrate de que coincida con lo que pusiste en el frontend
-                    signal: signal,    // A veces signal se envía vacío o como string
+                    action: action_id,
+                    signal: signal,
                     proof,
                     merkle_root,
                     nullifier_hash,
