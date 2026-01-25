@@ -2,10 +2,10 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function ThemeToggle() {
+export function ThemeToggle() {
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -15,35 +15,22 @@ export default function ThemeToggle() {
 
     if (!mounted) return null;
 
-    const options = [
-        { id: "light", icon: Sun, label: "Light" },
-        { id: "system", icon: Monitor, label: "System" },
-        { id: "dark", icon: Moon, label: "Dark" },
-    ];
-
     return (
-        <div className="flex bg-black/10 border border-white/10 p-1 rounded-full backdrop-blur-sm -mx-1 mt-2">
-            {options.map((option) => {
-                const Icon = option.icon;
-                const isActive = theme === option.id;
-                return (
-                    <button
-                        key={option.id}
-                        onClick={() => setTheme(option.id)}
-                        className={`relative flex-1 flex justify-center py-1.5 rounded-full transition-all ${isActive ? "text-white" : "text-white/40 hover:text-white/70"
-                            }`}
-                    >
-                        {isActive && (
-                            <motion.div
-                                layoutId="theme-pill"
-                                className="absolute inset-0 bg-white/10 rounded-full border border-white/10 shadow-sm"
-                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            />
-                        )}
-                        <Icon className="w-3.5 h-3.5 relative z-10" strokeWidth={2} />
-                    </button>
-                );
-            })}
-        </div>
+        <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="relative p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-md overflow-hidden group"
+            aria-label="Toggle Theme"
+        >
+            <div className="relative z-10">
+                {theme === "dark" ? (
+                    <Moon size={20} className="text-blue-400 group-hover:text-blue-300 transition-colors" />
+                ) : (
+                    <Sun size={20} className="text-amber-500 group-hover:text-amber-400 transition-colors" />
+                )}
+            </div>
+
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </button>
     );
 }

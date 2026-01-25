@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useDisconnect, useConnect, useEnsName } from "wagmi";
 import { Copy, Check, LogOut, ChevronDown } from "lucide-react";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { toast } from "sonner";
 
 interface WalletConnectProps {

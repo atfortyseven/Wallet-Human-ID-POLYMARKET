@@ -4,7 +4,12 @@ import "./globals.css";
 import { headers } from 'next/headers'
 import { cookieToInitialState } from "wagmi";
 import { config } from "@/src/config/wagmi";
-import Web3Provider from "@/src/context/Web3Provider";
+import { UnifrakturMaguntia } from "next/font/google"; // Font logic moved up
+import { Toaster } from "sonner";
+import NetworkGuard from "@/components/guards/NetworkGuard";
+import Providers from "@/components/Providers";
+import BackgroundWrapper from "@/components/layout/BackgroundWrapper";
+import { Footer } from "@/components/layout/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const merriweather = Merriweather({
@@ -13,7 +18,6 @@ const merriweather = Merriweather({
     variable: "--font-merriweather"
 });
 
-import { UnifrakturMaguntia } from "next/font/google";
 const unifraktur = UnifrakturMaguntia({
     weight: "400",
     subsets: ["latin"],
@@ -26,13 +30,6 @@ export const metadata: Metadata = {
     description: "Identity-First Wallet for Prediction Markets",
 };
 
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import GlobalBackground from "@/components/GlobalBackground";
-import { Toaster } from "sonner";
-import NetworkGuard from "@/components/guards/NetworkGuard";
-
-// ... existing imports
-
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -43,21 +40,17 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${inter.variable} ${merriweather.variable} ${unifraktur.variable} font-sans`}>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <Web3Provider initialState={initialState}>
-                        <GlobalBackground />
-                        <NetworkGuard />
-                        <Toaster position="bottom-right" theme="dark" richColors closeButton />
-                        <div style={{ position: 'relative', zIndex: 1 }}>
+                <Providers initialState={initialState}>
+                    <BackgroundWrapper />
+                    <NetworkGuard />
+                    <Toaster position="bottom-right" theme="dark" richColors closeButton />
+                    <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                        <div className="flex-1">
                             {children}
                         </div>
-                    </Web3Provider>
-                </ThemeProvider>
+                        <Footer />
+                    </div>
+                </Providers>
             </body>
         </html>
     );

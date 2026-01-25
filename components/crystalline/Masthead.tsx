@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import WalletConnect from "@/components/wallet/WalletConnect";
+import { WalletControl } from "@/components/crystalline/WalletControl";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
 
 export default function Masthead() {
     return (
@@ -14,23 +16,25 @@ export default function Masthead() {
 
                 {/* Date/Meta - Left */}
                 <div className="hidden md:flex flex-col">
-                    <span className="text-xs font-serif text-white/40 italic">
+                    <span className="text-xs font-serif text-gray-500 dark:text-white/40 italic">
                         The Crystalline Ledger
                     </span>
-                    <span className="text-[10px] font-sans tracking-widest text-white/30 uppercase mt-1">
+                    <span className="text-[10px] font-sans tracking-widest text-gray-400 dark:text-white/30 uppercase mt-1">
                         {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                 </div>
 
                 {/* BRAND - Center */}
-                <h1 className="flex-1 text-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto font-serif text-3xl md:text-5xl text-white/90 tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
+                <h1 className="flex-1 text-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto font-serif text-3xl md:text-5xl text-gray-900 dark:text-white/90 tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
                     Polymarket News
                 </h1>
 
                 {/* NETWORK - Right */}
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:block h-8 w-[1px] bg-white/10 mx-2" />
-                    <WalletConnect />
+                <div className="flex items-center gap-3">
+                    <LanguageSelector />
+                    <ThemeToggle />
+                    <div className="hidden md:block h-6 w-[1px] bg-black/10 dark:bg-white/10 mx-1" />
+                    <WalletControl />
                 </div>
             </div>
         </motion.header>
