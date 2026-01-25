@@ -40,30 +40,13 @@ export default function NewsFeed() {
                         {/* Image Column */}
                         <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/40 md:bg-gradient-to-l opacity-50 z-10" />
-                            <Image
-                                src={`https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&q=80&w=600&keyword=${article.imageKeyword}`}
-                                // Fallback dinámico usando keywords de Unsplash Source si fuera necesario, 
-                                // pero para layout safe usamos una url base y podríamos variar parámetros o usar un placeholder service mejor.
-                                // Para cumplir con el prompt "imageKeyword: Para que la foto sea relevante", 
-                                // usaremos un truco de Unsplash Source si estuviera disponible, pero Unsplash Source está deprecado.
-                                // Usaremos imágenes fijas de alta calidad rotativas o buscaremos una solución mejor.
-                                // DADO QUE UNSPLASH SOURCE FALLA: Usaré 3-4 imágenes de stock de alta calidad rotando por ID para asegurar carga.
-                                // O MEJOR: Usaré la keyword en la URL de source.unsplash si funcionara, pero no.
-                                // SOLUCIÓN ROBUSTA: Usar safe images fijas.
-
-                                // REVISIÓN: El usuario pidió "imageKeyword".
-                                // Voy a simular la relevancia usando unas cuantas imágenes fijas bonitas.
-                                src={
-                                    article.category === "Elections" ? "https://images.unsplash.com/photo-1540910419868-474947cebacb?auto=format&fit=crop&q=80&w=600" :
-                                        article.category === "Crypto" ? "https://images.unsplash.com/photo-1518546305927-5a420f3463fb?auto=format&fit=crop&q=80&w=600" :
-                                            "https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&q=80&w=600"
-                                }
-                                alt={article.imageKeyword}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                                priority={article.id <= 2}
-                                unoptimized={true}
+                            src={article.imageUrl}
+                            alt={article.imageKeyword}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            priority={article.id <= 2}
+                            unoptimized={true}
                             />
                         </div>
 
