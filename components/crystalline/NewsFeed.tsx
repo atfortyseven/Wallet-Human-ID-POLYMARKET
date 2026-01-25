@@ -1,81 +1,77 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Category, NewsItem } from "@/data/news";
-import CategoryTabs from "@/components/crystalline/CategoryTabs";
+import { Category, NewsItem } from "@/data/news"; // Ensure this matches user's types
+import CategoryTabs, { CATEGORIES } from "@/components/crystalline/CategoryTabs";
 import NewsCard from "@/components/crystalline/NewsCard";
+import { toast } from "sonner";
 
 export default function NewsFeed() {
     const [activeCategory, setActiveCategory] = useState<Category>("Trending");
-    const [newsData, setNewsData] = useState<NewsItem[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    // Cache: Store loaded news by category to avoid refetching
+    const [newsCache, setNewsCache] = useState<Record<string, NewsItem[]>>({});
+
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch News from our API
+    // Initial Load (Trending)
     useEffect(() => {
-        async function fetchNews() {
-            try {
-                setLoading(true);
-                const response = await fetch('/api/news/sync');
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch news');
-                }
-
-                const data = await response.json();
-
-                if (data.articles && Array.isArray(data.articles)) {
-                    // Map API response to our UI NewsItem type
-                    const mappedArticles: NewsItem[] = data.articles.map((art: any) => ({
-                        id: art.id,
-                        headline: art.originalTitle,
-                        description: art.description || "No description available.",
-                        category: mapCategory(art.categories), // Helper function needed or simple logic
-                        time: new Date(art.date).toLocaleDateString(),
-                        source: art.source || "Polymarket News",
-                        imageUrl: art.image || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2832"
-                    }));
-
-                    setNewsData(mappedArticles);
-                    setError(null);
-                } else {
-                    setNewsData([]);
-                }
-
-            } catch (err) {
-                console.error("News Fetch Error:", err);
-                setError("Could not load real-time news.");
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchNews();
+        loadCategory("Trending");
     }, []);
 
-    // Filter Logic
-    const filteredNews = newsData.filter(item => {
-        if (activeCategory === "Trending") return true;
-        return item.category === activeCategory;
-    });
+    // Load category data (from cache or API)
+    const loadCategory = useCallback(async (category: Category) => {
+        // If already cached, don't fetch (unless we want to force refresh? For now, standard lazy loading)
+        // Check if key exists (even if empty array, it means we tried)
+        if (newsCache[category]) return;
 
-    // Helper to map API categories to our fixed UI categories
-    // NewsData.io returns array like ["technology", "business"]
-    function mapCategory(apiCategories: string[]): Category {
-        if (!apiCategories || apiCategories.length === 0) return "Trending";
+        setLoading(true);
+        setError(null);
 
-        const catString = apiCategories.join(' ').toLowerCase();
+        try {
+            console.log(`Fetching news for: ${category}`);
+            // Call our own API route which proxies to NewsData
+            const response = await fetch(`/api/news/sync?category=${encodeURIComponent(category)}`);
 
-        if (catString.includes('crypto') || catString.includes('bitcoin')) return "Crypto";
-        if (catString.includes('tech') || catString.includes('technology')) return "Tech";
-        if (catString.includes('science')) return "Climate & Science";
-        if (catString.includes('business') || catString.includes('finance')) return "Finance";
-        if (catString.includes('economy')) return "Economy";
-        if (catString.includes('politics')) return "Politics";
+            if (!response.ok) {
+                throw new Error('Failed to fetch news');
+            }
 
-        return "Trending"; // Fallback
-    }
+            const data = await response.json();
+
+            if (data.articles) {
+                setNewsCache(prev => ({
+                    ...prev,
+                    [category]: data.articles
+                }));
+            } else {
+                setNewsCache(prev => ({
+                    ...prev,
+                    [category]: []
+                }));
+            }
+
+        } catch (err) {
+            console.error("News Fetch Error:", err);
+            setError("No se pudieron cargar las noticias.");
+            toast.error("Error cargando noticias");
+        } finally {
+            setLoading(false);
+        }
+    }, [newsCache]);
+
+    // Handle Tab Selection
+    const handleCategorySelect = (cat: Category) => {
+        setActiveCategory(cat);
+        loadCategory(cat);
+    };
+
+    // Get Data for render
+    const currentNews = newsCache[activeCategory] || [];
+    // Show loading only if we have NO data for this category yet
+    const isCategoryLoading = loading && !newsCache[activeCategory];
 
     return (
         <div className="w-full max-w-7xl mx-auto space-y-4 pb-32 px-2 md:px-0">
@@ -83,14 +79,14 @@ export default function NewsFeed() {
             <div className="sticky top-16 md:top-20 z-30 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 pb-2 pt-2 -mx-4 px-4 md:mx-0 md:px-0">
                 <CategoryTabs
                     activeCategory={activeCategory}
-                    onSelect={setActiveCategory}
+                    onSelect={handleCategorySelect}
                 />
             </div>
 
-            {/* ERROR / API KEY MSG */}
-            {error && (
+            {/* ERROR MSG */}
+            {error && !currentNews.length && (
                 <div className="p-4 mb-4 text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg text-center text-sm">
-                    ⚠ {error}
+                    ⚠️ {error}
                 </div>
             )}
 
@@ -100,15 +96,15 @@ export default function NewsFeed() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4"
             >
                 <AnimatePresence mode="popLayout">
-                    {loading ? (
+                    {isCategoryLoading ? (
                         // Skeleton Loading State
-                        [1, 2, 3].map((n) => (
+                        [1, 2, 3, 4, 5, 6].map((n) => (
                             <div key={n} className="h-64 bg-white/5 rounded-2xl animate-pulse" />
                         ))
                     ) : (
-                        filteredNews.map((article, index) => (
+                        currentNews.map((article, index) => (
                             <NewsCard
-                                key={article.id}
+                                key={`${article.id}-${index}`} // Composite key to avoid dups if any
                                 article={article}
                                 priority={index < 6}
                             />
@@ -117,10 +113,10 @@ export default function NewsFeed() {
                 </AnimatePresence>
             </motion.div>
 
-            {/* Footer fallback */}
-            {!loading && filteredNews.length === 0 && (
+            {/* Empty State */}
+            {!isCategoryLoading && currentNews.length === 0 && (
                 <div className="py-20 text-center text-white/30 italic">
-                    {error ? "Please configure API keys to see real news." : "No trending news found right now."}
+                    {error ? "Intenta recargar la página." : "No se encontraron noticias para esta categoría."}
                 </div>
             )}
         </div>
