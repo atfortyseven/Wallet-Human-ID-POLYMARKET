@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner";
+
 import { motion } from "framer-motion";
 import { ShieldCheck, Wallet } from "lucide-react";
 import { useState } from "react";
@@ -10,14 +12,37 @@ export default function GlassLogin() {
     const [isDiving, setIsDiving] = useState(false);
     const router = useRouter();
 
-    const handleSuccess = () => {
-        // Trigger "Dive" animation
-        setIsDiving(true);
+    const handleSuccess = async (proof: any) => {
+        try {
+            // 1. Send proof to Backend for Verification & Sybil Check
+            toast.loading("Verifying Identity...");
 
-        // Divert focus and navigate after animation completes
-        setTimeout(() => {
-            router.push("/dashboard");
-        }, 2800); // Slightly before 3s to ensure smooth crossover
+            const res = await fetch("/api/auth/verify-world-id", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(proof),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Verification failed");
+            }
+
+            // 2. Success Feedback
+            toast.dismiss();
+            toast.success("Identity Verified: Human confirmed");
+
+            // 3. Trigger Animation & Navigation
+            setIsDiving(true);
+            setTimeout(() => {
+                router.push("/dashboard");
+            }, 2800);
+
+        } catch (error: any) {
+            console.error(error);
+            toast.dismiss();
+            toast.error(error.message || "Verification Failed");
+        }
     };
 
     const diveVariants = {
