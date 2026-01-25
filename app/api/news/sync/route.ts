@@ -24,11 +24,11 @@ export async function GET(request: Request) {
             id: news.id,
             originalTitle: news.title,
             source: news.source,
-            image: news.imageUrl,
+            imageUrl: news.imageUrl, // Match NewsItem interface
             url: news.link,
             date: news.pubDate,
             description: news.description,
-            categories: news.category
+            category: category // Use the requested category to ensure fallback alignment
         }));
 
         return NextResponse.json({
