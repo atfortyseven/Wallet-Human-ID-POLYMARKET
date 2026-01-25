@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import NetworkSwitcher from "@/components/wallet/NetworkSwitcher";
+import WalletConnect from "@/components/wallet/WalletConnect";
 
 export default function Masthead() {
     return (
@@ -30,7 +30,7 @@ export default function Masthead() {
                 {/* NETWORK - Right */}
                 <div className="flex items-center gap-4">
                     <div className="hidden md:block h-8 w-[1px] bg-white/10 mx-2" />
-                    <NetworkSwitcher />
+                    <WalletConnect />
                 </div>
             </div>
         </motion.header>
