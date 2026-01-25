@@ -1,13 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image, { ImageProps } from "next/image";
-import { cn } from "@/lib/utils"; // Assuming you have a utils file, if not I'll just use template literals or install clsx/tailwind-merge. I'll stick to template literals for safety if utils is missing, but usually standard Nextjs projects have it. I'll check first or just implement a simple join.
-
-// Simple class merger if utility is missing
-function classNames(...classes: (string | undefined | null | false)[]) {
-    return classes.filter(Boolean).join(" ");
-}
+import { cn } from "@/lib/utils";
 
 interface SafeImageProps extends Omit<ImageProps, "src"> {
     src?: string;
@@ -23,15 +18,27 @@ export default function SafeImage({
     ...props
 }: SafeImageProps) {
     const [error, setError] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    // Si no hay src o hubo error, mostramos el fallback
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Reiniciar estado si cambia el src
+    useEffect(() => {
+        setError(false);
+    }, [src]);
+
+    if (!mounted) return null; // Evitar hidratación mismatch simple
+
+    // Lógica de Fallback
     if (!src || error) {
         return (
-            <div className={classNames(
-                "flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-900 to-slate-900",
+            <div className={cn(
+                "flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-slate-800",
                 className
             )}>
-                <span className="text-white/20 font-serif font-bold italic text-2xl tracking-widest uppercase">
+                <span className="text-white/10 font-serif font-bold italic text-3xl tracking-widest uppercase select-none">
                     {fallbackCategory}
                 </span>
             </div>

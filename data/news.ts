@@ -11,10 +11,9 @@ export interface NewsItem {
     time: string;
     source: string;
     imageUrl: string;
-    imageKeyword: string; // Used for fallback or debugging
 }
 
-// --- GENERATION CONFIG ---
+// --- CONFIG ---
 
 const CATEGORIES: Category[] = [
     "Trending", "Breaking", "New", "Politics", "Sports", "Crypto",
@@ -24,95 +23,109 @@ const CATEGORIES: Category[] = [
 
 const ITEMS_PER_CATEGORY = 50;
 
-const PREFIXES = ["Breaking:", "Update:", "Analysis:", "Exclusive:", "Report:", "Live:", "Just In:", "Forecast:", "Alert:", "Deep Dive:"];
-
-const TOPICS: Record<Category, { subjects: string[], actions: string[], keywords: string[] }> = {
+// Procedural Generators
+const GENERATORS: Record<string, { subjects: string[], verbs: string[], complements: string[], keywords: string[] }> = {
     Trending: {
-        subjects: ["Bitcoin", "Taylor Swift", "SpaceX", "AI Model", "Super Bowl", "Election Polls"],
-        actions: ["breaks internet records", "surges in popularity", "faces controversy", "announces surprise tour", "launches new rocket"],
-        keywords: ["crowd", "concert", "rocket", "bitcoin", "celebrity"]
+        subjects: ["Taylor Swift", "SpaceX Starship", "Viral TikTok Trend", "New iPhone", "ChatGPT-5", "Super Bowl"],
+        verbs: ["breaks internet records", "surges in popularity", "faces backlash", "dominates headlines", "launches globally"],
+        complements: ["after surprise announcement", "amidst fan frenzy", "following leaked video", "despite controversy", "in historic moment"],
+        keywords: ["concert", "rocket", "phone", "technology", "crowd"]
     },
     Breaking: {
-        subjects: ["White House", "Federal Reserve", "NASA", "UN Security Council", "TSA", "CDC"],
-        actions: ["declares state of emergency", "issues warning", "releases classified report", "holds press conference", "shuts down operations"],
-        keywords: ["siren", "police", "press conference", "emergency", "breaking news"]
+        subjects: ["Federal Reserve", "White House", "NASA", "European Union", "WHO", "Supreme Court"],
+        verbs: ["declares emergency", "issues red alert", "announces lockdown", "passes historic bill", "confirms report"],
+        complements: ["effective immediately", "shocking markets", "citing security concerns", "in unanimous decision", "after overnight summit"],
+        keywords: ["siren", "police", "press", "government", "emergency"]
     },
     New: {
-        subjects: ["Startup", "Gadget", "App", "Protocol", "Design Trend", "Beta Feature"],
-        actions: ["launches today", "goes viral on TikTok", "secures Series A funding", "disrupts the market", "opens waitlist"],
-        keywords: ["startup", "phone", "app", "launch", "rocket"]
+        subjects: ["Revolutionary App", "Hidden Feature", "Beta Protocol", "Crypto Wallet", "Design System", "Startup"],
+        verbs: ["launches today", "goes live", "secures funding", "disrupts industry", "opens waitlist"],
+        complements: ["promising 10x growth", "backed by Y Combinator", "with AI integration", "solving major pain point", "for early adopters"],
+        keywords: ["startup", "launch", "rocket", "code", "app"]
     },
     Politics: {
-        subjects: ["Congress", "Senate", "Supreme Court", "The President", "GOP", "Democrats"],
-        actions: ["votes on critical bill", "blocks legislation", "debates new policy", "faces backlash", "rallies supporters"],
-        keywords: ["capitol", "white house", "flag", "politics", "vote"]
+        subjects: ["Senate Leader", "Congress", "The President", "GOP Nominee", "Democratic Party", "Supreme Court Justice"],
+        verbs: ["blocks legislation", "vetoes bill", "calls for investigation", "rallies supporters", "leaks memo"],
+        complements: ["ahead of midterms", "sparking debate", "change in policy", "regarding tax reform", "on border security"],
+        keywords: ["capitol", "flag", "vote", "politics", "white house"]
     },
     Sports: {
-        subjects: ["NBA Finals", "NFL Draft", "Champions League", "F1 Grand Prix", "UFC Title Fight", "Olympics"],
-        actions: ["ends in dramatic finish", "sees record breaking performance", "postponed due to weather", "attracts millions of viewers", "ends in upset"],
-        keywords: ["stadium", "basketball", "soccer", "race car", "athlete"]
+        subjects: ["LeBron James", "Manchester City", "Max Verstappen", "Kansas City Chiefs", "UFC Champion", "Olympic Team"],
+        verbs: ["wins championship", "breaks world record", "signs massive contract", "suffers injury", "demands trade"],
+        complements: ["in stunning uptime", "shocking the world", "worth $500 million", "ending season early", "before playoffs"],
+        keywords: ["stadium", "athlete", "soccer", "basketball", "race car"]
     },
     Crypto: {
-        subjects: ["Bitcoin", "Ethereum", "Solana", "DeFi TVL", "NFT Market", "Coinbase"],
-        actions: ["smashes resistance", "drops 10%", "integrates new layer 2", "faces sec scrutiny", "partners with BlackRock"],
-        keywords: ["bitcoin", "ethereum", "blockchain", "crypto", "trading"]
+        subjects: ["Bitcoin", "Ethereum ETF", "Solana", "Binance", "BlackRock", "Satoshi Nakamoto"],
+        verbs: ["smashes $100k", "suffers flash crash", "implements hard fork", "receives SEC approval", "moves 10,000 BTC"],
+        complements: ["triggering bull run", "wiping out shorts", "improving scalability", "opening institutional gates", "from dormant wallet"],
+        keywords: ["bitcoin", "crypto", "blockchain", "chart", "ethereum"]
     },
     Finance: {
-        subjects: ["S&P 500", "Goldman Sachs", "Interest Rates", "Inflation", "Oil Prices", "Housing Market"],
-        actions: ["hits all time high", "plummets on earnings", "stabilizes after crash", "predicts recession", "outperforms expectations"],
-        keywords: ["stock market", "chart", "money", "finance", "wall street"]
+        subjects: ["S&P 500", "Goldman Sachs", "Inflation Rate", "Oil Prices", "Housing Market", "Federal Reserve"],
+        verbs: ["hits all-time high", "plummets drastically", "exceeds expectations", "signals recession", "stabilizes"],
+        complements: ["driven by tech sector", "worrying investors", "despite rate hikes", "crushing home buyers", "after volatile week"],
+        keywords: ["stock", "money", "wall street", "finance", "graph"]
     },
     Geopolitics: {
-        subjects: ["NATO", "China", "Russia", "Middle East", "EU Commission", "Trade War"],
-        actions: ["imposes new sanctions", "signs peace treaty", "deploys troops", "holds summit", "issues ultimatum"],
+        subjects: ["NATO Alliance", "China", "Russia", "UN Security Council", "Middle East Treaty", "G7 Leaders"],
+        verbs: ["mobilizes troops", "imposes sanctions", "signs peace deal", "issues ultimatum", "holds crisis summit"],
+        complements: ["escalating tensions", "targeting economy", "ending decades of conflict", "warning of consequences", "in Geneva"],
         keywords: ["map", "globe", "flag", "army", "diplomacy"]
     },
     Earnings: {
         subjects: ["Apple", "Tesla", "Nvidia", "Amazon", "Microsoft", "Netflix"],
-        actions: ["beats revenue estimates", "misses profit targets", "announces buyback", "warns of supply chain issues", "soars in after hours"],
-        keywords: ["chart", "money", "meeting", "finance", "stock"]
+        verbs: ["crushes earnings", "misses revenue", "announces stock split", "guides lower", "buys back shares"],
+        complements: ["sending stock soaring", "dropping 15%", "attracting retail investors", "blaming supply chain", "boosting dividend"],
+        keywords: ["chart", "meeting", "money", "office", "presentation"]
     },
     Tech: {
-        subjects: ["OpenAI", "Google Gemini", "Quantum Computer", "Robot", "VR Headset", "Microchip"],
-        actions: ["achieves AGI milestone", "fails turing test", "unveiled at CES", "replaces human workers", "becomes open source"],
-        keywords: ["robot", "computer", "code", "technology", "vr"]
+        subjects: ["OpenAI", "Quantum Computer", "Google Gemini", "Humanoid Robot", "Neuralink", "VR Headset"],
+        verbs: ["achieves AGI", "solves math problem", "passes Turing test", "learns to walk", "implants chip"],
+        complements: ["scaring experts", "faster than supercomputer", "fooling humans", "without assistance", "in first human trial"],
+        keywords: ["robot", "computer", "vr", "technology", "cyber"]
     },
     Culture: {
-        subjects: ["Hollywood", "Music Awards", "Modern Art", "Viral Meme", "Fashion Week", "Streaming Service"],
-        actions: ["creates chaos", "sets new trend", "canceled after tweet", "dominates conversation", "wins best picture"],
-        keywords: ["concert", "fashion", "art", "cinema", "music"]
+        subjects: ["Hollywood Strike", "Viral Meme", "Music Festival", "Modern Art", "Fashion Week", "Streaming Giant"],
+        verbs: ["ends after months", "takes over internet", "sells out instantly", "confuses critics", "sets new trend"],
+        complements: ["costing billions", "generating millions of views", "attracting huge crowds", "selling for $50M", "showcasing bitter rivalry"],
+        keywords: ["cinema", "concert", "fashion", "art", "music"]
     },
     World: {
-        subjects: ["UN", "Global Population", "Pandemic Treaty", "Ocean Cleanup", "Space Station", "Antarctica"],
-        actions: ["reaches critical mass", "signs historic accord", "discovers new species", "launches mission", "melts faster than expected"],
-        keywords: ["earth", "people", "city", "nature", "world"]
+        subjects: ["Global Population", "Amazon Rainforest", "Antarctica", "Ocean Cleanup", "Space Station", "Pandemic Treaty"],
+        verbs: ["hits 8 billion", "faces tipping point", "loses ice shelf", "removes plastic", "welcomes astronauts"],
+        complements: ["presenting new challenges", "requiring urgent action", "raising sea levels", "milestone achieved", "for 6 month mission"],
+        keywords: ["earth", "nature", "city", "world", "people"]
     },
     Economy: {
-        subjects: ["Jobs Report", "GDP Growth", "Consumer Spending", "Manufacturing", "Supply Chain", "Minimum Wage"],
-        actions: ["exceeds forecast", "slows down", "rebounds strongly", "stalls due to strikes", "increases incrementally"],
-        keywords: ["factory", "money", "shopping", "economy", "worker"]
+        subjects: ["Unemployment Rate", "GDP Growth", "Consumer Spending", "Manufacturing Output", "National Debt", "Minimum Wage"],
+        verbs: ["drops to record low", "exceeds forecast", "slows down", "rebounds strongly", "crosses $34 trillion"],
+        complements: ["signaling strong economy", "defying recession fears", "worrying retailers", "indicating recovery", "sparking debate"],
+        keywords: ["factory", "worker", "money", "shopping", "economy"]
     },
-    Climate_Science: {
-        subjects: ["Global Warming", "Space Telescope", "New Vaccine", "Renewable Energy", "Mars Rover", "Ocean Temperature"],
-        actions: ["breaks heat records", "captures image of galaxy", "enters clinical trials", "surpasses coal", "lands successfully"],
-        keywords: ["nature", "space", "science", "solar panel", "forest"]
+    'Climate & Science': {
+        subjects: ["James Webb Telescope", "New Vaccine", "Solar Power", "Mars Colony", "Ocean Temperature", "Endangered Species"],
+        verbs: ["captures galaxy", "enters trials", "surpasses coal", "plans announced", "breaks heat record"],
+        complements: ["revealing early universe", "targeting cancer", "in energy mix", "by Elon Musk", "threatening coral reefs"],
+        keywords: ["space", "science", "nature", "solar", "telescope"]
     },
     Elections: {
-        subjects: ["Trump", "Biden", "Swing State", "Electoral College", "Debate", "Voter Turnout"],
-        actions: ["leads in new poll", "campaigns in Ohio", "secures endorsement", "attacks opponent", "faces legal challenge"],
-        keywords: ["vote", "ballot", "trump", "biden", "usa"]
+        subjects: ["Donald Trump", "Joe Biden", "Swing State Poll", "Electoral Map", "Voter Turnout", "Debate Stage"],
+        verbs: ["surges in lead", "struggles in key state", "shows dead heat", "predicts landslide", "prepares for face-off"],
+        complements: ["among independent voters", "worrying campaign staff", "in Pennsylvania", "according to FiveThirtyEight", "next Tuesday"],
+        keywords: ["vote", "ballot", "usa", "election", "candidate"]
     },
     Mentions: {
-        subjects: ["Polymarket", "Vitalik Buterin", "Prediction Markets", "Crypto Twitter", "Betting Odds", "Whale Alert"],
-        actions: ["mentioned on CNBC", "tweets about market efficiency", "predicts election outcome", "moves $10M USDC", "goes viral"],
-        keywords: ["twitter", "polymarket", "chart", "phone", "news"]
+        subjects: ["Polymarket", "Vitalik Buterin", "Prediction Odds", "Whale Trade", "Market Volume", "Crypto Twitter"],
+        verbs: ["predicts outcome", "praises platform", "shifts dramatically", "bets $5 Million", "hits record high"],
+        complements: ["correctly again", "calling it future of truth", "after breaking news", "on Trump victory", "during election night"],
+        keywords: ["twitter", "polymarket", "chart", "phone", "network"]
     }
 };
 
-// Handle category mapping for keys with special chars
-const getTopic = (cat: Category) => {
-    if (cat === "Climate & Science") return TOPICS["Climate_Science"];
-    return TOPICS[cat];
+const getGenerator = (cat: Category) => {
+    if (cat === "Climate & Science") return GENERATORS["Climate & Science"];
+    return GENERATORS[cat] || GENERATORS["Trending"];
 };
 
 const generateNews = (): NewsItem[] => {
@@ -120,46 +133,29 @@ const generateNews = (): NewsItem[] => {
     let idCounter = 1;
 
     CATEGORIES.forEach(category => {
-        const topic = getTopic(category);
+        const gen = getGenerator(category);
         for (let i = 0; i < ITEMS_PER_CATEGORY; i++) {
-            const prefix = PREFIXES[Math.floor(Math.random() * PREFIXES.length)];
-            const subject = topic.subjects[Math.floor(Math.random() * topic.subjects.length)];
-            const action = topic.actions[Math.floor(Math.random() * topic.actions.length)];
-            const keyword = topic.keywords[Math.floor(Math.random() * topic.keywords.length)];
+            const subject = gen.subjects[Math.floor(Math.random() * gen.subjects.length)];
+            const verb = gen.verbs[Math.floor(Math.random() * gen.verbs.length)];
+            const complement = gen.complements[Math.floor(Math.random() * gen.complements.length)];
+            const keyword = gen.keywords[Math.floor(Math.random() * gen.keywords.length)];
 
-            // Generate a deterministic-ish image URL so it doesn't change on every re-render but is unique per item
-            // Using unsplash source with specific sizing and keyword
-            const imageUrl = `https://images.unsplash.com/photo-${(1500000000000 + (idCounter * 123456)).toString().slice(0, 13)}?auto=format&fit=crop&w=800&q=80`;
-            // Note: Since real unsplash IDs correspond to specific photos, randomly generating IDs like above will likely result in 404s.
-            // Better approach as per user "Fail Safe": Use a set of Valid Base URLs and cycle them? 
-            // OR use the requested fail-safe component which handles the error gracefully.
-            // The prompt says "Guarantee absolute image visualization".
-            // Since I cannot guarantee random Unsplash IDs are valid, I will use a keyword-based source URL which usually redirects to a valid image,
-            // OR I will rely on the SafeImage component to show the gradient fallback if the random ID fails.
-            // Given the requirement "generate 800 items", I can't check 800 urls.
-            // I will use source.unsplash.com/random which IS supported by my next.config update (source.unsplash.com).
-            // Format: https://source.unsplash.com/800x600/?{keyword}&sig={id} to ensure consistency per ID.
-
-            const robustImageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keyword)}&sig=${idCounter}`;
+            // Unsplash Source URL with keyword for relevance
+            // Using random query param to potentially bust cache or provide variety if supported
+            const displayId = idCounter;
 
             allNews.push({
-                id: idCounter.toString(),
-                headline: `${prefix} ${subject} ${action} amid growing uncertainty`,
-                description: `Exclusive report on how ${subject} is reshaping the landscape of ${category}. Analysts suggest this could be a turning point.`,
+                id: displayId.toString(),
+                headline: `${subject} ${verb} ${complement}`,
+                description: `Detailed analysis: ${subject} has made headlines as it ${verb}. This development ${complement} is being closely watched by experts in ${category}.`,
                 category: category,
-                time: `${Math.floor(Math.random() * 59) + 1}m ago`,
-                source: "Polymarket Analytics",
-                imageUrl: robustImageUrl,
-                imageKeyword: keyword
+                time: `${Math.floor(Math.random() * 23) + 1}h ago`,
+                source: "Polymarket News",
+                imageUrl: `https://source.unsplash.com/800x600/?${encodeURIComponent(keyword)}&sig=${displayId}`
             });
             idCounter++;
         }
     });
-
-    // Shuffle array (Fisher-Yates) to mix categories if needed, but requirements say "Filter by category". 
-    // So keeping them ordered might be easier or shuffling and then filtering.
-    // Let's shuffle so the "All" view (if it existed) or the initial state looks dynamic.
-    // Actually, prompt says "Default starts in Trending".
 
     return allNews;
 };
