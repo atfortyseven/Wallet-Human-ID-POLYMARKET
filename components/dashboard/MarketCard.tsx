@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { TrendingUp, BarChart3 } from "lucide-react";
+import { TrendingUp, BarChart3, Loader2 } from "lucide-react";
 import { Market } from "@/lib/polymarket";
+import { useState } from "react";
+import { usePolymarketBet } from "@/hooks/usePolymarketBet";
 
 interface MarketCardProps {
     market?: Market;
@@ -11,6 +13,14 @@ interface MarketCardProps {
 }
 
 export default function MarketCard({ market, isLoading }: MarketCardProps) {
+    const { placeBet, status } = usePolymarketBet();
+    const [betAmount, setBetAmount] = useState("10"); // Default 10 USDC
+
+    const handleBet = (outcome: "YES" | "NO") => {
+        if (!market) return;
+        placeBet(outcome, betAmount, market.id);
+    };
+
     if (isLoading || !market) {
         return (
             <div className="rounded-2xl border border-white/5 bg-white/5 p-4 h-[300px] animate-pulse">

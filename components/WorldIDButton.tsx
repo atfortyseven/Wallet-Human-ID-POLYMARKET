@@ -4,7 +4,7 @@ import { IDKitWidget, VerificationLevel } from "@worldcoin/idkit";
 import { useState } from "react";
 
 interface WorldIDButtonProps {
-  onVerificationSuccess?: () => void;
+  onVerificationSuccess?: (result: any) => void;
 }
 
 export default function WorldIDButton({ onVerificationSuccess }: WorldIDButtonProps) {
@@ -14,7 +14,7 @@ export default function WorldIDButton({ onVerificationSuccess }: WorldIDButtonPr
     console.log("Verified successfully", result);
     setDone(true);
     if (onVerificationSuccess) {
-      onVerificationSuccess();
+      onVerificationSuccess(result);
     }
   };
 
