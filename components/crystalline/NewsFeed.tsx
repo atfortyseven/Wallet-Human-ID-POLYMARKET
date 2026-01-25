@@ -1,5 +1,7 @@
 "use client";
-
+import { motion } from "framer-motion";
+import { Clock, TrendingUp } from "lucide-react";
+import Image from "next/image";
 import { NEWS_DATA } from "@/data/news";
 
 export default function NewsFeed() {
@@ -40,13 +42,14 @@ export default function NewsFeed() {
                         {/* Image Column */}
                         <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/40 md:bg-gradient-to-l opacity-50 z-10" />
-                            src={article.imageUrl}
-                            alt={article.imageKeyword}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            priority={article.id <= 2}
-                            unoptimized={true}
+                            <Image
+                                src={article.imageUrl}
+                                alt={article.imageKeyword || "News image"}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                                priority={article.id <= 2}
+                                unoptimized={true}
                             />
                         </div>
 
