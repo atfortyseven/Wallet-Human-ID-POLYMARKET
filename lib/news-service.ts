@@ -152,3 +152,5 @@ export class NewsDataService {
         }
     }
 }
+
+export const fetchNewsByCategory = NewsDataService.fetchByCategory.bind(NewsDataService);
