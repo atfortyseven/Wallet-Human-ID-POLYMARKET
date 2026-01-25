@@ -14,7 +14,7 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://polymarketwallet.com'),
+    metadataBase: new URL('https://polymarketwallet.up.railway.app'),
     title: "Polymarket Wallet | Secure Identity & Prediction Markets",
     description: "Identity-First Wallet for Prediction Markets",
 };

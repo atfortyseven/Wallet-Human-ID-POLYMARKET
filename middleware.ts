@@ -4,8 +4,7 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
     const origin = request.headers.get('origin');
     const allowedOrigins = [
-        'https://polymarketwallet.com',
-        'https://www.polymarketwallet.com',
+        'https://polymarketwallet.up.railway.app',
         'http://localhost:3000' // Keep localhost for dev
     ];
 
