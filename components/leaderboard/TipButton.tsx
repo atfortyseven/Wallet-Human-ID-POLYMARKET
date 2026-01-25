@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coins, Loader2, X } from "lucide-react";
-import { useTips } from "@/hooks/useTips";
+import { toast } from "sonner";
+import { useSocialHub } from "@/hooks/useSocialHub";
 
 interface TipButtonProps {
     traderName: string;
@@ -13,13 +14,23 @@ interface TipButtonProps {
 export default function TipButton({ traderName, traderAddress }: TipButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [amount, setAmount] = useState("");
-    const { sendTip, isPending } = useTips();
+    const [isPending, setIsPending] = useState(false); // Local loading state
+    const { sendTip } = useSocialHub();
 
     const handleTip = async () => {
         if (!amount || parseFloat(amount) <= 0) return;
-        await sendTip(traderAddress, amount);
-        setIsOpen(false);
-        setAmount("");
+
+        setIsPending(true);
+        try {
+            await sendTip(traderAddress, amount);
+            toast.success(`Tipped ${amount} USDC to ${traderName}!`);
+            setIsOpen(false);
+            setAmount("");
+        } catch (error: any) {
+            toast.error("Failed to send tip");
+        } finally {
+            setIsPending(false);
+        }
     };
 
     return (
