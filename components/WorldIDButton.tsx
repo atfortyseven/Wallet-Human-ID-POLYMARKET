@@ -22,8 +22,8 @@ export default function VerifyWorldID() {
 
   const onSuccess = (result: ISuccessResult) => {
     console.log("Verificación Exitosa 🎉:", result);
-    // REDIRECCIÓN A NEWS (Como pediste antes)
-    router.push("/news");
+    // REDIRECCIÓN A MERCADOS (Ruta válida)
+    router.push("/mercados");
   };
 
   const onError = (error: any) => {
