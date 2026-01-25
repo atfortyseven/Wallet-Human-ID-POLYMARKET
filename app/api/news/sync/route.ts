@@ -3,27 +3,32 @@ import { NextResponse } from 'next/server';
 import { NewsDataService } from '@/lib/news-service';
 import { generateSmartTitles } from '@/lib/ai-editor';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        // Fetch diverse news to populate all categories
-        const articles = await NewsDataService.fetchLatest('crypto OR technology OR business OR science OR politics');
+        const { searchParams } = new URL(request.url);
+        const category = searchParams.get('category') || 'Trending';
+
+        console.log(`[API] Fetching news for: ${category}`);
+
+        // Fetch using the new method with a limit of 20
+        const articles = await NewsDataService.fetchByCategory(category, 20);
 
         if (!articles.length) {
-            return NextResponse.json({ message: "No fresh news found (or API Key missing)" }, { status: 404 });
+            return NextResponse.json({
+                articles: [],
+                message: "No articles found"
+            });
         }
 
-        // Return up to 10 articles
-        // Note: AI title generation for ALL articles might be too slow/expensive for this demo, 
-        // using original titles + descriptions.
-        const mappedArticles = articles.slice(0, 10).map(news => ({
+        const mappedArticles = articles.map(news => ({
             id: news.id,
             originalTitle: news.title,
             source: news.source,
             image: news.imageUrl,
             url: news.link,
             date: news.pubDate,
-            description: news.description, // Pass the description/summary
-            categories: news.category // Pass original categories for filtering
+            description: news.description,
+            categories: news.category
         }));
 
         return NextResponse.json({
