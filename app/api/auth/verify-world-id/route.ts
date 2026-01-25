@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         }
 
         // 2. Verificar la prueba con la API de Worldcoin (Server-to-Server)
-        const app_id = process.env.WLD_APP_ID;
+        const app_id = process.env.WLD_APP_ID || process.env.NEXT_PUBLIC_WLD_APP_ID;
         const action_id = process.env.NEXT_PUBLIC_WLD_ACTION || "";
 
         // DEBUG: Logging para encontrar el error en Railway
