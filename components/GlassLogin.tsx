@@ -51,7 +51,7 @@ export default function GlassLogin() {
 
         // Reducimos el tiempo de espera para que sea más ágil
         setTimeout(() => {
-            router.push("/dashboard");
+            router.push("/mercados");
         }, 1500);
     };
 
