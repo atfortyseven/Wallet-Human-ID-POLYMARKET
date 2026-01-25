@@ -51,6 +51,15 @@ export async function POST(req: Request) {
             );
         }
 
+        // VALIDACIÓN DE FORMATO
+        if (!app_id.startsWith("app_")) {
+            console.error(`CRITICAL: Malformed App ID: ${app_id}. Must start with 'app_'.`);
+            return NextResponse.json(
+                { error: "Configuration Error: Invalid App ID Format", details: "App ID must start with 'app_'" },
+                { status: 500 }
+            );
+        }
+
         // URL de verificación oficial de Worldcoin
         const verifyRes = await fetch(
             `https://developer.worldcoin.org/api/v1/verify/${app_id}`,
