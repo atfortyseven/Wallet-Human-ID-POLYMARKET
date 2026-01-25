@@ -1,4 +1,4 @@
-```
+
 import { ExternalLink, Clock, TrendingUp, TrendingDown, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { RelatedMarket } from './RelatedMarket';
@@ -66,7 +66,7 @@ export const NewsCard = ({ title, image, url, source, timeAgo, isGradient = fals
                 {mounted && (
                     <Star
                         size={16}
-                        className={`transition - colors duration - 300 ${ isFav ? 'text-yellow-500 fill-yellow-500' : 'text-white/60 hover:text-white' } `}
+                        className={`transition - colors duration - 300 ${isFav ? 'text-yellow-500 fill-yellow-500' : 'text-white/60 hover:text-white'} `}
                     />
                 )}
             </button>
@@ -78,13 +78,12 @@ export const NewsCard = ({ title, image, url, source, timeAgo, isGradient = fals
                 {/* Actually, let's keep Sentiment Top Right but lower it, or put it bottom right of image? */}
                 {/* Simplified: Put Star Top Right. Put Sentiment Top Left next to Source Badge? Or Bottom Left of image? */}
                 {/* Decision: Put Sentiment Bottom Right of Image. */}
-                
+
                 {sentiment !== 'neutral' && (
-                    <div className={`absolute bottom - 3 right - 3 z - 10 px - 2 py - 1 rounded text - [10px] font - bold uppercase tracking - wider backdrop - blur - md border ${
-    sentiment === 'bullish'
-        ? 'bg-green-500/80 text-white border-green-400/50'
-        : 'bg-red-500/80 text-white border-red-400/50'
-} `}>
+                    <div className={`absolute bottom - 3 right - 3 z - 10 px - 2 py - 1 rounded text - [10px] font - bold uppercase tracking - wider backdrop - blur - md border ${sentiment === 'bullish'
+                            ? 'bg-green-500/80 text-white border-green-400/50'
+                            : 'bg-red-500/80 text-white border-red-400/50'
+                        } `}>
                         <div className="flex items-center gap-1">
                             {sentiment === 'bullish' ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                             {sentiment}
