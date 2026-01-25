@@ -68,13 +68,14 @@ export default function SafeImage({
         );
     }
 
+    // Use standard <img> for dynamic news sources to bypass Next.js restricted domain list
     return (
-        <Image
+        <img
             src={imgSrc}
             alt={alt}
             className={className}
             onError={handleOnError}
-            {...props}
+        // Pass simple props, excluding Next.js specific ones if they cause issues, but className is key
         />
     );
 }
