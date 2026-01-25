@@ -1,8 +1,11 @@
 import { createHash } from 'crypto';
 
-// Conjuntos globales (en memoria) para rastrear lo que el usuario ya vio en esta sesión
-const seenArticleIds = new Set<string>();
+// GLOBAL: Rastreo de imágenes para garantizar variedad visual en toda la sesión
 const seenImageUrls = new Set<string>();
+
+// NOTA: Hemos eliminado 'seenArticleIds' global. 
+// Ahora deduplicamos solo dentro del array actual para evitar que las noticias 
+// desaparezcan al navegar entre pestañas o recargar.
 
 export interface ProcessedNews {
     id: string;
@@ -11,10 +14,9 @@ export interface ProcessedNews {
     url: string;
     source: string;
     timeAgo: string;
-    isGradient: boolean; // Para saber si renderizar foto o gradiente elegante
+    isGradient: boolean;
 }
 
-// Función auxiliar para generar un gradiente único basado en texto (Fallback elegante)
 function generateUniqueGradient(text: string): string {
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
@@ -26,43 +28,45 @@ function generateUniqueGradient(text: string): string {
 }
 
 export const processNewsFeed = (rawArticles: any[]): ProcessedNews[] => {
+    // LOCAL: Deduplicación solo para el lote actual de noticias
+    const currentBatchIds = new Set<string>();
+
     return rawArticles
         .filter((article) => {
-            // 1. Filtrado de calidad básica
-            if (!article.title || article.title.length < 10) return false;
-            if (!article.url) return false;
+            // 1. Filtros de Calidad
+            if (!article.title || article.title.length < 5) return false;
 
-            // 2. DETECCIÓN DE NOTICIAS DUPLICADAS
-            // Usamos el ID o la URL como huella única
-            const uniqueId = article.article_id || article.url;
-            if (seenArticleIds.has(uniqueId)) return false;
+            // 2. Deduplicación Local (dentro de esta categoría)
+            const uniqueId = article.article_id || article.url || article.title;
 
-            seenArticleIds.add(uniqueId);
+            if (currentBatchIds.has(uniqueId)) return false;
+            currentBatchIds.add(uniqueId);
+
             return true;
         })
         .map((article) => {
-            let finalImage = article.image_url || article.image || article.imageUrl;
+            // 3. Lógica de "Visual Uniqueness" (Esta sí se mantiene global)
+            let finalImage = article.image || article.image_url;
             let isGradient = false;
 
-            // 3. DETECCIÓN DE FOTOS DUPLICADAS (Lógica Senior)
-            // Si la foto ya salió antes, O si no hay foto: Generamos un arte único.
+            // Si no hay imagen O si la imagen ya se usó en otra noticia -> Gradiente
             if (!finalImage || seenImageUrls.has(finalImage)) {
                 finalImage = generateUniqueGradient(article.title);
                 isGradient = true;
             } else {
+                // Registramos la imagen como "usada"
                 seenImageUrls.add(finalImage);
             }
 
             return {
-                id: article.article_id || article.url,
+                id: article.article_id || article.url || Math.random().toString(),
                 title: article.title,
                 image: finalImage,
-                url: article.url,
-                source: article.source_name || article.source || "Polymarket",
-                timeAgo: article.pubDate || article.publishedAt || article.time || new Date().toISOString(),
+                url: article.url || article.link,
+                source: article.source || article.source_name || "Polymarket",
+                timeAgo: article.time || article.pubDate || article.publishedAt || new Date().toISOString(),
                 isGradient
             };
         })
-        // Limitamos a 20 para mantener performance visual
         .slice(0, 20);
 };
