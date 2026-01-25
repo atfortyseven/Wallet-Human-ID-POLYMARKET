@@ -9,6 +9,16 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { proof, signal, merkle_root, nullifier_hash, verification_level, action } = body;
 
+        // 0. BYPASS DE EMERGENCIA (Para que puedas entrar al dashboard mientras arreglamos esto)
+        if (process.env.BYPASS_WORLD_ID === "true") {
+            console.log("⚠️ BYPASS_WORLD_ID enabled. Skipping verification.");
+            return NextResponse.json({
+                success: true,
+                verified: true,
+                nullifier_hash: "bypass-hash-" + Date.now()
+            });
+        }
+
         // 1. Validar que los datos existen
         if (!proof || !merkle_root || !nullifier_hash) {
             return NextResponse.json(
