@@ -13,6 +13,13 @@ const merriweather = Merriweather({
     variable: "--font-merriweather"
 });
 
+import { UnifrakturMaguntia } from "next/font/google";
+const unifraktur = UnifrakturMaguntia({
+    weight: "400",
+    subsets: ["latin"],
+    variable: "--font-unifraktur",
+});
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://polymarketwallet.up.railway.app'),
     title: "Polymarket Wallet | Secure Identity & Prediction Markets",
@@ -33,7 +40,7 @@ export default function RootLayout({
 
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.variable} ${merriweather.variable} font-sans`}>
+            <body className={`${inter.variable} ${merriweather.variable} ${unifraktur.variable} font-sans`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"

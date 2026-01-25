@@ -9,22 +9,6 @@
   }
 }
 
-/* Animación de pulsación sutil */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-    /* Un poco mas notorio si es full screen */
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
 .backgroundContainer {
   position: fixed;
   top: 0;
@@ -47,12 +31,11 @@
   height: 100%;
   object-fit: cover;
   /* Ocupa toda la pantalla */
+  display: block;
 
-  /* Filtros sutiles para look Web3 */
-  filter: brightness(0.8) contrast(1.2) drop-shadow(0 0 50px rgba(0, 255, 255, 0.2));
+  /* Filtros sutiles para look Web3 - Adjusted for GIF brightness */
+  filter: brightness(0.6) contrast(1.1);
 
   /* Aplicar las animaciones */
-  animation:
-    fadeIn 2s ease-out forwards,
-    pulse 10s ease-in-out infinite alternate;
+  animation: fadeIn 2s ease-out forwards;
 }

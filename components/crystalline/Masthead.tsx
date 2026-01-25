@@ -23,8 +23,8 @@ export default function Masthead() {
                 </div>
 
                 {/* BRAND - Center */}
-                <h1 className="flex-1 text-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto font-serif text-2xl md:text-3xl text-white/90 tracking-[0.1em] font-bold">
-                    POLYMARKET NEWS
+                <h1 className="flex-1 text-center md:absolute md:left-1/2 md:-translate-x-1/2 md:w-auto font-serif text-3xl md:text-5xl text-white/90 tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
+                    Polymarket News
                 </h1>
 
                 {/* NETWORK - Right */}
