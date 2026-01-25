@@ -26,30 +26,31 @@ export default function Leaderboard() {
     return (
         <div className="w-full max-w-5xl mx-auto space-y-8 pb-32 px-2 md:px-0">
             {/* HEADER SECTION */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 md:px-0">
+            <div className="relative flex flex-col md:flex-row md:items-center justify-end gap-6 px-2 md:px-0 pt-8">
 
                 {/* Titles */}
-                <div className="space-y-2">
-                    <h2 className="flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold text-white tracking-wide">
+                {/* Titles */}
+                <div className="space-y-4 w-full md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 text-center">
+                    <h2 className="flex items-center justify-center gap-3 text-3xl md:text-5xl font-serif text-white tracking-[0.05em] font-normal" style={{ fontFamily: 'var(--font-unifraktur)' }}>
                         <Trophy className="w-8 h-8 text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
                         Global Leaderboard
                     </h2>
-                    <p className="text-white/40 text-sm font-sans tracking-wider uppercase ml-1">
+                    <p className="text-white/40 text-[10px] font-sans tracking-[0.15em] uppercase">
                         Top Performers & Whales
                     </p>
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative w-full md:w-96 group">
-                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                        <Search className="w-4 h-4 text-white/40 group-focus-within:text-emerald-400 transition-colors" />
+                <div className="relative w-full md:w-64 group mt-4 md:mt-0">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <Search className="w-3.5 h-3.5 text-white/40 group-focus-within:text-emerald-400 transition-colors" />
                     </div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search by Name or Address..."
-                        className="w-full bg-white/5 border border-white/10 rounded-full py-3.5 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all shadow-lg shadow-black/20 backdrop-blur-md"
+                        className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all shadow-lg shadow-black/20 backdrop-blur-md placeholder:text-white/20"
                     />
                 </div>
             </div>
