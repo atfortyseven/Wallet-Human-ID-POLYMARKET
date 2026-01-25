@@ -1,18 +1,16 @@
 import { NextResponse } from 'next/server';
 import { fetchTopTraders } from '@/lib/leaderboard-service';
 
-export async function GET() {
-    try {
-        const traders = await fetchTopTraders();
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    // Leemos la página, por defecto es 1 si no viene nada
+    const page = parseInt(searchParams.get('page') || '1');
 
-        return NextResponse.json(traders, {
-            status: 200,
-            headers: {
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
-            },
-        });
-    } catch (error) {
-        console.error('[API Error] Leaderboard fetch failed:', error);
-        return NextResponse.json([], { status: 500 });
-    }
+    const traders = await fetchTopTraders(page);
+
+    return NextResponse.json(traders, {
+        headers: {
+            'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
+        },
+    });
 }
