@@ -9,32 +9,30 @@ const JWT_SECRET = new TextEncoder().encode(
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Allow access to admin login and API routes
-    if (
-        pathname.startsWith('/admin/login') ||
-        pathname.startsWith('/api/admin/login') ||
-        pathname.startsWith('/_next') ||
-        pathname.startsWith('/favicon')
-    ) {
-        return NextResponse.next();
+    // Admin route protection
+    if (pathname.startsWith('/admin')) {
+        // Allow access to admin login
+        if (pathname.startsWith('/admin/login')) {
+            return NextResponse.next();
+        }
+
+        // Check for admin authentication
+        const token = request.cookies.get('admin_token')?.value;
+
+        if (!token) {
+            return NextResponse.redirect(new URL('/admin/login', request.url));
+        }
+
+        try {
+            await jwtVerify(token, JWT_SECRET);
+        } catch (error) {
+            const response = NextResponse.redirect(new URL('/admin/login', request.url));
+            response.cookies.delete('admin_token');
+            return response;
+        }
     }
 
-    // Check for admin authentication
-    const token = request.cookies.get('admin_token')?.value;
-
-    if (!token) {
-        return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-
-    try {
-        await jwtVerify(token, JWT_SECRET);
-    } catch (error) {
-        const response = NextResponse.redirect(new URL('/admin/login', request.url));
-        response.cookies.delete('admin_token');
-        return response;
-    }
-
-    // Original CORS and security logic
+    // CORS and security logic for all routes
     const origin = request.headers.get('origin');
     const allowedOrigins = [
         'https://www.polymarketwallet.com',
