@@ -1,5 +1,9 @@
 "use client";
 
+import { useWorld } from "@/src/context/WorldContext";
+import NewsFeed from "@/components/crystalline/NewsFeed";
+import { Leaderboard } from "@/components/crystalline/Leaderboard";
+import { motion } from "framer-motion";
 import WalletSection from "@/components/WalletSection";
 
 export default function Home() {
