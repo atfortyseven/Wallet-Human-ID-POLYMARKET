@@ -1,6 +1,7 @@
 "use client";
 
 import { Cpu, Github, Globe, Heart, ShieldCheck, Twitter } from "lucide-react";
+import SystemStatus from "@/components/SystemStatus";
 
 export function Footer() {
     return (
@@ -65,6 +66,9 @@ export function Footer() {
                                 </span>
                             </div>
                         </div>
+                        <div className="pt-2 border-t border-white/5">
+                            <SystemStatus />
+                        </div>
                     </div>
                 </div>
 
@@ -77,6 +81,6 @@ export function Footer() {
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer >
     );
 }

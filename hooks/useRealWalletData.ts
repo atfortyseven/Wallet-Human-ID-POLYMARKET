@@ -2,7 +2,7 @@ import { useAccount, useBalance } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { matchNewsToMarket } from '@/utils/news-matcher';
-import { NewsItem } from '@/types/wallet';
+import { NewsItem, Position, Transaction } from '@/types/wallet';
 
 // Dirección de Bridged USDC en Polygon
 const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
@@ -42,7 +42,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = []) => {
 
 
     // 4. Procesamiento y Enriquecimiento de Datos
-    const positions = positionsRaw?.map((pos: any) => {
+    const positions: Position[] = positionsRaw?.map((pos: any) => {
         const currentPrice = parseFloat(pos.market.outcomePrices[pos.outcomeIndex]);
         const avgPrice = parseFloat(pos.avgPrice) || currentPrice;
         const size = parseFloat(pos.size);
@@ -68,7 +68,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = []) => {
         };
     }) || [];
 
-    const transactions = historyRaw?.map((trade: any) => ({
+    const transactions: Transaction[] = historyRaw?.map((trade: any) => ({
         id: trade.id,
         type: trade.side === 'BUY' ? 'BUY' : 'SELL',
         amount: (trade.size * trade.price).toFixed(2),

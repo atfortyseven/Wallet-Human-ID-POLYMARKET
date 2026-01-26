@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    compress: true,
+    poweredByHeader: false,
     images: {
         remotePatterns: [
             { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -13,11 +15,12 @@ const nextConfig = {
         ],
     },
     // OPTIMIZATION: Disable checks during deploy to prevent OOM/Timeouts
+    // OPTIMIZATION: Checks enabled for stability
     eslint: {
-        ignoreDuringBuilds: true,
+        ignoreDuringBuilds: false,
     },
     typescript: {
-        ignoreBuildErrors: true,
+        ignoreBuildErrors: false,
     },
     // ESTA PARTE ES SAGRADA: Mantiene viva la conexión Web3
     webpack: (config) => {

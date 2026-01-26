@@ -15,8 +15,9 @@ export const NewsGrid = ({ category }: { category: string }) => {
         const fetchNews = async () => {
             setLoading(true);
             try {
-                // Fetch a tu API interna
-                const res = await fetch(`/api/news/sync?category=${category}&t=${Date.now()}`);
+                // Fetch a tu API interna (Cache de 1 minuto)
+                const cacheBuster = Math.floor(Date.now() / 60000);
+                const res = await fetch(`/api/news/sync?category=${category}&t=${cacheBuster}`);
                 const rawData = await res.json();
 
                 if (isMounted) {

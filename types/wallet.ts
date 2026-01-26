@@ -13,11 +13,13 @@ export interface Position {
     marketTitle: string;
     outcome: 'YES' | 'NO';
     shares: number;
-    avgPrice: number;
-    currentPrice: number;
+    avgPrice?: number;
+    currentPrice?: number;
+    value?: number; // Hook adds this
     pnl: number;
     pnlPercent: number;
-    relatedNewsId?: string; // Link to Breaking News
+    relatedNewsId?: string;
+    newsContext?: string; // Hook adds this
 }
 
 export interface Transaction {

@@ -28,7 +28,7 @@ const unifraktur = UnifrakturMaguntia({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://polymarketwallet.up.railway.app'),
+    metadataBase: new URL('https://www.polymarketwallet.com'),
     title: "Polymarket Wallet | Secure Identity & Prediction Markets",
     description: "Identity-First Wallet for Prediction Markets",
 };

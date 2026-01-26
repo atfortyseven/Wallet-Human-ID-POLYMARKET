@@ -4,6 +4,8 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
     const origin = request.headers.get('origin');
     const allowedOrigins = [
+        'https://www.polymarketwallet.com',
+        'https://polymarketwallet.com',
         'https://polymarketwallet.up.railway.app',
         'http://localhost:3000' // Keep localhost for dev
     ];
@@ -34,6 +36,8 @@ export function middleware(request: NextRequest) {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: wss: data: blob:; img-src 'self' https: data: blob:; frame-ancestors 'none';");
+    response.headers.set('Permissions-Policy', "camera=(), microphone=(), geolocation=()");
 
     // Geo-Block logic (Compliance)
     const country = request.geo?.country || request.headers.get('x-vercel-ip-country') || 'XX';
