@@ -13,7 +13,7 @@ export default function LoginWithWorld() {
     const [isLoading, setIsLoading] = useState(false);
 
     // Configuración desde env
-    const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
+    const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}` || "app_affe7470221b57a8edee20b3ac30c484";
     const action = "login"; // Acción específica solicitada
 
     const handleVerify = async (proof: ISuccessResult) => {

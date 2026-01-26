@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Verificar la prueba con Worldcoin (Logic Step 2)
-        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as string;
+        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as string || "app_affe7470221b57a8edee20b3ac30c484";
         const action = "login"; // Debe coincidir con el frontend
 
         const verifyRes = await verifyWorldIDProof(
