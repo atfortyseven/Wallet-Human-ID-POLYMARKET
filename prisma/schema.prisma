@@ -61,6 +61,7 @@ model MarketProposal {
   marketCreatedAt   DateTime?
   
   // Polymarket Integration
+  proposalId        String?  @unique // On-chain bytes32 ID
   polymarketId      String?  @unique
   conditionId       String?
   
