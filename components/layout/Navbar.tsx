@@ -17,20 +17,24 @@ export function Navbar() {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    const navLinks = [
-        { href: '/', label: t('nav.home'), icon: <Home size={18} /> },
-        { href: '/favorites', label: t('nav.fav'), icon: <Heart size={18} /> },
-        { href: '/dashboard', label: t('nav.leaderboard'), icon: <BarChart2 size={18} /> },
-    ];
+    // Conditional Menu for Verified vs Unverified
+    const navLinks = isHuman
+        ? [
+            { href: '/', label: t('nav.home'), icon: <Home size={18} /> },
+            { href: '/favorites', label: t('nav.fav'), icon: <Heart size={18} /> },
+            { href: '/dashboard', label: t('nav.leaderboard'), icon: <BarChart2 size={18} /> },
+            // Add any verified-only links here if needed in future
+        ]
+        : [
+            { href: '/', label: t('nav.home'), icon: <Home size={18} /> },
+            { href: '/dashboard', label: t('nav.leaderboard'), icon: <BarChart2 size={18} /> },
+        ];
 
     return (
         <nav
             className={`
                 sticky top-0 z-50 w-full border-b transition-all duration-1000 ease-in-out
-                ${isHuman
-                    ? 'bg-[#0D0D12]/80 dark:bg-[#0D0D12]/80 bg-white/80 backdrop-blur-xl border-white/5 opacity-100 translate-y-0'
-                    : 'bg-black/20 backdrop-blur-[2px] border-transparent opacity-40 grayscale pointer-events-none select-none'
-                }
+                bg-[#0D0D12]/80 dark:bg-[#0D0D12]/80 bg-white/80 backdrop-blur-xl border-white/5 opacity-100 translate-y-0
             `}
         >
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">

@@ -1,11 +1,6 @@
 import { createHash } from 'crypto';
 
-// GLOBAL: Rastreo de imágenes para garantizar variedad visual en toda la sesión
-const seenImageUrls = new Set<string>();
-
-// NOTA: Hemos eliminado 'seenArticleIds' global. 
-// Ahora deduplicamos solo dentro del array actual para evitar que las noticias 
-// desaparezcan al navegar entre pestañas o recargar.
+// GLOBAL removed
 
 export interface ProcessedNews {
     id: string;
@@ -45,17 +40,13 @@ export const processNewsFeed = (rawArticles: any[]): ProcessedNews[] => {
             return true;
         })
         .map((article) => {
-            // 3. Lógica de "Visual Uniqueness" (Esta sí se mantiene global)
             let finalImage = article.image || article.image_url;
             let isGradient = false;
 
-            // Si no hay imagen O si la imagen ya se usó en otra noticia -> Gradiente
-            if (!finalImage || seenImageUrls.has(finalImage)) {
+            // Simple check: If no image, generate gradient
+            if (!finalImage) {
                 finalImage = generateUniqueGradient(article.title);
                 isGradient = true;
-            } else {
-                // Registramos la imagen como "usada"
-                seenImageUrls.add(finalImage);
             }
 
             return {
