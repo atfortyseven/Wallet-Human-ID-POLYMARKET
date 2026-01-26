@@ -1,9 +1,54 @@
 "use client";
 
-import React from "react";
-import { Copy, Menu, User } from "lucide-react";
+import React, { useState } from "react";
+import { Copy, Menu, User, Loader2 } from "lucide-react";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function VoidShell({ children }: { children: React.ReactNode }) {
+    const { address } = useAccount();
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+
+    // World ID Config
+    const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}` || "app_affe7470221b57a8edee20b3ac30c484"; // Fallback to ensure it works if env missing
+    const action = "login";
+
+    const handleVerify = async (proof: ISuccessResult) => {
+        setIsLoading(true);
+        const toastId = toast.loading("Verifying identity...");
+
+        try {
+            const res = await fetch("/api/auth/verify-world-id", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    proof,
+                    walletAddress: address,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Verification failed");
+
+            toast.dismiss(toastId);
+            toast.success("Identity Verified!");
+
+            // Redirect to Wallet as requested
+            router.push("/wallet");
+
+        } catch (error: any) {
+            console.error("Login Error:", error);
+            toast.dismiss(toastId);
+            toast.error(error.message || "Failed to verify");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-void text-white selection:bg-midgard/30 overflow-x-hidden relative">
 
@@ -43,9 +88,24 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
 
                 {/* User Controls (Right) */}
                 <div className="absolute right-6 top-4 hidden md:flex items-center gap-3">
-                    <button className="p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white">
-                        <User size={18} />
-                    </button>
+                    <IDKitWidget
+                        app_id={app_id}
+                        action={action}
+                        onSuccess={handleVerify}
+                        handleVerify={async (proof: ISuccessResult) => { return; }}
+                        verification_level={VerificationLevel.Orb}
+                    >
+                        {({ open }: { open: () => void }) => (
+                            <button
+                                onClick={open}
+                                disabled={isLoading}
+                                className="p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white disabled:opacity-50"
+                            >
+                                {isLoading ? <Loader2 size={18} className="animate-spin" /> : <User size={18} />}
+                            </button>
+                        )}
+                    </IDKitWidget>
+
                     <button className="p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white">
                         <Menu size={18} />
                     </button>
