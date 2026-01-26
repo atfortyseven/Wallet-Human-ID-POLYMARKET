@@ -63,7 +63,7 @@ export default function LoginWithWorld() {
                 app_id={app_id}
                 action={action}
                 onSuccess={handleVerify}
-                handleVerify={async (proof) => {
+                handleVerify={async (proof: ISuccessResult) => {
                     // Validamos en el onSuccess para manejar la respuesta del backend
                     // y la redirección correctamente.
                     // IDKit espera una promesa void o throw
