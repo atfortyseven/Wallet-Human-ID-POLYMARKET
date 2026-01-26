@@ -13,11 +13,11 @@ export async function POST(req: Request) {
         }
 
         console.log(`[Verify] 🔵 Attempting verification...`);
-        console.log(`[Verify] 🔹 URL: https://developer.worldcoin.org/api/v1/verify/${app_id}`);
+        console.log(`[Verify] 🔹 URL: https://developer.worldcoin.org/api/v2/verify/${app_id}`);
         console.log(`[Verify] 🔹 Action: ${action}`);
         console.log(`[Verify] 🔹 Payload Preview:`, JSON.stringify({ ...proof, action }).substring(0, 150) + "...");
 
-        const verifyRes = await fetch(`https://developer.worldcoin.org/api/v1/verify/${app_id}`, {
+        const verifyRes = await fetch(`https://developer.worldcoin.org/api/v2/verify/${app_id}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...proof, action }),
