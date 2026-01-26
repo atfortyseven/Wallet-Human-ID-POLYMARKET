@@ -41,8 +41,8 @@ export default function LoginWithWorld() {
             toast.dismiss(toastId);
             toast.success("Login successful!");
 
-            // Redirigir al dashboard como solicitado
-            router.push("/dashboard");
+            // Redirigir a wallet para ver el balance y DeFi
+            router.push("/wallet");
 
         } catch (error: any) {
             console.error("Login Error:", error);

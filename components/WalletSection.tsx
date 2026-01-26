@@ -17,6 +17,7 @@ import {
 import { ProposeMarket } from "@/components/governance/ProposeMarket";
 import { useAccount, useBalance } from "wagmi";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 import { useTokenPrice } from "@/hooks/useTokenPrice";
 import useSWR from "swr";
@@ -35,6 +36,7 @@ const formatAddress = (addr: string) =>
 export default function WalletSection() {
     // --- Hooks de Blockchain ---
     const { address, isConnected, chain } = useAccount();
+    const { isAuthenticated } = useAuth(); // World ID authentication
 
     const { price: wldPrice, isLoading: isPriceLoading } = useTokenPrice();
 
@@ -76,7 +78,7 @@ export default function WalletSection() {
     const unclaimedRoyalties = userStats?.unclaimedRoyalties || 0;
     const votingPower = userStats?.votingPower || 0;
     const activeProposals = userStats?.activeProposals || 0;
-    const isWorldIDVerified = true; // Still Mock until Context is fully integrated
+    const isWorldIDVerified = isAuthenticated; // Use actual auth status
 
     // --- Handlers ---
     const handleCopy = () => {
@@ -107,13 +109,14 @@ export default function WalletSection() {
 
     if (!mounted) return null;
 
-    if (!isConnected) {
+    // Allow access if either wallet is connected OR World ID is authenticated
+    if (!isConnected && !isAuthenticated) {
         return (
             <div className="w-full max-w-5xl mx-auto p-12 text-center">
                 <div className="bg-neutral-900/50 border border-neutral-800 rounded-3xl p-12 backdrop-blur-sm">
                     <Wallet className="w-16 h-16 text-neutral-600 mx-auto mb-6" />
-                    <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-                    <p className="text-neutral-400 mb-8">Access the Void Terminal to verify your humanity and manage your assets.</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">Authentication Required</h2>
+                    <p className="text-neutral-400 mb-8">Please sign in with World ID or connect your wallet to access the Void Terminal.</p>
                     {/* El botón de conectar suele estar en el Navbar, pero podríamos poner uno aquí */}
                 </div>
             </div>
