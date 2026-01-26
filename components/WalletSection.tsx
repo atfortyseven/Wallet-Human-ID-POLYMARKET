@@ -14,6 +14,7 @@ import {
     ExternalLink,
     Info
 } from "lucide-react";
+import { ProposeMarket } from "@/components/governance/ProposeMarket";
 
 // --- Utility: Formateador de Moneda Seguro ---
 const formatCurrency = (value: number) =>
@@ -28,7 +29,7 @@ const formatCrypto = (value: number, symbol: string) =>
 
 export default function WalletSection() {
     // --- Estado ---
-    const [activeTab, setActiveTab] = useState<'zap' | 'activity'>('zap');
+    const [activeTab, setActiveTab] = useState<'zap' | 'governance' | 'activity'>('zap');
     const [zapAmount, setZapAmount] = useState("");
     const [isZapping, setIsZapping] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -147,16 +148,16 @@ export default function WalletSection() {
                     </motion.div>
 
                     {/* 2. Action Center (Tabs + Content) */}
-                    <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden flex flex-col min-h-[400px]">
+                    <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden flex flex-col min-h-[500px]">
                         {/* Tabs Header */}
                         <div className="flex border-b border-neutral-800">
-                            {['zap', 'activity'].map((tab) => (
+                            {['zap', 'governance', 'activity'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab as any)}
-                                    className="relative flex-1 py-4 text-sm font-medium transition-colors outline-none"
+                                    className="relative flex-1 py-4 text-xs md:text-sm font-medium transition-colors outline-none"
                                 >
-                                    <span className={`relative z-10 ${activeTab === tab ? 'text-white' : 'text-neutral-500'}`}>
+                                    <span className={`relative z-10 tracking-widest ${activeTab === tab ? 'text-white' : 'text-neutral-500'}`}>
                                         {tab.toUpperCase()}
                                     </span>
                                     {activeTab === tab && (
@@ -170,14 +171,14 @@ export default function WalletSection() {
                         </div>
 
                         {/* Tab Content */}
-                        <div className="p-6 md:p-8 flex-1 relative">
+                        <div className="p-6 md:p-8 flex-1 relative overflow-hidden">
                             <AnimatePresence mode="wait">
                                 {activeTab === 'zap' ? (
                                     <motion.div
                                         key="zap-panel"
-                                        initial={{ opacity: 0, scale: 0.98 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.98 }}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
                                         className="h-full flex flex-col justify-center max-w-lg mx-auto"
                                     >
                                         <div className="text-center mb-8">
@@ -243,6 +244,16 @@ export default function WalletSection() {
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                                         </button>
 
+                                    </motion.div>
+                                ) : activeTab === 'governance' ? (
+                                    <motion.div
+                                        key="governance-panel"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        className="h-full"
+                                    >
+                                        <ProposeMarket />
                                     </motion.div>
                                 ) : (
                                     <motion.div
