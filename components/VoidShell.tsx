@@ -37,7 +37,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-4 text-sm font-medium text-neutral-400">
                         <a href="/" className="hover:text-white transition-colors">Feed</a>
                         <a href="/wallet" className="text-white">Wallet</a>
-                        <a href="/governance" className="hover:text-white transition-colors">Gov</a>
+                        <a href="/wallet" className="hover:text-white transition-colors">Gov</a>
                     </div>
                 </nav>
 
