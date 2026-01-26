@@ -81,10 +81,10 @@ export async function POST(request: NextRequest) {
                         data: { worldIdNullifierHash: nullifierHash },
                     });
                 } else {
-                    // CREATE: Nuevo usuario (SignUp)
+                    // CREATE: Nuevo usuario con wallet (SignUp)
                     user = await prisma.user.create({
                         data: {
-                            walletAddress: walletAddress, // Requerido por schema
+                            walletAddress: walletAddress,
                             worldIdNullifierHash: nullifierHash,
                         },
                     });
@@ -95,11 +95,21 @@ export async function POST(request: NextRequest) {
                     });
                 }
             } else {
-                // No user found, and no wallet provided to create one
-                return NextResponse.json(
-                    { error: "User not found. Please connect wallet to sign up." },
-                    { status: 404 }
-                );
+                // CREATE: Nuevo usuario SIN wallet - usar nullifier_hash como ID temporal
+                // El usuario puede vincular su wallet más tarde
+                const tempWalletAddress = `worldid_${nullifierHash.slice(0, 16)}`;
+
+                user = await prisma.user.create({
+                    data: {
+                        walletAddress: tempWalletAddress,
+                        worldIdNullifierHash: nullifierHash,
+                    },
+                });
+
+                // Inicializar métricas
+                await prisma.userMetrics.create({
+                    data: { userAddress: tempWalletAddress }
+                });
             }
         }
 
