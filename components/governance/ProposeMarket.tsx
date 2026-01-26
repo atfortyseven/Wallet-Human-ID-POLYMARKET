@@ -176,6 +176,19 @@ export function ProposeMarket() {
                 </div>
 
                 <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-neutral-500 uppercase tracking-wider ml-1">Description</label>
+                    <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Detailed explanation of the market..."
+                        rows={3}
+                        className="w-full bg-surface/50 border border-glass-border rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-700 focus:outline-none focus:border-white/20 transition-all font-mono resize-none disabled:opacity-50"
+                        required
+                        disabled={!isVerified}
+                    />
+                </div>
+
+                <div className="space-y-1.5">
                     <label className="text-xs font-mono text-neutral-500 uppercase tracking-wider ml-1">Outcomes</label>
                     <div className="grid grid-cols-2 gap-2">
                         {formData.outcomes.map((outcome, index) => (
