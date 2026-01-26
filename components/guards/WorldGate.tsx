@@ -9,8 +9,8 @@ import { Toaster, toast } from 'sonner';
 export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     const { isHuman, verifyHumanity } = useWorld();
     // HARDCODE PARA EVITAR ERRORES DE ENV EN DEPLOY
-    const APP_ID = "app_2e2c2cee1ea7297203d7d5534c3c5201";
-    const ACTION = "polymarket-wallet-id";
+    const APP_ID = "app_affe7470221b57a8edee20b3ac30c484";
+    const ACTION = "polymarket-wallet";
 
     useEffect(() => {
         if (!isHuman) {
