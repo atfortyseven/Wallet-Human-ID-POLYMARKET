@@ -15,6 +15,8 @@ import {
     Info
 } from "lucide-react";
 import { ProposeMarket } from "@/components/governance/ProposeMarket";
+import { useAccount, useBalance, useNetwork } from "wagmi";
+import { toast } from "sonner";
 
 // --- Utility: Formateador de Moneda Seguro ---
 const formatCurrency = (value: number) =>
@@ -24,10 +26,27 @@ const formatCurrency = (value: number) =>
         minimumFractionDigits: 2
     }).format(value);
 
-const formatCrypto = (value: number, symbol: string) =>
-    `${value.toFixed(4)} ${symbol}`;
+const formatAddress = (addr: string) =>
+    `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
 
 export default function WalletSection() {
+    // --- Hooks de Blockchain ---
+    const { address, isConnected } = useAccount();
+    const { chain } = useNetwork();
+
+    // Balance Nativo (ETH)
+    const { data: balanceData } = useBalance({
+        address: address,
+    });
+
+    // Balance WLD (Mock Address para Demo - Reemplazar con real en prod)
+    // Optimism WLD: 0x1C272aE0F3752e50D05798F8074900a0Ed32906e
+    const { data: wldBalanceData } = useBalance({
+        address: address,
+        token: "0x1C272aE0F3752e50D05798F8074900a0Ed32906e",
+        chainId: 10 // Optimism
+    });
+
     // --- Estado ---
     const [activeTab, setActiveTab] = useState<'zap' | 'governance' | 'activity'>('zap');
     const [zapAmount, setZapAmount] = useState("");
@@ -37,29 +56,55 @@ export default function WalletSection() {
     // Evitar hidratación incorrecta en Next.js
     useEffect(() => setMounted(true), []);
 
-    // --- Datos Mock (Conectar a tus hooks) ---
-    const portfolioValue = 12450.32;
-    const wldBalance = 450.00;
-    const wldPrice = 7.85; // Precio simulado
-    const unclaimedRoyalties = 45.20;
-    const isWorldIDVerified = true;
-    const walletAddress = "0x71C...9A21";
+    // --- Datos Derivados ---
+    const ethBalance = balanceData ? parseFloat(balanceData.formatted) : 0;
+    const wldVal = wldBalanceData ? parseFloat(wldBalanceData.formatted) : 0;
+    const wldPrice = 7.85; // Mock Price (Idealmente fetch de API)
+    const portfolioValue = (ethBalance * 2500) + (wldVal * wldPrice); // ETH @ $2500 approx
+    const unclaimedRoyalties = 45.20; // Mock (Vendría de la API de royalties)
+    const isWorldIDVerified = true; // Mock (Vendría del hook useWorld)
 
     // --- Handlers ---
+    const handleCopy = () => {
+        if (address) {
+            navigator.clipboard.writeText(address);
+            toast.success("Address copied to clipboard");
+        }
+    };
+
     const handleZap = async () => {
+        if (!isConnected) {
+            toast.error("Please connect your wallet first");
+            return;
+        }
         if (!zapAmount || parseFloat(zapAmount) <= 0) return;
+
         setIsZapping(true);
         // Simular Tx
         await new Promise((r) => setTimeout(r, 2500));
         setIsZapping(false);
         setZapAmount("");
+        toast.success("Zap executed successfully! (Simulation)");
     };
 
     const setPercentage = (percent: number) => {
-        setZapAmount((wldBalance * percent).toFixed(2));
+        setZapAmount((wldVal * percent).toFixed(2));
     };
 
     if (!mounted) return null;
+
+    if (!isConnected) {
+        return (
+            <div className="w-full max-w-5xl mx-auto p-12 text-center">
+                <div className="bg-neutral-900/50 border border-neutral-800 rounded-3xl p-12 backdrop-blur-sm">
+                    <Wallet className="w-16 h-16 text-neutral-600 mx-auto mb-6" />
+                    <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+                    <p className="text-neutral-400 mb-8">Access the Void Terminal to verify your humanity and manage your assets.</p>
+                    {/* El botón de conectar suele estar en el Navbar, pero podríamos poner uno aquí */}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-5xl mx-auto p-4 md:p-6 text-neutral-200">
@@ -76,8 +121,8 @@ export default function WalletSection() {
                     <div>
                         <h2 className="text-xl font-bold text-white tracking-tight">Main Vault</h2>
                         <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
-                            <span>{walletAddress}</span>
-                            <button className="hover:text-indigo-400 transition-colors"><Copy size={12} /></button>
+                            <span>{address ? formatAddress(address) : "0x..."}</span>
+                            <button onClick={handleCopy} className="hover:text-indigo-400 transition-colors"><Copy size={12} /></button>
                         </div>
                     </div>
                 </div>
@@ -85,8 +130,8 @@ export default function WalletSection() {
                 {/* Status Badges */}
                 <div className="flex items-center gap-3">
                     <div className="px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs font-medium text-neutral-400">Optimism Mainnet</span>
+                        <div className={`w-2 h-2 rounded-full ${chain?.id === 10 ? 'bg-emerald-500' : 'bg-yellow-500'} animate-pulse`} />
+                        <span className="text-xs font-medium text-neutral-400">{chain?.name || "Unknown Network"}</span>
                     </div>
 
                     <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 ${isWorldIDVerified
@@ -132,16 +177,17 @@ export default function WalletSection() {
                             {/* Mini Stats Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-6 border-t border-white/5">
                                 <div>
+                                    <p className="text-xs text-neutral-500 mb-1">ETH Balance</p>
+                                    <p className="text-lg font-mono text-white">{ethBalance.toFixed(4)}</p>
+                                </div>
+                                <div>
                                     <p className="text-xs text-neutral-500 mb-1">WLD Balance</p>
-                                    <p className="text-lg font-mono text-white">{wldBalance.toFixed(2)}</p>
+                                    <p className="text-lg font-mono text-white">{wldVal.toFixed(2)}</p>
                                 </div>
                                 <div>
+                                    {/* Placeholder for now */}
                                     <p className="text-xs text-neutral-500 mb-1">WLD Price</p>
-                                    <p className="text-lg font-mono text-white">${wldPrice.toFixed(2)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-neutral-500 mb-1">24h Vol</p>
-                                    <p className="text-lg font-mono text-white">$1.2M</p>
+                                    <p className="text-lg font-mono text-white">${wldPrice}</p>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +236,7 @@ export default function WalletSection() {
                                         <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 mb-4 focus-within:ring-2 focus-within:ring-indigo-500/50 transition-all">
                                             <div className="flex justify-between text-xs text-neutral-500 mb-2 font-mono">
                                                 <span>INPUT</span>
-                                                <span>BAL: {wldBalance} WLD</span>
+                                                <span>BAL: {wldVal.toFixed(2)} WLD</span>
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <input
