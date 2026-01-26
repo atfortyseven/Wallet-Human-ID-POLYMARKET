@@ -56,7 +56,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     return (
         <>
             {!isHuman && (
-                <div className="fixed bottom-10 right-10 z-[100] animate-bounce-slow">
+                <div className="fixed bottom-28 right-8 z-[100] animate-bounce-slow">
                     <IDKitWidget
                         app_id={APP_ID as `app_${string}`}
                         action={ACTION}

@@ -4,8 +4,14 @@ import { motion } from "framer-motion";
 import { WalletControl } from "@/components/crystalline/WalletControl";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
+import { usePathname } from "next/navigation";
 
 export default function Masthead() {
+    const pathname = usePathname();
+
+    // Prevent duplicate header on Home (which uses Ghost Navbar)
+    if (pathname === '/') return null;
+
     return (
         <motion.header
             initial={{ y: -20, opacity: 0 }}
