@@ -2,32 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 5, 5, 10;
-  --background-end-rgb: 10, 10, 20;
+@layer base {
+  :root {
+    --background: #000000;
+    --foreground: #ededed;
+  }
+  
+  html, body {
+    @apply bg-[var(--background)] text-[var(--foreground)] antialiased cursor-default selection:bg-indigo-500/30 selection:text-indigo-200;
+  }
+
+  /* Custom Scrollbar minimalista */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors;
+  }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: #121212;
-  /* Neutral MetaMask Dark Mode */
-  min-height: 100vh;
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
-}
-
-/* Glassmorphism helpers if needed via generic classes */
-.glass-effect {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-/* Fix for World ID Modal Z-Index */
-#idkit-widget,
-[data-idkit-modal],
-div[id^="idkit-"] {
-  z-index: 99999 !important;
-  position: relative;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Utilitarios de brillo sutil */
+  .glow-text {
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+  }
 }
