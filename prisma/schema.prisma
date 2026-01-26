@@ -72,9 +72,21 @@ model MarketProposal {
   votes             ProposalVote[]
   royalties         RoyaltyAccrual[]
   
+  // Blockchain Transaction Status
+  txStatus          TransactionStatus @default(PENDING_RELAY)
+  txHash            String?           @unique
+  onChainId         Int?              @unique // ID assigned by Smart Contract
+
   @@index([status, votingEndsAt])
   @@index([creatorAddress])
   @@index([createdAt])
+}
+
+enum TransactionStatus {
+  PENDING_RELAY    // Firma recibida, esperando ser enviada a la blockchain
+  SUBMITTED        // Enviada a la red, esperando confirmación (txHash generado)
+  CONFIRMED        // Confirmada en la blockchain (On-chain)
+  FAILED           // Revertida o fallo de gas
 }
 
 enum ProposalStatus {
@@ -113,7 +125,12 @@ model ProposalVote {
   verificationLevel String @default("orb")
   
   // Metadata
-  ipfsHash        String?
+  ipfsHash          String?
+  
+  // Relayer Status
+  txHash            String?
+  txStatus          TransactionStatus @default(PENDING_RELAY)
+  errorMessage      String?
   
   @@unique([proposalId, nullifierHash])
   @@index([proposalId, votedAt])
