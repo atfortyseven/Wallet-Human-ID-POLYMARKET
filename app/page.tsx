@@ -4,7 +4,6 @@ import { useWorld } from "@/src/context/WorldContext";
 import NewsFeed from "@/components/crystalline/NewsFeed";
 import { Leaderboard } from "@/components/crystalline/Leaderboard";
 import { motion } from "framer-motion";
-import WalletSection from "@/components/WalletSection";
 
 export default function Home() {
     const { isHuman } = useWorld();
@@ -15,12 +14,7 @@ export default function Home() {
             {/* 1. BACKGROUND is handled by BackgroundWrapper in Layout */}
 
             {/* 2. CONTENIDO */}
-            <div className="relative z-10 w-full max-w-7xl px-4 flex flex-col gap-8">
-
-                {/* THE VOID TERMINAL (Wallet Section) - Centerpiece */}
-                <div className="w-full">
-                    <WalletSection />
-                </div>
+            <div className="relative z-10 w-full max-w-7xl px-4 flex flex-col gap-12">
 
                 {/* News Feed - Visible to Everyone (Ghost Layer) */}
                 <div className="w-full animate-fade-in-up">
