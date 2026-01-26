@@ -1,17 +1,49 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { jwtVerify } from 'jose'
 
-export function middleware(request: NextRequest) {
+const JWT_SECRET = new TextEncoder().encode(
+    process.env.JWT_SECRET || 'VOID_SECRET_99_POLY'
+);
+
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
+    // Allow access to admin login and API routes
+    if (
+        pathname.startsWith('/admin/login') ||
+        pathname.startsWith('/api/admin/login') ||
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/favicon')
+    ) {
+        return NextResponse.next();
+    }
+
+    // Check for admin authentication
+    const token = request.cookies.get('admin_token')?.value;
+
+    if (!token) {
+        return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+
+    try {
+        await jwtVerify(token, JWT_SECRET);
+    } catch (error) {
+        const response = NextResponse.redirect(new URL('/admin/login', request.url));
+        response.cookies.delete('admin_token');
+        return response;
+    }
+
+    // Original CORS and security logic
     const origin = request.headers.get('origin');
     const allowedOrigins = [
         'https://www.polymarketwallet.com',
         'https://polymarketwallet.com',
         'https://polymarketwallet.up.railway.app',
-        'http://localhost:3000', // Keep localhost for dev
-        'http://localhost:8080'  // Railway local dev port
+        'http://localhost:3000',
+        'http://localhost:8080'
     ];
 
-    // Check if origin is allowed
     if (origin && !allowedOrigins.includes(origin)) {
         return new NextResponse(null, {
             status: 403,
@@ -22,7 +54,6 @@ export function middleware(request: NextRequest) {
         });
     }
 
-    // Standard response for allowed origins or no-origin (server-side/navigation)
     const response = NextResponse.next();
 
     // Set CORS headers
