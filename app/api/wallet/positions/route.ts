@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAddress } from 'viem';
 import axios from 'axios';
 
-const GAMMA_API = 'https://gamma-api.polymarket.com';
+const DATA_API = 'https://data-api.polymarket.com';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     try {
         // 2. Llamada a Polymarket
         // Nota: 'limit' a 20 como solicitado, podría ser dinámico
-        const response = await axios.get(`${GAMMA_API}/positions`, {
+        const response = await axios.get(`${DATA_API}/positions`, {
             params: { user: userAddress, limit: '20' }
         });
 
