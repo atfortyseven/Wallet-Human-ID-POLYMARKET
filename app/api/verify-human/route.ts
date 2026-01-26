@@ -12,7 +12,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ verified: false, detail: "Server Configuration Error: Missing App ID" }, { status: 500 });
         }
 
-        console.log(`[Verify] Calling Worldcoin API for App ID: ${app_id}`);
+        console.log(`[Verify] 🔵 Attempting verification...`);
+        console.log(`[Verify] 🔹 URL: https://developer.worldcoin.org/api/v1/verify/${app_id}`);
+        console.log(`[Verify] 🔹 Action: ${action}`);
+        console.log(`[Verify] 🔹 Payload Preview:`, JSON.stringify({ ...proof, action }).substring(0, 150) + "...");
 
         const verifyRes = await fetch(`https://developer.worldcoin.org/api/v1/verify/${app_id}`, {
             method: "POST",
