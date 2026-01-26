@@ -36,7 +36,7 @@ export async function checkRateLimit(
         const userTxCount = await prisma.proposalVote.count({
             where: {
                 voterAddress: address.toLowerCase(),
-                createdAt: { gte: oneDayAgo },
+                votedAt: { gte: oneDayAgo },
             },
         });
 
