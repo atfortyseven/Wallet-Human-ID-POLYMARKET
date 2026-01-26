@@ -76,7 +76,11 @@ model MarketProposal {
   // Blockchain Transaction Status
   txStatus          TransactionStatus @default(PENDING_RELAY)
   txHash            String?           @unique
-  onChainId         Int?              @unique // ID assigned by Smart Contract
+  onChainId         Int?              @unique
+  
+  // Execution Details
+  executedAt        DateTime?
+  executionTxHash   String?
 
   @@index([status, votingEndsAt])
   @@index([creatorAddress])
@@ -98,6 +102,7 @@ enum ProposalStatus {
   CREATED
   RESOLVED
   CANCELLED
+  EXECUTED
 }
 
 // ============================================================================
