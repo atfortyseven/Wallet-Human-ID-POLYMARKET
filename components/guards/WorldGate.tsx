@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { IDKitWidget, VerificationLevel, ISuccessResult } from '@worldcoin/idkit';
 import { useWorld } from '@/src/context/WorldContext';
 import { ScanFace } from 'lucide-react';
@@ -7,6 +8,18 @@ import { Toaster, toast } from 'sonner';
 
 export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     const { isHuman, verifyHumanity } = useWorld();
+    const APP_ID = process.env.NEXT_PUBLIC_WLD_APP_ID || "app_staging_560824623761352378912739";
+    const ACTION = "login";
+
+    useEffect(() => {
+        if (!isHuman) {
+            console.log("--------------------------------------------------");
+            console.log("👁️ WORLD ID DEBUGGER");
+            console.log(`🔹 Active App ID: ${APP_ID}`);
+            console.log(`🔹 Required Action: ${ACTION}`);
+            console.log("--------------------------------------------------");
+        }
+    }, [isHuman, APP_ID]);
 
     const handleProof = async (result: ISuccessResult) => {
         const toastId = toast.loading("Verificando prueba criptográfica (ZK-Proof)...");
@@ -42,8 +55,8 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
             {!isHuman && (
                 <div className="fixed bottom-10 right-10 z-[100] animate-bounce-slow">
                     <IDKitWidget
-                        app_id={process.env.NEXT_PUBLIC_WLD_APP_ID || "app_staging_560824623761352378912739"}
-                        action="login"
+                        app_id={APP_ID as `app_${string}`}
+                        action={ACTION}
                         onSuccess={handleProof}
                         handleVerify={async (proof: unknown) => {
                             // World ID requiere esta función, pero validamos en onSuccess
