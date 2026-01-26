@@ -5,13 +5,16 @@ import { WalletControl } from "@/components/crystalline/WalletControl";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
 import { usePathname } from "next/navigation";
+import { useWorld } from "@/src/context/WorldContext";
 
 export default function Masthead() {
     const pathname = usePathname();
+    const { isHuman } = useWorld();
     console.log("DEBUG: Masthead Pathname =", pathname);
 
-    // Prevent duplicate header on Home (which uses Ghost Navbar)
-    if (pathname === '/' || pathname === '/es' || pathname === '/en') return null;
+    // CRITICAL FIX: Hide Masthead if user is GHOST (Unverified) -> Show Navbar instead
+    // Also hide on Home explicitly if needed, but !isHuman generally covers the initial state
+    if (!isHuman || pathname === '/' || pathname === '/es' || pathname === '/en') return null;
 
     return (
         <motion.header
