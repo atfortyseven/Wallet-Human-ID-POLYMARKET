@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
     try {
         const proof = await req.json();
-        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID;
+        // HARDCODE PARA EVITAR ERRORES DE ENV EN DEPLOY
+        const app_id = "app_d2014c58bb084dcb09e1f3c1c1144287";
         const action = "login";
 
         if (!app_id) {
