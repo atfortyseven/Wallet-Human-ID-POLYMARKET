@@ -12,6 +12,7 @@ const config: Config = {
             fontFamily: {
                 sans: ["var(--font-inter)"],
                 serif: ["var(--font-merriweather)"],
+                mono: ["JetBrains Mono", "Fira Code", "Roboto Mono", "monospace"],
             },
             colors: {
                 "glass-border": "rgba(255, 255, 255, 0.08)",
