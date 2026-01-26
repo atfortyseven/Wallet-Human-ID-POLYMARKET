@@ -32,9 +32,13 @@ export async function verifyWorldIDProof(
     app_id: string,
     action: string
 ): Promise<IVerifyResponse> {
+
+    // Ensure we aren't using the default accidentally if env is missing in some context
+    const finalAppId = app_id || "app_d2014c58bb084dcb09e1f3c1c1144287";
+
     try {
         const response = await fetch(
-            `https://developer.worldcoin.org/api/v1/verify/${app_id}`,
+            `https://developer.worldcoin.org/api/v1/verify/${finalAppId}`,
             {
                 method: 'POST',
                 headers: {
@@ -48,11 +52,18 @@ export async function verifyWorldIDProof(
         );
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            const errorBody = await response.text();
+            console.error(`World ID API Error (${response.status}):`, errorBody);
+            let errorData;
+            try {
+                errorData = JSON.parse(errorBody);
+            } catch {
+                errorData = {};
+            }
             return {
                 success: false,
                 code: errorData.code || 'server_error',
-                detail: errorData.detail || 'Failed to verify proof',
+                detail: errorData.detail || `Failed to verify proof. Status: ${response.status}. Body: ${errorBody.substring(0, 100)}`,
             };
         }
 
