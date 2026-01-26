@@ -43,10 +43,12 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
             toast.success("✨ Identidad Soberana Verificada");
             verifyHumanity(data);
 
-        } catch (error) {
+        } catch (error: any) {
             toast.dismiss(toastId);
-            toast.error("Error: No se pudo verificar tu humanidad.");
-            console.error(error);
+            // Mostrar el error específico del backend si existe
+            const errorMessage = error.message || "Error desconocido al verificar.";
+            toast.error(`Error: ${errorMessage}`);
+            console.error("Verification Error details:", error);
         }
     };
 
