@@ -1,132 +1,135 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { verifyWorldIDProof } from "@/lib/worldid";
+import { cookies } from "next/headers";
+import { SignJWT } from "jose"; // Necesitaremos 'jose' para JWT (o jsonwebtoken)
 
-// IMPORTANTE: NO importes nada de @worldcoin/idkit aquí.
-// NO importes componentes de React.
-// SOLO librerías de servidor o tipos.
+const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+// Secret para JWT (Debería estar en env, usamos un fallback seguro para dev)
+const JWT_SECRET = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-prod";
+
+export async function POST(request: NextRequest) {
     try {
-        const body = await req.json();
-        console.log("DEBUG: Verification Request Body:", JSON.stringify(body).slice(0, 100) + "...");
+        const body = await request.json();
+        const { proof, walletAddress } = body;
 
-        const { proof, signal, merkle_root, nullifier_hash, verification_level, action } = body;
-
-        // 0. BYPASS DE EMERGENCIA
-        // Chequeamos si la variable existe y si, al normalizarla, es 'true'
-        const bypassVar = process.env.BYPASS_WORLD_ID?.toLowerCase().trim();
-        if (bypassVar === "true" || bypassVar === "1") {
-            console.log("⚠️ BYPASS_WORLD_ID enabled. Skipping verification.");
-            return NextResponse.json({
-                success: true,
-                verified: true,
-                nullifier_hash: "bypass-hash-" + Date.now()
-            });
-        }
-
-        // 1. Validar que los datos existen
-        if (!proof || !merkle_root || !nullifier_hash) {
+        // 1. Validar input básico
+        if (!proof || !proof.nullifier_hash) {
             return NextResponse.json(
-                { error: "Missing required parameters" },
+                { error: "Missing proof data" },
                 { status: 400 }
             );
         }
 
-        // 2. Verificar la prueba con la API de Worldcoin (Server-to-Server)
-        // Usamos trim() y replace para quitar comillas accidentales
-        const raw_app_id = process.env.WLD_APP_ID || process.env.NEXT_PUBLIC_WLD_APP_ID || "";
-        const app_id = raw_app_id.trim().replace(/["']/g, ""); // Quitamos comillas ' o "
-        const action_id = (process.env.NEXT_PUBLIC_WLD_ACTION || "").trim().replace(/["']/g, "");
+        // 2. Verificar la prueba con Worldcoin (Logic Step 2)
+        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as string;
+        const action = "login"; // Debe coincidir con el frontend
 
-        // DEBUG: Logging para encontrar el error en Railway
-        console.log("--- World ID Verification Debug ---");
-        console.log("App ID (sanitized):", app_id ? `${app_id.substring(0, 6)}...` : "UNDEFINED");
-        console.log("Action ID (sanitized):", action_id);
-        console.log("Target URL:", `https://developer.worldcoin.org/api/v1/verify/${app_id}`);
-
-        if (!app_id) {
-            console.error("CRITICAL: WLD_APP_ID is missing or empty.");
-            return NextResponse.json(
-                { error: "Server Configuration Error: Missing WLD_APP_ID" },
-                { status: 500 }
-            );
-        }
-
-        // VALIDACIÓN DE FORMATO
-        if (!app_id.startsWith("app_")) {
-            console.error(`CRITICAL: Malformed App ID: ${app_id}. Must start with 'app_'.`);
-            return NextResponse.json(
-                { error: "Configuration Error: Invalid App ID Format", details: "App ID must start with 'app_'" },
-                { status: 500 }
-            );
-        }
-
-        // URL de verificación oficial de Worldcoin (V2)
-        const verifyRes = await fetch(
-            `https://developer.worldcoin.org/api/v2/verify/${app_id}`,
+        const verifyRes = await verifyWorldIDProof(
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    action: action_id,
-                    signal: signal,
-                    proof,
-                    merkle_root,
-                    nullifier_hash,
-                    verification_level,
-                }),
-            }
+                proof: proof.proof,
+                merkle_root: proof.merkle_root,
+                nullifier_hash: proof.nullifier_hash,
+                verification_level: proof.verification_level,
+            },
+            app_id,
+            action
         );
 
-        // LEEMOS TEXTO PRIMERO (Para evitar el crash "Unexpected token <")
-        const rawBody = await verifyRes.text();
-        console.log("Worldcoin API Raw Status:", verifyRes.status);
-
-        let wldResponse;
-        try {
-            wldResponse = JSON.parse(rawBody);
-        } catch (e) {
-            console.error("CRITICAL: Worldcoin API returned non-JSON. Likely HTML error page.");
-            console.error("Raw Body Preview:", rawBody.slice(0, 500));
+        if (!verifyRes.success) {
+            console.error("World ID Verification failed:", verifyRes);
             return NextResponse.json(
-                {
-                    error: "Upstream API Error (Non-JSON)",
-                    details: "The Worldcoin API returned HTML instead of JSON. Check App ID.",
-                    raw_preview: rawBody.slice(0, 200),
-                    status: verifyRes.status
-                },
-                { status: 502 }
+                { error: "Invalid World ID proof", detail: verifyRes.detail },
+                { status: 401 }
             );
         }
 
-        if (!verifyRes.ok) {
-            console.error("Worldcoin API Error Response (Parsed):", JSON.stringify(wldResponse, null, 2));
-            return NextResponse.json(
-                {
-                    error: "Worldcoin Verification Failed",
-                    details: wldResponse,
-                    status: verifyRes.status
-                },
-                { status: 400 }
-            );
+        const nullifierHash = proof.nullifier_hash;
+
+        // 3. Lógica de Usuario y Base de Datos (Logic Step 3)
+
+        // A) Buscar usuario por nullifier_hash
+        let user = await prisma.user.findUnique({
+            where: { worldIdNullifierHash: nullifierHash },
+        });
+
+        // B) Escenario Migración: No existe por nullifier, intentamos linkear si hay wallet
+        if (!user) {
+            if (walletAddress) {
+                // Buscamos si el usuario existe por wallet
+                const existingUserByWallet = await prisma.user.findUnique({
+                    where: { walletAddress: walletAddress },
+                });
+
+                if (existingUserByWallet) {
+                    // LINK: Actualizamos el usuario existente con el nullifier
+                    if (existingUserByWallet.worldIdNullifierHash && existingUserByWallet.worldIdNullifierHash !== nullifierHash) {
+                        // PRECAUCIÓN: Ya tiene otro World ID. Política: Rechazar o Sobreescribir?
+                        // Por seguridad, rechazamos el hijacking.
+                        return NextResponse.json(
+                            { error: "Wallet already linked to another World ID" },
+                            { status: 409 }
+                        );
+                    }
+
+                    user = await prisma.user.update({
+                        where: { walletAddress: walletAddress },
+                        data: { worldIdNullifierHash: nullifierHash },
+                    });
+                } else {
+                    // CREATE: Nuevo usuario (SignUp)
+                    user = await prisma.user.create({
+                        data: {
+                            walletAddress: walletAddress, // Requerido por schema
+                            worldIdNullifierHash: nullifierHash,
+                        },
+                    });
+
+                    // Inicializar métricas
+                    await prisma.userMetrics.create({
+                        data: { userAddress: walletAddress }
+                    });
+                }
+            } else {
+                // No user found, and no wallet provided to create one
+                return NextResponse.json(
+                    { error: "User not found. Please connect wallet to sign up." },
+                    { status: 404 }
+                );
+            }
         }
 
-        console.log("Worldcoin Verification Success!");
+        // 4. Generar Session Token (JWT)
+        // Usamos 'jose' para un entorno edge-friendly si fuera necesario
+        const token = await new SignJWT({
+            sub: user.walletAddress,
+            nullifier: user.worldIdNullifierHash
+        })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('24h')
+            .sign(new TextEncoder().encode(JWT_SECRET));
 
-        // 3. (Opcional) Guardar en Base de Datos con Prisma
-        // Si vas a usar Prisma aquí, asegúrate de importar 'prisma' desde tu lib instanciada, no crear una nueva instancia.
-        // import prisma from '@/lib/prisma';
+        // Establecer cookie (opcional, o devolver en body)
+        cookies().set("auth_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24, // 1 day
+            path: "/",
+        });
 
-        // Por ahora, devolvemos éxito para que el build pase
         return NextResponse.json({
             success: true,
-            verified: true,
-            nullifier_hash
+            token: token,
+            user: {
+                address: user.walletAddress,
+                verified: true
+            }
         });
 
     } catch (error) {
-        console.error("API Error:", error);
+        console.error("Auth Error:", error);
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }

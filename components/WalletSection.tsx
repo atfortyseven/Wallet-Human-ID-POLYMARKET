@@ -18,6 +18,9 @@ import { ProposeMarket } from "@/components/governance/ProposeMarket";
 import { useAccount, useBalance } from "wagmi";
 import { toast } from "sonner";
 
+import { useTokenPrice } from "@/hooks/useTokenPrice";
+import useSWR from "swr";
+
 // --- Utility: Formateador de Moneda Seguro ---
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-US', {
@@ -32,6 +35,15 @@ const formatAddress = (addr: string) =>
 export default function WalletSection() {
     // --- Hooks de Blockchain ---
     const { address, isConnected, chain } = useAccount();
+
+    const { price: wldPrice, isLoading: isPriceLoading } = useTokenPrice();
+
+    // Fetch User Governance & Royalty Stats
+    const { data: userStats } = useSWR(
+        address ? `/api/user/stats?address=${address}` : null,
+        (url) => fetch(url).then(r => r.json()),
+        { refreshInterval: 10000 }
+    );
 
     // Balance Nativo (ETH)
     const { data: balanceData } = useBalance({
@@ -58,10 +70,13 @@ export default function WalletSection() {
     // --- Datos Derivados ---
     const ethBalance = balanceData ? parseFloat(balanceData.formatted) : 0;
     const wldVal = wldBalanceData ? parseFloat(wldBalanceData.formatted) : 0;
-    const wldPrice = 7.85; // Mock Price (Idealmente fetch de API)
-    const portfolioValue = (ethBalance * 2500) + (wldVal * wldPrice); // ETH @ $2500 approx
-    const unclaimedRoyalties = 45.20; // Mock (Vendría de la API de royalties)
-    const isWorldIDVerified = true; // Mock (Vendría del hook useWorld)
+
+    // Real Data or Default
+    const portfolioValue = (ethBalance * 2500) + (wldVal * (wldPrice || 0)); // ETH @ $2500 approx fixed for now
+    const unclaimedRoyalties = userStats?.unclaimedRoyalties || 0;
+    const votingPower = userStats?.votingPower || 0;
+    const activeProposals = userStats?.activeProposals || 0;
+    const isWorldIDVerified = true; // Still Mock until Context is fully integrated
 
     // --- Handlers ---
     const handleCopy = () => {
@@ -373,13 +388,13 @@ export default function WalletSection() {
                         <div className="space-y-3">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Voting Power</span>
-                                <span className="text-white font-mono">1,250 VP</span>
+                                <span className="text-white font-mono">{votingPower} VP</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Active Props</span>
                                 <span className="flex items-center gap-1 text-white">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    3
+                                    <span className={`w-1.5 h-1.5 rounded-full ${activeProposals > 0 ? 'bg-emerald-500' : 'bg-neutral-500'}`}></span>
+                                    {activeProposals}
                                 </span>
                             </div>
                             <div className="pt-3 mt-3 border-t border-neutral-800">
