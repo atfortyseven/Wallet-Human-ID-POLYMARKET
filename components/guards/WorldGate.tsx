@@ -9,8 +9,8 @@ import { Toaster, toast } from 'sonner';
 export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     const { isHuman, verifyHumanity } = useWorld();
     // HARDCODE PARA EVITAR ERRORES DE ENV EN DEPLOY
-    const APP_ID = "app_d2014c58bb084dcb09e1f3c1c1144287";
-    const ACTION = "login";
+    const APP_ID = "app_5a04351aada2559d77266326ea89ace8";
+    const ACTION = "verification-id";
 
     useEffect(() => {
         if (!isHuman) {

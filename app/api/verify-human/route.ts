@@ -4,8 +4,8 @@ export async function POST(req: Request) {
     try {
         const proof = await req.json();
         // HARDCODE PARA EVITAR ERRORES DE ENV EN DEPLOY
-        const app_id = "app_d2014c58bb084dcb09e1f3c1c1144287";
-        const action = "login";
+        const app_id = "app_5a04351aada2559d77266326ea89ace8";
+        const action = "verification-id";
 
         if (!app_id) {
             console.error("❌ CRITICAL: NEXT_PUBLIC_WLD_APP_ID is missing in server environment");
