@@ -1,4 +1,4 @@
-```javascript
+
 import React, { useState } from 'react';
 import {
     Wallet, TrendingUp, Newspaper, ArrowRight, ArrowUpRight,
@@ -66,9 +66,8 @@ export default function SuperWallet({ recentNews = [] }: { recentNews?: any[] })
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab as any)}
-                        className={`px - 4 py - 2 text - sm font - bold transition - colors relative ${
-    activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-} `}
+                        className={`px-4 py-2 text-sm font-bold transition-colors relative ${activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+                            }`}
                     >
                         {tab}
                         {activeTab === tab && (
@@ -126,114 +125,114 @@ export default function SuperWallet({ recentNews = [] }: { recentNews?: any[] })
                                     </button>
                                     <button
                                         onClick={() => window.open(`https://global.transak.com?defaultCryptoCurrency=USDC&network=polygon&walletAddress=${address}`, '_blank')}
-className = "flex flex-col items-center justify-center p-3 bg-green-600 hover:bg-green-500 rounded-lg transition text-white col-span-2"
-    >
+                                        className="flex flex-col items-center justify-center p-3 bg-green-600 hover:bg-green-500 rounded-lg transition text-white col-span-2"
+                                    >
                                         <CreditCard className="w-5 h-5 mb-1" />
                                         <span className="text-xs font-bold">Buy USDC</span>
                                     </button >
                                 </div >
 
-    <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
-        <h3 className="text-gray-400 text-sm font-bold uppercase mb-4">Capital Breakdown</h3>
-        <div className="flex items-center justify-between">
-            <div>
-                <div className="text-white font-medium">Idle Cash (USDC)</div>
-                <div className="text-2xl font-bold text-gray-200">${usdcBalance}</div>
-            </div>
-            <div className="h-16 w-px bg-gray-800 mx-4"></div>
-            <div>
-                <div className="text-white font-medium">Active Positions</div>
-                <div className="text-2xl font-bold text-blue-400">${portfolioValue}</div>
-                <div className="text-xs text-gray-400 mt-2">Across {positions.length} Markets</div>
-            </div>
-        </div>
-    </div>
+                                <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
+                                    <h3 className="text-gray-400 text-sm font-bold uppercase mb-4">Capital Breakdown</h3>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="text-white font-medium">Idle Cash (USDC)</div>
+                                            <div className="text-2xl font-bold text-gray-200">${usdcBalance}</div>
+                                        </div>
+                                        <div className="h-16 w-px bg-gray-800 mx-4"></div>
+                                        <div>
+                                            <div className="text-white font-medium">Active Positions</div>
+                                            <div className="text-2xl font-bold text-blue-400">${portfolioValue}</div>
+                                            <div className="text-xs text-gray-400 mt-2">Across {positions.length} Markets</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </>
                         )}
 
-{/* TAB: POSITIONS */ }
-{
-    activeTab === 'POSITIONS' && (
-        <div>
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-white font-bold">Active Trades ({positions.length})</h3>
-            </div>
-            {positions.length === 0 ? (
-                <div className="text-center py-10 border border-dashed border-gray-800 rounded-xl text-gray-500">
-                    No active positions found on Polymarket.
-                </div>
-            ) : (
-                positions.map(pos => (
-                    <div key={pos.id} className="bg-gray-800/50 p-4 rounded-lg mb-2 border border-gray-700 flex justify-between items-center group hover:bg-gray-800 transition">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className={`px-2 py-0.5 rounded text-xs font-bold ${pos.outcome === 'YES' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-                                    {pos.outcome}
-                                </span>
-                                <span className="text-white text-sm font-medium">{pos.marketTitle}</span>
-                            </div>
-                            <div className="text-gray-400 text-xs flex gap-3">
-                                <span>{pos.shares.toFixed(1)} Shares</span>
-                                <span className={pos.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-                                    {pos.pnl >= 0 ? '+' : ''}{pos.pnl.toFixed(2)} ({pos.pnlPercent.toFixed(1)}%)
-                                </span>
-                            </div>
-                        </div>
+                        {/* TAB: POSITIONS */}
+                        {
+                            activeTab === 'POSITIONS' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-white font-bold">Active Trades ({positions.length})</h3>
+                                    </div>
+                                    {positions.length === 0 ? (
+                                        <div className="text-center py-10 border border-dashed border-gray-800 rounded-xl text-gray-500">
+                                            No active positions found on Polymarket.
+                                        </div>
+                                    ) : (
+                                        positions.map(pos => (
+                                            <div key={pos.id} className="bg-gray-800/50 p-4 rounded-lg mb-2 border border-gray-700 flex justify-between items-center group hover:bg-gray-800 transition">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${pos.outcome === 'YES' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+                                                            {pos.outcome}
+                                                        </span>
+                                                        <span className="text-white text-sm font-medium">{pos.marketTitle}</span>
+                                                    </div>
+                                                    <div className="text-gray-400 text-xs flex gap-3">
+                                                        <span>{pos.shares.toFixed(1)} Shares</span>
+                                                        <span className={pos.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                                            {pos.pnl >= 0 ? '+' : ''}{pos.pnl.toFixed(2)} ({pos.pnlPercent.toFixed(1)}%)
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                        <div className="flex items-center gap-3">
-                            {pos.newsContext && (
-                                <div className="hidden md:flex items-center text-xs text-blue-400 bg-blue-900/20 px-2 py-1 rounded border border-blue-900/50">
-                                    <Newspaper className="w-3 h-3 mr-1" />
-                                    <span>Linked: {pos.newsContext}</span>
+                                                <div className="flex items-center gap-3">
+                                                    {pos.newsContext && (
+                                                        <div className="hidden md:flex items-center text-xs text-blue-400 bg-blue-900/20 px-2 py-1 rounded border border-blue-900/50">
+                                                            <Newspaper className="w-3 h-3 mr-1" />
+                                                            <span>Linked: {pos.newsContext}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                ))
-            )}
-        </div>
-    )
-}
+                            )
+                        }
 
-{/* TAB: ACTIVITY (REAL) */ }
-{
-    activeTab === 'ACTIVITY' && (
-        <div className="space-y-3">
-            {transactions.length === 0 ? <p className="text-gray-500 text-center">No recent history.</p> : transactions.map((tx, index) => (
-                <div key={index} className="bg-gray-900 p-4 rounded border border-gray-800 flex justify-between items-center">
-                    <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-full ${tx.type === 'SELL' ? 'bg-red-900/20 text-red-500' : 'bg-green-900/20 text-green-500'}`}>
-                            {tx.type === 'SELL' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />}
-                        </div>
-                        <div>
-                            <div className="text-white font-bold text-sm">{tx.type} {tx.asset}</div>
-                            <div className="text-gray-500 text-xs">{tx.date}</div>
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-white font-mono font-bold">${tx.amount}</div>
-                        <div className="text-xs text-green-500">Confirmed</div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    )
-}
+                        {/* TAB: ACTIVITY (REAL) */}
+                        {
+                            activeTab === 'ACTIVITY' && (
+                                <div className="space-y-3">
+                                    {transactions.length === 0 ? <p className="text-gray-500 text-center">No recent history.</p> : transactions.map((tx, index) => (
+                                        <div key={index} className="bg-gray-900 p-4 rounded border border-gray-800 flex justify-between items-center">
+                                            <div className="flex items-start gap-3">
+                                                <div className={`p-2 rounded-full ${tx.type === 'SELL' ? 'bg-red-900/20 text-red-500' : 'bg-green-900/20 text-green-500'}`}>
+                                                    {tx.type === 'SELL' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />}
+                                                </div>
+                                                <div>
+                                                    <div className="text-white font-bold text-sm">{tx.type} {tx.asset}</div>
+                                                    <div className="text-gray-500 text-xs">{tx.date}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-white font-mono font-bold">${tx.amount}</div>
+                                                <div className="text-xs text-green-500">Confirmed</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        }
 
-{/* TAB: DEFI / YIELD */ }
-{
-    activeTab === 'DEFI' && (
-        <div className="text-center py-12 bg-gray-900 rounded-xl border border-gray-800 border-dashed">
-            <h3 className="text-gray-300 font-bold text-lg mb-2">Idle Cash Optimization</h3>
-            <p className="text-gray-500 text-sm max-w-xs mx-auto mb-6">
-                Connect to Aave V3 to earn yield on your uninvested USDC automatically.
-            </p>
-            <button className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition">
-                Activate Smart Savings
-            </button>
-        </div>
-    )
-}
+                        {/* TAB: DEFI / YIELD */}
+                        {
+                            activeTab === 'DEFI' && (
+                                <div className="text-center py-12 bg-gray-900 rounded-xl border border-gray-800 border-dashed">
+                                    <h3 className="text-gray-300 font-bold text-lg mb-2">Idle Cash Optimization</h3>
+                                    <p className="text-gray-500 text-sm max-w-xs mx-auto mb-6">
+                                        Connect to Aave V3 to earn yield on your uninvested USDC automatically.
+                                    </p>
+                                    <button className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition">
+                                        Activate Smart Savings
+                                    </button>
+                                </div>
+                            )
+                        }
                     </>
                 )}
 
@@ -241,4 +240,4 @@ className = "flex flex-col items-center justify-center p-3 bg-green-600 hover:bg
         </div >
     );
 }
-```
+
