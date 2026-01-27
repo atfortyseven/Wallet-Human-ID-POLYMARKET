@@ -63,7 +63,7 @@ export default function RealDashboard() {
                     onSuccess={castVote}
                     verification_level={VerificationLevel.Orb}
                 >
-                    {({ open }) => (
+                    {({ open }: { open: () => void }) => (
                         <button onClick={open} disabled={power === 0} className={`w-full py-4 rounded-xl font-bold transition ${power === 0 ? "bg-gray-100 text-gray-400" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
                             {power === 0 ? "⛔ Haz ZAP para Votar" : "🗳️ Votar con World ID"}
                         </button>
