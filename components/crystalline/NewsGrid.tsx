@@ -22,7 +22,7 @@ export const NewsGrid = ({ category }: { category: string }) => {
 
                 if (isMounted) {
                     // AQUI OCURRE LA MAGIA: Procesamos para eliminar duplicados y mejorar imágenes
-                    const uniqueNews = processNewsFeed(Array.isArray(rawData) ? rawData : []);
+                    const uniqueNews = processNewsFeed(Array.isArray(rawData) ? rawData : [], category);
                     setNews(uniqueNews);
                 }
             } catch (error) {
@@ -41,7 +41,7 @@ export const NewsGrid = ({ category }: { category: string }) => {
     if (news.length === 0) return <div className="text-center py-20 text-gray-500 font-light">Sin novedades visuales en esta categoría.</div>;
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24 px-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24 px-1 min-h-[500px]">
             {news.map((item) => (
                 <NewsCard
                     key={item.id}
