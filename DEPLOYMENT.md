@@ -76,6 +76,7 @@ NEXT_PUBLIC_ZAP_GASLESS_CONTRACT_ADDRESS="0x..."
 RELAYER_PRIVATE_KEY="0x..."
 BASE_SEPOLIA_RPC_URL="https://sepolia.base.org"
 DATABASE_URL="postgresql://..." # Railway auto-generates
+NEWSDATA_API_KEY="pub_37e6802d84354845bec7cff76350c478"
 ```
 
 ---
