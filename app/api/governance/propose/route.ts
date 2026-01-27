@@ -75,7 +75,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create proposal
+        // 1. Ensure User exists FIRST (Foreign Key Constraint)
+        await prisma.user.upsert({
+            where: { walletAddress: body.creatorAddress },
+            update: {
+                updatedAt: new Date(),
+                // Update nullifier if it changed (unlikely but possible)
+                worldIdNullifierHash: body.worldIdProof.nullifier_hash,
+            },
+            create: {
+                walletAddress: body.creatorAddress,
+                worldIdNullifierHash: body.worldIdProof.nullifier_hash,
+            },
+        });
+
+        // 2. Create proposal
         const votingEndsAt = new Date();
         votingEndsAt.setDate(votingEndsAt.getDate() + 7); // 7 days voting period
 
@@ -93,19 +107,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Create or update user
-        await prisma.user.upsert({
-            where: { walletAddress: body.creatorAddress },
-            update: {
-                updatedAt: new Date(),
-            },
-            create: {
-                walletAddress: body.creatorAddress,
-                worldIdNullifierHash: body.worldIdProof.nullifier_hash,
-            },
-        });
-
-        // Update user metrics
+        // 3. Update user metrics
         await prisma.userMetrics.upsert({
             where: { userAddress: body.creatorAddress },
             update: {
