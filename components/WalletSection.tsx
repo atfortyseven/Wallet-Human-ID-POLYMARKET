@@ -152,6 +152,14 @@ export default function WalletSection() {
                     <Wallet className="w-16 h-16 text-neutral-600 mx-auto mb-6" />
                     <h2 className="text-2xl font-bold text-white mb-2">Authentication Required</h2>
                     <p className="text-neutral-400 mb-8">Please sign in with World ID or connect your wallet to access the Void Terminal.</p>
+
+                    <button
+                        onClick={handleConnect}
+                        className="px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-neutral-200 transition-colors flex items-center gap-2 mx-auto"
+                    >
+                        <Zap className="w-5 h-5" />
+                        Conectar World ID
+                    </button>
                 </div>
             </div>
         );

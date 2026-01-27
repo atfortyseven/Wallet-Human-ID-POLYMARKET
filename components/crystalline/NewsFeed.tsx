@@ -6,7 +6,7 @@ import { Clock, ArrowUpRight, Bookmark, Zap, Sun, CloudRain, Loader2 } from 'luc
 /* ========================================================================
    1. CONFIGURACIÓN DE APIS REALES (TU LLAVE MAESTRA)
    ======================================================================== */
-const NEWS_API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY || 'e19cf7fd83d74d768a784db82aa19954';
+const NEWS_API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
 // Endpoints Reales
 const ENDPOINTS = {
