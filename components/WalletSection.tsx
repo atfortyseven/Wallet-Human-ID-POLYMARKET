@@ -14,6 +14,7 @@ import {
     ExternalLink,
     Info
 } from "lucide-react";
+import { IDKitWidget, VerificationLevel } from "@worldcoin/idkit";
 import { ProposeMarket } from "@/components/governance/ProposeMarket";
 import { useAccount, useBalance } from "wagmi";
 import { toast } from "sonner";
@@ -33,10 +34,23 @@ const formatCurrency = (value: number) =>
 const formatAddress = (addr: string) =>
     `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
 
+import { useHumanFi } from "@/hooks/useHumanFi";
+import { formatEther } from "viem";
+
 export default function WalletSection() {
     // --- Hooks de Blockchain ---
     const { address, isConnected, chain } = useAccount();
     const { isAuthenticated } = useAuth(); // World ID authentication
+
+    // Human-Fi Hook
+    const {
+        wldBalance,
+        votingPower: governancePower,
+        executeZap,
+        claimFaucet,
+        castVote,
+        isPending: isHumanFiPending
+    } = useHumanFi();
 
     const { price: wldPrice, isLoading: isPriceLoading } = useTokenPrice();
 
@@ -52,14 +66,6 @@ export default function WalletSection() {
         address: address,
     });
 
-    // Balance WLD (Mock Address para Demo - Reemplazar con real en prod)
-    // Optimism WLD: 0x1C272aE0F3752e50D05798F8074900a0Ed32906e
-    const { data: wldBalanceData } = useBalance({
-        address: address,
-        token: "0x1C272aE0F3752e50D05798F8074900a0Ed32906e",
-        chainId: 10 // Optimism
-    });
-
     // --- Estado ---
     const [activeTab, setActiveTab] = useState<'zap' | 'governance' | 'activity'>('zap');
     const [zapAmount, setZapAmount] = useState("");
@@ -71,7 +77,8 @@ export default function WalletSection() {
 
     // --- Datos Derivados ---
     const ethBalance = balanceData ? parseFloat(balanceData.formatted) : 0;
-    const wldVal = wldBalanceData ? parseFloat(wldBalanceData.formatted) : 0;
+    // Usar balance real del hook (parseando BigInt a float)
+    const wldVal = wldBalance ? parseFloat(formatEther(wldBalance as bigint)) : 0;
 
     // Real Data or Default
     const portfolioValue = (ethBalance * 2500) + (wldVal * (wldPrice || 0)); // ETH @ $2500 approx fixed for now
@@ -95,12 +102,16 @@ export default function WalletSection() {
         }
         if (!zapAmount || parseFloat(zapAmount) <= 0) return;
 
-        setIsZapping(true);
-        // Simular Tx
-        await new Promise((r) => setTimeout(r, 2500));
-        setIsZapping(false);
-        setZapAmount("");
-        toast.success("Zap executed successfully! (Simulation)");
+        try {
+            executeZap(zapAmount);
+            // El hook maneja el state de loading via isHumanFiPending pero aquí tenemos isZapping local.
+            // Idealmente deberíamos usar el del hook para el UI feedback.
+            setZapAmount("");
+            toast.success("Zap transaction initiated!");
+        } catch (e) {
+            console.error(e);
+            toast.error("Zap failed");
+        }
     };
 
     const setPercentage = (percent: number) => {
@@ -246,7 +257,17 @@ export default function WalletSection() {
                                     >
                                         <div className="text-center mb-8">
                                             <h3 className="text-xl font-bold text-white mb-2">Atomic Zap</h3>
-                                            <p className="text-sm text-neutral-400">Transforma WLD en tokens de gobernanza en una sola transacción.</p>
+                                            <p className="text-sm text-neutral-400 mb-4">Transforma WLD en tokens de gobernanza en una sola transacción.</p>
+
+                                            {/* Faucet for Demo */}
+                                            {wldVal < 5 && (
+                                                <button
+                                                    onClick={claimFaucet}
+                                                    className="px-4 py-1.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-full text-xs font-bold hover:bg-yellow-500/20 transition-colors"
+                                                >
+                                                    💸 Get 10 Demo WLD
+                                                </button>
+                                            )}
                                         </div>
 
                                         {/* Input Box */}
@@ -314,8 +335,38 @@ export default function WalletSection() {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 20 }}
-                                        className="h-full"
+                                        className="h-full flex flex-col gap-4"
                                     >
+                                        <div className="bg-neutral-950/50 p-4 rounded-xl border border-neutral-800">
+                                            <h4 className="font-bold text-white mb-2">Proposal #1: Activate Rewards</h4>
+                                            <p className="text-sm text-neutral-400 mb-4">Vote to distribute royalties to stakers.</p>
+
+                                            <div className="flex gap-2">
+                                                {/* Voting Integration */}
+                                                <div className="w-full">
+                                                    <IDKitWidget
+                                                        app_id={process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`}
+                                                        action={process.env.NEXT_PUBLIC_WLD_ACTION || "vote_proposal_1"}
+                                                        signal="1"
+                                                        onSuccess={castVote}
+                                                        verification_level={VerificationLevel.Orb}
+                                                    >
+                                                        {({ open }) => (
+                                                            <button
+                                                                onClick={open}
+                                                                disabled={!governancePower || governancePower === BigInt(0)}
+                                                                className={`w-full py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 ${!governancePower || governancePower === BigInt(0)
+                                                                    ? "bg-neutral-800 text-neutral-500 cursor-not-allowed"
+                                                                    : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                                                                    }`}
+                                                            >
+                                                                {!governancePower || governancePower === BigInt(0) ? "Zap WLD to Vote" : "🗳️ Votar con World ID"}
+                                                            </button>
+                                                        )}
+                                                    </IDKitWidget>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <ProposeMarket />
                                     </motion.div>
                                 ) : (

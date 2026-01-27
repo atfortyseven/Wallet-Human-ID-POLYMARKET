@@ -1,0 +1,6 @@
+.exit
+ethers.formatEther(await ethers.provider.getBalance((await ethers.getSigners())[0].address))
+(await ethers.getSigners())[0].address
+ethers.formatEther(await ethers.provider.getBalance((await ethers.getSigners())[0].address))
+(await ethers.getSigners())[0].address
+clear
