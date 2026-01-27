@@ -19,8 +19,8 @@ export const config = createConfig({
             metadata: {
                 name: 'HumanID',
                 description: 'Identity-based Governance',
-                url: 'https://humanidfi.com', // Debe coincidir con tu URL real
-                icons: ['https://humanidfi.com/logo.png'],
+                url: process.env.NEXT_PUBLIC_APP_URL || 'https://polymarketwallet.up.railway.app', // Must match origin
+                icons: ['https://raw.githubusercontent.com/walletconnect/web3modal/master/public/logo.png'], // Standard fallback icon
             }
         }),
     ],
