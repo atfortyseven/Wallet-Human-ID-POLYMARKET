@@ -25,3 +25,5 @@ export const useWatchlistStore = create<WatchlistState>()(
         }
     )
 );
+
+export const useWatchlist = useWatchlistStore;

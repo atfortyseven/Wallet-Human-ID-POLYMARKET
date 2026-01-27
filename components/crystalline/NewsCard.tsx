@@ -8,7 +8,7 @@ interface NewsCardProps {
     date?: string;
 }
 
-export default function NewsCard({ title, description, source, url, date }: NewsCardProps) {
+export function NewsCard({ title, description, source, url, date }: NewsCardProps) {
     return (
         <a
             href={url}
