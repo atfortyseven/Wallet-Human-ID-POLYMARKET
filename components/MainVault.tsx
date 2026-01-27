@@ -1,12 +1,21 @@
 // components/MainVault.tsx
 import { useWLD } from '../hooks/useWLD'
 
-export const MainVault = () => {
+interface MainVaultProps {
+    onConnect?: () => void;
+}
+
+export const MainVault = ({ onConnect }: MainVaultProps) => {
     const { balance, symbol, status, isLoading } = useWLD()
 
     return (
-        <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 shadow-2xl">
-            <div className="flex justify-between items-start mb-6">
+        <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
+            {/* Background Glow for Connected State */}
+            {status === 'connected' && (
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] -z-0" />
+            )}
+
+            <div className="flex justify-between items-start mb-6 relative z-10">
                 <div>
                     <p className="text-gray-500 text-sm font-medium flex items-center gap-2">
                         Net Worth Estimate <span className="rotate-180">↺</span>
@@ -21,22 +30,28 @@ export const MainVault = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
+            <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-6 relative z-10">
                 <div>
                     <p className="text-gray-500 text-[10px] uppercase tracking-widest">WLD Balance</p>
                     <p className="text-xl font-mono font-semibold">
                         {isLoading ? '---' : `${parseFloat(balance).toFixed(4)}`}
                     </p>
                 </div>
-                <div>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-widest">Status</p>
-                    <p className={`text-sm font-bold ${status === 'connected' ? 'text-blue-400' : 'text-red-400'}`}>
-                        {status.toUpperCase()}
-                    </p>
-                </div>
-                <div>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-widest">WLD Price</p>
-                    <p className="text-xl font-mono font-semibold">$0.458581</p>
+                <div className="col-span-2">
+                    <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Status</p>
+                    {status === 'connected' ? (
+                        <p className="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                            CONNECTED
+                        </p>
+                    ) : (
+                        <button
+                            onClick={onConnect}
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg font-bold text-xs hover:bg-gray-200 transition-colors"
+                        >
+                            CONNECT WORLD APP
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

@@ -240,7 +240,7 @@ export default function WalletSection() {
                         }
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <MainVault />
+                        <MainVault onConnect={handleConnect} />
                     </motion.div >
 
                     {/* 2. Action Center (Tabs + Content) */}
