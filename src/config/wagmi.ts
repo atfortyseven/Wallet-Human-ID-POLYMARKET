@@ -1,9 +1,9 @@
 import { http, createConfig, cookieStorage, createStorage } from 'wagmi'
-import { polygon, baseSepolia } from 'wagmi/chains'
+import { polygon, baseSepolia, optimismSepolia } from 'wagmi/chains'
 import { injected, walletConnect } from 'wagmi/connectors'
 
 export const config = createConfig({
-    chains: [polygon, baseSepolia],
+    chains: [polygon, baseSepolia, optimismSepolia],
     ssr: true,
     storage: createStorage({
         storage: cookieStorage,
@@ -11,6 +11,7 @@ export const config = createConfig({
     transports: {
         [polygon.id]: http(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`),
         [baseSepolia.id]: http("https://sepolia.base.org"),
+        [optimismSepolia.id]: http("https://sepolia.optimism.io"),
     },
     connectors: [
         injected(),
