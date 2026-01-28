@@ -87,14 +87,30 @@ export const BootSequence = () => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    {/* 1. FONDO DE VIDEO (Warp Speed) - Placeholder removed for stability, using gradient for now */}
-                    <div className="absolute inset-0 z-0 opacity-60">
-                        {/* Video removed temporarily to avoid 404s, replaced with deep space gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-[#050510]/90 to-black/90" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]" />
+                    {/* 1. FONDO DE VIDEO (CSS WARP SPEED) */}
+                    <div className="absolute inset-0 z-0">
+                        {/* Deep Space Gradients - Lighter and more colorful */}
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1a1a2e_0%,#000000_100%)]" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 via-black to-purple-900/20 mix-blend-screen" />
 
-                        {/* Subtle Animated Stars */}
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light"></div>
+                        {/* CSS Stars/Noise */}
+                        <div className="absolute inset-0 animate-pulse opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+
+                        {/* Pseudo-Starfield (CSS Radial Gradient Stars) */}
+                        <div className="absolute inset-0 opacity-80"
+                            style={{
+                                backgroundImage: 'radial-gradient(white 1px, transparent 1px), radial-gradient(#00f2ea 1px, transparent 1px)',
+                                backgroundSize: '50px 50px, 100px 100px',
+                                backgroundPosition: '0 0, 25px 25px',
+                                animation: 'warpSpeed 20s linear infinite'
+                            }}
+                        />
+                        <style jsx>{`
+                            @keyframes warpSpeed {
+                                from { transform: scale(1); opacity: 0.5; }
+                                to { transform: scale(1.5); opacity: 0; }
+                            }
+                        `}</style>
                     </div>
 
                     {/* 2. INTERFAZ CENTRAL (Glassmorphism) */}
