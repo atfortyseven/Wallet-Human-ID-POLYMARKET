@@ -4,6 +4,7 @@
 ![Status](https://img.shields.io/badge/status-Mainnet%20Ready-success)
 ![Network](https://img.shields.io/badge/network-Base%20Sepolia-blueviolet)
 ![Audit](https://img.shields.io/badge/security-UUPS%20Upgradeable-secure)
+![Deployed](https://img.shields.io/badge/deployed-28%20Jan%202026-blue)
 
 **HumanID.fi** is a sovereign, identity-first predictive market interface built on **PolyMarket** and **World ID**. It bridges the gap between anonymous DeFi and compliant real-world finance using a novel "Proof-of-Humanity" governance model and an AI-driven integrity engine.
 
