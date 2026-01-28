@@ -16,47 +16,11 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
 
             <div className="relative z-10 max-w-[1600px] mx-auto p-8 lg:p-12">
 
-                {/* HEADER REMOVED AS REQUESTED */}
-                <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/5 pb-8" style={{ display: 'none' }}>
-                    <div>
-                        <h2 className="text-xs font-mono text-neutral-500 mb-2 tracking-widest uppercase">Protocol Overview</h2>
-                        <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white">
-                            Financial Integrity <span className="text-neutral-600">Ledger</span>
-                        </h1>
-                    </div>
-                    <div className="flex gap-4">
-                        <DataBadge label="Network" value="Base Mainnet" status="live" />
-                        <DataBadge label="Status" value="Operational" status="success" />
-                    </div>
-                </header>
 
                 {/* BENTO GRID LAYOUT */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-                    {/* BLOQUE 1: TREASURY (Oculto) */}
-                    <div className="md:col-span-2 bg-[#111] border border-white/5 rounded-2xl p-8 hover:border-white/10 transition-colors group hidden">
-                        <div className="flex justify-between items-start mb-8">
-                            <div>
-                                <p className="text-neutral-500 text-sm font-medium mb-1">Total Treasury Value</p>
-                                <h3 className="text-4xl font-semibold text-white tracking-tight">
-                                    ${typeof treasury.tvl === 'number' ? treasury.tvl.toLocaleString(undefined, { minimumFractionDigits: 2 }) : treasury.tvl}
-                                </h3>
-                            </div>
-                            <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white group-hover:bg-white/10 transition-colors">
-                                ↗
-                            </div>
-                        </div>
-
-                        {/* Mini Gráfico CSS Puro (Elegante) */}
-                        <div className="flex items-end gap-1 h-16 mb-4 opacity-50">
-                            {[40, 65, 50, 80, 55, 90, 70, 100].map((h, i) => (
-                                <div key={i} className="flex-1 bg-white/20 hover:bg-white/40 transition-colors rounded-t-sm" style={{ height: `${h}%` }}></div>
-                            ))}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-neutral-500 font-mono">
-                            <span className="text-emerald-400">+12.5%</span> vs last epoch
-                        </div>
-                    </div>
+                    {/* BLOQUE 1: TREASURY (Removed) */}
 
                     {/* BLOQUE 2: SUPPLY METRICS */}
                     <div className="bg-[#111] border border-white/5 rounded-2xl p-8 flex flex-col justify-between hover:border-white/10 transition-colors">
