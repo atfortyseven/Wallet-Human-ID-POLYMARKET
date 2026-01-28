@@ -39,9 +39,16 @@ import { useCTF } from "@/hooks/useCTF"; // [NEW] Gnosis Hook
 const formatAddress = (addr: string) =>
     `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
 
+import { useSearchParams } from "next/navigation"; // Import
+
+// ... (existing imports)
+
 export default function WalletSection() {
     // --- Global "Brain" Context ---
     const { formatMoney, t } = useApp();
+
+    const searchParams = useSearchParams();
+    const marketParam = searchParams.get('market') as `0x${string}` | null;
 
     // --- Hooks de Blockchain ---
     const { address, isConnected, chain } = useAccount();
@@ -80,7 +87,11 @@ export default function WalletSection() {
     const [mounted, setMounted] = useState(false);
 
     // [NEW] FPMM Hook (Market Maker)
-    const { buy, isPending: isTrading } = useFPMM(process.env.NEXT_PUBLIC_MARKET_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000");
+    // Priority: URL Param > Env Var > Default Zero
+    const activeMarketAddress = marketParam || process.env.NEXT_PUBLIC_MARKET_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
+
+    // Pass active address to hook
+    const { buy, isPending: isTrading } = useFPMM(activeMarketAddress);
 
     // Evitar hidratación incorrecta en Next.js
     useEffect(() => setMounted(true), []);
@@ -155,7 +166,8 @@ export default function WalletSection() {
         try {
             // Calculate Min Amount (Slippage protection) - Mocked for now to 0
             const minTokens = BigInt(0);
-            buy(zapAmount, selectedOutcome, minTokens);
+            // Buy using the hook's context (which uses activeMarketAddress)
+            await buy(zapAmount, selectedOutcome, minTokens, activeMarketAddress); // Explicitly passing address just in case, though hook defaults to it
 
             setZapAmount("");
             toast.success(`Buying ${selectedOutcome === 0 ? 'YES' : 'NO'} positions...`);

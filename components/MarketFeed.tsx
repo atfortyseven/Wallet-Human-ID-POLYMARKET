@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { GlassCard, GlassBadge, ProgressBar } from './ui/GlassComponents';
 import { TrendingUp, Clock, Users, ArrowRight, AlertCircle, BarChart3 } from 'lucide-react';
 import { useMarkets } from '../hooks/useMarkets';
+import { useRouter } from 'next/navigation';
 
 // Animaciones optimizadas
 const container = {
@@ -17,6 +18,7 @@ const item = {
 
 export const MarketFeed = () => {
     const { markets, isLoading } = useMarkets();
+    const router = useRouter();
 
     return (
         <div className="w-full max-w-7xl mx-auto mt-20 pb-20">
@@ -61,7 +63,10 @@ export const MarketFeed = () => {
                 >
                     {markets.map((market) => (
                         <motion.div key={market.address} variants={item}>
-                            <GlassCard className="h-full p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 cursor-pointer group flex flex-col relative overflow-hidden">
+                            <GlassCard
+                                className="h-full p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 cursor-pointer group flex flex-col relative overflow-hidden"
+                                onClick={() => router.push(`/wallet?market=${market.address}`)}
+                            >
 
                                 {/* Decoración de fondo hover */}
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />

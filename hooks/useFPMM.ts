@@ -18,6 +18,19 @@ const FACTORY_ABI = [
             { name: 'fee', type: 'uint256' }
         ],
         outputs: [{ name: 'fixedProductMarketMaker', type: 'address' }]
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, name: 'creator', type: 'address' },
+            { indexed: false, name: 'fixedProductMarketMaker', type: 'address' },
+            { indexed: false, name: 'conditionalTokens', type: 'address' },
+            { indexed: false, name: 'collateralToken', type: 'address' },
+            { indexed: false, name: 'conditionIds', type: 'bytes32[]' },
+            { indexed: false, name: 'fee', type: 'uint256' }
+        ],
+        name: 'FixedProductMarketMakerCreation',
+        type: 'event'
     }
 ] as const;
 
@@ -45,7 +58,20 @@ const FPMM_ABI = [
     }
 ] as const;
 
-export function useFPMM(marketAddress?: `0x${string}`) {
+const ERC20_ABI = [
+    {
+        name: 'approve',
+        type: 'function',
+        stateMutability: 'nonpayable',
+        inputs: [
+            { name: 'spender', type: 'address' },
+            { name: 'amount', type: 'uint256' }
+        ],
+        outputs: [{ name: '', type: 'bool' }]
+    }
+] as const;
+
+export function useFPMM(defaultMarketAddress?: `0x${string}`) {
     const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
 
     // Minimal wrapper to call factory
@@ -65,15 +91,16 @@ export function useFPMM(marketAddress?: `0x${string}`) {
         });
     };
 
-    const buy = async (amount: string, outcomeIndex: number, minTokens: bigint = BigInt(0)) => {
-        if (!marketAddress || marketAddress === "0x0000000000000000000000000000000000000000") {
+    const buy = async (amount: string, outcomeIndex: number, minTokens: bigint = BigInt(0), marketAddress?: `0x${string}`) => {
+        const targetAddress = marketAddress || defaultMarketAddress;
+        if (!targetAddress || targetAddress === "0x0000000000000000000000000000000000000000") {
             throw new Error("Invalid Market Address");
         }
 
         const investmentAmount = parseEther(amount);
 
         return await writeContractAsync({
-            address: marketAddress,
+            address: targetAddress,
             abi: FPMM_ABI,
             functionName: 'buy',
             args: [
@@ -84,15 +111,16 @@ export function useFPMM(marketAddress?: `0x${string}`) {
         });
     };
 
-    const addFunding = async (amount: string, distributionHint: bigint[] = []) => {
-        if (!marketAddress || marketAddress === "0x0000000000000000000000000000000000000000") {
+    const addFunding = async (amount: string, distributionHint: bigint[] = [], marketAddress?: `0x${string}`) => {
+        const targetAddress = marketAddress || defaultMarketAddress;
+        if (!targetAddress || targetAddress === "0x0000000000000000000000000000000000000000") {
             throw new Error("Invalid Market Address");
         }
 
         const investmentAmount = parseEther(amount);
 
         return await writeContractAsync({
-            address: marketAddress,
+            address: targetAddress,
             abi: FPMM_ABI,
             functionName: 'addFunding',
             args: [
@@ -102,10 +130,21 @@ export function useFPMM(marketAddress?: `0x${string}`) {
         });
     };
 
+    const approve = async (spender: `0x${string}`, amount: string) => {
+        const amountBI = parseEther(amount);
+        return await writeContractAsync({
+            address: COLLATERAL_TOKEN,
+            abi: ERC20_ABI,
+            functionName: 'approve',
+            args: [spender, amountBI]
+        });
+    };
+
     return {
         deployMarket,
         buy,
         addFunding,
+        approve,
         isPending,
         hash,
         error
