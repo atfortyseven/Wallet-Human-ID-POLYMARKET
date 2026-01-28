@@ -16,8 +16,8 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
 
             <div className="relative z-10 max-w-[1600px] mx-auto p-8 lg:p-12">
 
-                {/* HEADER: Minimalista y Jerárquico */}
-                <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/5 pb-8">
+                {/* HEADER REMOVED AS REQUESTED */}
+                <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/5 pb-8" style={{ display: 'none' }}>
                     <div>
                         <h2 className="text-xs font-mono text-neutral-500 mb-2 tracking-widest uppercase">Protocol Overview</h2>
                         <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white">
@@ -33,8 +33,8 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
                 {/* BENTO GRID LAYOUT */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-                    {/* BLOQUE 1: TREASURY (El más importante, ocupa 2 columnas) */}
-                    <div className="md:col-span-2 bg-[#111] border border-white/5 rounded-2xl p-8 hover:border-white/10 transition-colors group">
+                    {/* BLOQUE 1: TREASURY (Oculto) */}
+                    <div className="md:col-span-2 bg-[#111] border border-white/5 rounded-2xl p-8 hover:border-white/10 transition-colors group hidden">
                         <div className="flex justify-between items-start mb-8">
                             <div>
                                 <p className="text-neutral-500 text-sm font-medium mb-1">Total Treasury Value</p>
