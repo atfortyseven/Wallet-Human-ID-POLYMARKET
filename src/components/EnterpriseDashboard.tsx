@@ -56,25 +56,8 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
                         <IntelFeed />
                     </div>
 
-                    {/* BLOQUE 5: YOUR IDENTITY (Minimalista) */}
-                    <div className="bg-[#111] border border-white/5 rounded-2xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full" />
-                        <p className="text-neutral-500 text-sm font-medium mb-4">Identity Status</p>
-
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center text-xl">
-                                👤
-                            </div>
-                            <div>
-                                <div className="text-sm font-medium text-white">Unverified</div>
-                                <div className="text-xs text-neutral-500">Tier 0 Account</div>
-                            </div>
-                        </div>
-
-                        <button className="w-full py-3 bg-white text-black rounded-lg text-sm font-semibold hover:bg-neutral-200 transition-colors">
-                            Verify World ID
-                        </button>
-                    </div>
+                    {/* BLOQUE 5: YOUR IDENTITY (MOVED TO HEADER) */}
+                    {/* Removed as per request to avoid duplication */}
 
                 </div>
 

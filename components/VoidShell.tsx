@@ -89,6 +89,18 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
 
                 {/* User Controls (Right) */}
                 <div className="absolute right-6 top-4 hidden md:flex items-center gap-3">
+                    {/* IDENTITY STATUS BADGE (NEW) */}
+                    <div className="hidden lg:flex items-center gap-3 mr-4">
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] uppercase tracking-widest text-[#00f2ea]">Identity Status</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                <span className="text-xs font-bold text-neutral-300">Unverified Tier 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* IDKit Widget - Wraps the User Button for Verification */}
                     <IDKitWidget
                         app_id={app_id}
                         action={action}
@@ -100,9 +112,17 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                             <button
                                 onClick={open}
                                 disabled={isLoading}
-                                className="p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white disabled:opacity-50"
+                                className="group relative p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white disabled:opacity-50"
                             >
-                                {isLoading ? <Loader2 size={18} className="animate-spin" /> : <User size={18} />}
+                                {isLoading ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                ) : (
+                                    <>
+                                        <User size={18} />
+                                        {/* Notification Dot */}
+                                        <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-[#09090b] rounded-full" />
+                                    </>
+                                )}
                             </button>
                         )}
                     </IDKitWidget>
