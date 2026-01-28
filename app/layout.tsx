@@ -62,7 +62,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={`${inter.variable} ${mono.variable}`}>
-            <body className="bg-transparent text-white relative min-h-screen">
+            <body className="relative min-h-screen">
                 <RegisterSW />
                 <TermsGate />
                 <GeoBlocker />

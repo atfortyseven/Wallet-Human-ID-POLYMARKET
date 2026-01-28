@@ -4,7 +4,6 @@ import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/components/AppContext";
-import SettingsMenu from "@/components/SettingsMenu";
 import { MainVault } from "@/components/MainVault";
 import {
     Wallet,
@@ -82,7 +81,7 @@ export default function WalletSection() {
 
     // Balance Nativo (ETH)
     const { data: balanceData } = useBalance({
-        address: address,
+        address: address as `0x${string}` | undefined,
     });
 
     // --- Estado ---
@@ -234,24 +233,20 @@ export default function WalletSection() {
     }
 
     return (
-        <div className="w-full max-w-5xl mx-auto p-4 md:p-6 text-neutral-200">
+        <div className="w-full max-w-5xl mx-auto p-4 md:p-6 text-[var(--text-primary)]">
 
             {/* --- HEADER: Identity Layer --- */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-                        <div className="relative p-3 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center gap-2">
+                        <div className="relative p-3 bg-[var(--bg-card)] border border-[var(--border-main)] rounded-2xl flex items-center gap-2">
                             <Wallet className="w-6 h-6 text-indigo-400" />
-                            {/* Settings Menu Trigger */}
-                            <div className="md:hidden">
-                                <SettingsMenu />
-                            </div>
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-white tracking-tight">Main Vault</h2>
-                        <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
+                        <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Main Vault</h2>
+                        <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-secondary)]">
                             {address ? (
                                 <>
                                     <span>{formatAddress(address)}</span>
@@ -284,10 +279,7 @@ export default function WalletSection() {
                         </span>
                     </div>
 
-                    {/* Global Settings Menu */}
-                    <div className="hidden md:block">
-                        <SettingsMenu />
-                    </div>
+                    {/* Global Settings Menu Removed - Moved to VoidShell */}
                 </div>
             </header >
 
@@ -307,32 +299,30 @@ export default function WalletSection() {
                     </motion.div >
 
                     {/* 2. Action Center (Tabs + Content) */}
-                    < div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden flex flex-col min-h-[500px]" >
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-main)] rounded-3xl overflow-hidden flex flex-col min-h-[500px]">
                         {/* Tabs Header */}
-                        < div className="flex border-b border-neutral-800" >
-                            {
-                                ['trade', 'governance', 'activity'].map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab as any)}
-                                        className="relative flex-1 py-4 text-xs md:text-sm font-medium transition-colors outline-none"
-                                    >
-                                        <span className={`relative z-10 tracking-widest ${activeTab === tab ? 'text-white' : 'text-neutral-500'}`}>
-                                            {tab.toUpperCase()}
-                                        </span>
-                                        {activeTab === tab && (
-                                            <motion.div
-                                                layoutId="activeTab"
-                                                className="absolute inset-0 bg-neutral-800"
-                                            />
-                                        )}
-                                    </button>
-                                ))
-                            }
-                        </div >
+                        <div className="flex border-b border-[var(--border-main)]">
+                            {['trade', 'governance', 'activity'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab as any)}
+                                    className="relative flex-1 py-4 text-xs md:text-sm font-medium transition-colors outline-none"
+                                >
+                                    <span className={`relative z-10 tracking-widest ${activeTab === tab ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+                                        {tab.toUpperCase()}
+                                    </span>
+                                    {activeTab === tab && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 bg-[var(--bg-surface)]"
+                                        />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
 
                         {/* Tab Content */}
-                        < div className="p-6 md:p-8 flex-1 relative overflow-hidden" >
+                        <div className="p-6 md:p-8 flex-1 relative overflow-hidden">
                             <AnimatePresence mode="wait">
                                 {activeTab === 'trade' ? (
                                     <motion.div
@@ -343,8 +333,8 @@ export default function WalletSection() {
                                         className="h-full flex flex-col justify-center max-w-lg mx-auto"
                                     >
                                         <div className="text-center mb-6">
-                                            <h3 className="text-xl font-bold text-white mb-2">Market Trading</h3>
-                                            <p className="text-sm text-neutral-400 mb-4">Buy YES or NO positions in the prediction market.</p>
+                                            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Market Trading</h3>
+                                            <p className="text-sm text-[var(--text-secondary)] mb-4">Buy YES or NO positions in the prediction market.</p>
                                         </div>
 
                                         {/* Market Outcome Toggle */}
@@ -353,7 +343,7 @@ export default function WalletSection() {
                                                 onClick={() => setSelectedOutcome(0)}
                                                 className={`py-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${selectedOutcome === 0
                                                     ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                                                    : 'bg-neutral-900 border-neutral-800 text-neutral-500 hover:border-neutral-700'
+                                                    : 'bg-[var(--bg-surface)] border-[var(--border-main)] text-[var(--text-muted)] hover:border-neutral-500'
                                                     }`}
                                             >
                                                 <span className="text-2xl font-bold">YES</span>
@@ -363,7 +353,7 @@ export default function WalletSection() {
                                                 onClick={() => setSelectedOutcome(1)}
                                                 className={`py-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${selectedOutcome === 1
                                                     ? 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-                                                    : 'bg-neutral-900 border-neutral-800 text-neutral-500 hover:border-neutral-700'
+                                                    : 'bg-[var(--bg-surface)] border-[var(--border-main)] text-[var(--text-muted)] hover:border-neutral-500'
                                                     }`}
                                             >
                                                 <span className="text-2xl font-bold">NO</span>
@@ -372,8 +362,8 @@ export default function WalletSection() {
                                         </div>
 
                                         {/* Input Box */}
-                                        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 mb-4 focus-within:ring-2 focus-within:ring-indigo-500/50 transition-all">
-                                            <div className="flex justify-between text-xs text-neutral-500 mb-2 font-mono">
+                                        <div className="bg-[var(--bg-card)] border border-[var(--border-main)] rounded-2xl p-4 mb-4 focus-within:ring-2 focus-within:ring-indigo-500/50 transition-all">
+                                            <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-2 font-mono">
                                                 <span>INVESTMENT</span>
                                                 <span>BAL: {wldVal.toFixed(2)} WLD</span>
                                             </div>
@@ -383,12 +373,12 @@ export default function WalletSection() {
                                                     placeholder="0.00"
                                                     value={zapAmount}
                                                     onChange={(e) => setZapAmount(e.target.value)}
-                                                    className="w-full bg-transparent text-3xl font-mono text-white focus:outline-none placeholder-neutral-700"
+                                                    className="w-full bg-transparent text-3xl font-mono text-[var(--text-primary)] focus:outline-none placeholder-[var(--text-muted)]"
                                                 />
-                                                <span className="shrink-0 bg-neutral-800 text-white px-3 py-1 rounded-lg text-sm font-bold">WLD</span>
+                                                <span className="shrink-0 bg-[var(--bg-surface)] text-[var(--text-primary)] px-3 py-1 rounded-lg text-sm font-bold">WLD</span>
                                             </div>
                                             {/* Estimated Return */}
-                                            <div className="text-right text-xs text-neutral-500 mt-2 font-mono">
+                                            <div className="text-right text-xs text-[var(--text-secondary)] mt-2 font-mono">
                                                 Est. Return: {zapAmount ? (parseFloat(zapAmount) * 1.95).toFixed(2) : '0.00'} Shares (mock)
                                             </div>
                                         </div>
@@ -399,7 +389,7 @@ export default function WalletSection() {
                                                 <button
                                                     key={pct}
                                                     onClick={() => setPercentage(pct)}
-                                                    className="flex-1 py-2 text-xs font-mono font-medium rounded-lg bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors"
+                                                    className="flex-1 py-2 text-xs font-mono font-medium rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)] transition-colors"
                                                 >
                                                     {pct * 100}%
                                                 </button>
@@ -510,28 +500,28 @@ export default function WalletSection() {
                 < div className="lg:col-span-4 space-y-6" >
 
                     {/* Rewards Card - The "Gold" Section */}
-                    < motion.div
+                    <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="relative overflow-hidden rounded-3xl bg-neutral-950 border border-amber-900/30 p-6 h-[400px] flex flex-col"
+                        className="relative overflow-hidden rounded-3xl bg-[var(--bg-card)] border border-amber-900/30 p-6 h-[400px] flex flex-col"
                     >
                         {/* Ambient Glow */}
-                        < div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-600/20 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-600/20 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex items-center gap-2 mb-6">
                             <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
                                 <Gift size={20} />
                             </div>
-                            <h3 className="font-bold text-white tracking-wide">ROYALTIES</h3>
+                            <h3 className="font-bold text-[var(--text-primary)] tracking-wide">ROYALTIES</h3>
                         </div>
 
                         <div className="flex-1 flex flex-col justify-center items-center text-center">
                             <div className="mb-2 text-amber-500 text-sm font-medium tracking-widest">CLAIMABLE</div>
-                            <div className="text-4xl font-mono font-bold text-white mb-1">
+                            <div className="text-4xl font-mono font-bold text-[var(--text-primary)] mb-1">
                                 ${unclaimedRoyalties.toFixed(2)}
                             </div>
-                            <div className="text-xs text-neutral-500">USDC</div>
+                            <div className="text-xs text-[var(--text-secondary)]">USDC</div>
 
                             {/* Visualizer Abstracto */}
                             <div className="flex items-end justify-center gap-1 h-16 mt-8 w-full px-8 opacity-50">
@@ -566,34 +556,34 @@ export default function WalletSection() {
                                 </>
                             )}
                         </button>
-                    </motion.div >
+                    </motion.div>
 
                     {/* Info / Governance Widget */}
-                    < div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-6" >
+                    <div className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-main)] p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-bold text-white">Governance</span>
-                            <ExternalLink size={14} className="text-neutral-500" />
+                            <span className="text-sm font-bold text-[var(--text-primary)]">Governance</span>
+                            <ExternalLink size={14} className="text-[var(--text-muted)]" />
                         </div>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">Voting Power</span>
-                                <span className="text-white font-mono">{votingPower} VP</span>
+                                <span className="text-[var(--text-muted)]">Voting Power</span>
+                                <span className="text-[var(--text-primary)] font-mono">{votingPower} VP</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">Active Props</span>
-                                <span className="flex items-center gap-1 text-white">
+                                <span className="text-[var(--text-muted)]">Active Props</span>
+                                <span className="flex items-center gap-1 text-[var(--text-primary)]">
                                     <span className={`w-1.5 h-1.5 rounded-full ${activeProposals > 0 ? 'bg-emerald-500' : 'bg-neutral-500'}`}></span>
                                     {activeProposals}
                                 </span>
                             </div>
-                            <div className="pt-3 mt-3 border-t border-neutral-800">
-                                <p className="text-xs text-neutral-500 leading-relaxed">
+                            <div className="pt-3 mt-3 border-t border-[var(--border-main)]">
+                                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                                     <Info size={10} className="inline mr-1" />
                                     Next proposal cycle starts in 2 days.
                                 </p>
                             </div>
                         </div>
-                    </div >
+                    </div>
 
                 </div >
             </div >

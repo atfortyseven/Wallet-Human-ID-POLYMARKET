@@ -6,6 +6,7 @@ import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import SettingsMenu from "./SettingsMenu";
 
 export default function VoidShell({ children }: { children: React.ReactNode }) {
     const { address } = useAccount();
@@ -50,15 +51,15 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <div className="min-h-screen bg-void text-white selection:bg-midgard/30 overflow-x-hidden relative">
+        <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] selection:bg-midgard/30 overflow-x-hidden relative transition-colors duration-300">
 
             {/* 1. Fondo Dinámico (Static Grid + Ambient Glow) */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
+            <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-300`}>
                 {/* Grid Sutil */}
                 <div
                     className="absolute inset-0 opacity-[0.03]"
                     style={{
-                        backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+                        backgroundImage: `linear-gradient(#888 1px, transparent 1px), linear-gradient(90deg, #888 1px, transparent 1px)`,
                         backgroundSize: '40px 40px'
                     }}
                 />
@@ -69,21 +70,20 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
 
             {/* 2. Header Flotante Minimalista */}
             <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-center">
-                <nav className="flex items-center gap-6 px-6 py-3 rounded-full bg-surface/50 border border-glass-border backdrop-blur-md shadow-2xl">
+                <nav className="flex items-center gap-6 px-6 py-3 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-md shadow-2xl transition-colors duration-300">
 
                     {/* Brand */}
-                    <div className="font-bold tracking-tighter text-lg">
-                        Human<span className="text-neutral-600">ID</span>.fi
+                    <div className="font-bold tracking-tighter text-lg text-[var(--text-primary)]">
+                        Human<span className="text-[var(--text-secondary)]">ID</span>.fi
                     </div>
 
-                    <div className="h-4 w-[1px] bg-white/10" />
+                    <div className="h-4 w-[1px] bg-[var(--border-main)]" />
 
                     {/* Nav Links (Placeholder) */}
-                    <div className="flex items-center gap-4 text-sm font-medium text-neutral-400">
-                        <a href="/" className="hover:text-white transition-colors">Feed</a>
-                        <a href="/wallet" className="hover:text-white transition-colors">Wallet</a>
-                        <a href="/tokenomics" className="hover:text-[#00f2ea] transition-colors text-[#00f2ea]">Ledger</a>
-                        <a href="/governance" className="hover:text-white transition-colors">Gov</a>
+                    <div className="flex items-center gap-4 text-sm font-medium text-[var(--text-secondary)]">
+                        <a href="/" className="hover:text-[var(--text-primary)] transition-colors">Feed</a>
+                        <a href="/wallet" className="hover:text-[var(--text-primary)] transition-colors">Wallet</a>
+                        <a href="/voting" className="hover:text-[#00f2ea] transition-colors">Voting Hub</a>
                     </div>
                 </nav>
 
@@ -107,9 +107,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                         )}
                     </IDKitWidget>
 
-                    <button className="p-2.5 rounded-full bg-surface border border-glass-border hover:bg-glass-highlight transition-colors text-neutral-400 hover:text-white">
-                        <Menu size={18} />
-                    </button>
+                    <SettingsMenu />
                 </div>
             </header>
 

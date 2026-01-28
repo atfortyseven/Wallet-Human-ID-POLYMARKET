@@ -12,89 +12,50 @@
 
 @layer base {
   :root {
-    --background: #000000;
-    --foreground: #ededed;
+    /* --- LIGHT MODE (Default) --- */
+    --bg-page: #ffffff;
+    --bg-surface: #f5f5f5;
+    /* Neutral-100 */
+    --bg-card: #fafafa;
+    /* Neutral-50 */
+
+    --text-primary: #171717;
+    /* Neutral-900 */
+    --text-secondary: #737373;
+    /* Neutral-500 */
+    --text-muted: #a3a3a3;
+    /* Neutral-400 */
+
+    --border-main: #e5e5e5;
+    /* Neutral-200 */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
   }
 
-  html,
+  .dark {
+    /* --- VOID MODE (Dark) --- */
+    --bg-page: #000000;
+    --bg-surface: #0a0a0a;
+    /* Neutral-950 */
+    --bg-card: #171717;
+    /* Neutral-900 */
+
+    --text-primary: #ffffff;
+    --text-secondary: #a3a3a3;
+    /* Neutral-400 */
+    --text-muted: #525252;
+    /* Neutral-600 */
+
+    --border-main: #262626;
+    /* Neutral-800 */
+    --glass-bg: rgba(0, 0, 0, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+
   body {
-    @apply bg-[var(--background)] text-[var(--foreground)] antialiased cursor-default selection:bg-indigo-500/30 selection:text-indigo-200;
-  }
-
-  /* Custom Scrollbar minimalista */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors;
-  }
-
-  /* --- LIGHT MODE OVERRIDES ("High Contrast" Style) --- */
-  /* Se activan cuando la clase .light está en el HTML */
-
-  .light body {
-    background-color: #ffffff !important;
-    /* FONDO BLANCO PURO */
-    color: #171717 !important;
-    /* Texto base oscuro */
-    background-image: none !important;
-  }
-
-  /* 1. Invertir TEXTO GLOBAL (el que flota sobre el fondo blanco) */
-  .light .text-white {
-    color: #171717 !important;
-  }
-
-  .light .text-neutral-200 {
-    color: #262626 !important;
-  }
-
-  .light .text-neutral-400 {
-    color: #525252 !important;
-  }
-
-  /* 2. PROTECCION DE TARJETAS (Mantenerlas OSCURAS) */
-  /* Rescatar contenedores oscuros para que NO se vuelvan blancos */
-  .light .bg-neutral-900,
-  .light .bg-neutral-900\/50,
-  .light .bg-neutral-950,
-  .light .bg-black,
-  .light .bg-void {
-    background-color: #0a0a0a !important;
-    /* Volver a negro/gris muy oscuro */
-    color: #ffffff !important;
-    border-color: #262626 !important;
-  }
-
-  /* 3. PROTECCION DE TEXTO DENTRO DE TARJETAS */
-  /* El texto dentro de las tarjetas oscuras debe volver a ser BLANCO */
-
-  /* Text-White dentro de tarjetas */
-  .light .bg-neutral-900 .text-white,
-  .light .bg-neutral-900\/50 .text-white,
-  .light .bg-neutral-950 .text-white,
-  .light .bg-black .text-white {
-    color: #ffffff !important;
-  }
-
-  /* Neutral-400 dentro de tarjetas (volver a gris claro) */
-  .light .bg-neutral-900 .text-neutral-400,
-  .light .bg-neutral-900\/50 .text-neutral-400,
-  .light .bg-neutral-950 .text-neutral-400 {
-    color: #a3a3a3 !important;
-  }
-
-  /* Neutral-500 dentro de tarjetas */
-  .light .bg-neutral-900 .text-neutral-500,
-  .light .bg-neutral-900\/50 .text-neutral-500,
-  .light .bg-neutral-950 .text-neutral-500 {
-    color: #737373 !important;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    @apply antialiased cursor-default selection:bg-indigo-500/30 selection:text-indigo-200 transition-colors duration-300;
   }
 }
 
