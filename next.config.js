@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // 1. DECENTRALIZED DEPLOY (IPFS/Fleek)
-    output: 'export',
+    // 1. DECENTRALIZED DEPLOY (Disabled for SSR/API Routes Support)
+    // output: 'export',
 
-    // 2. IMAGE OPTIMIZATION (Disable for Static Export)
+    // 2. IMAGE OPTIMIZATION (Enabled)
     images: {
-        unoptimized: true,
+        // unoptimized: true,
         remotePatterns: [
             { protocol: 'https', hostname: 'picsum.photos' },
             { protocol: 'https', hostname: 'cdn.weatherapi.com' }
