@@ -1,86 +1,43 @@
-"use client";
+import React from 'react';
 
-import { Cpu, Github, Globe, Heart, ShieldCheck, Twitter } from "lucide-react";
-import SystemStatus from "@/components/SystemStatus";
-
-export function Footer() {
+export const Footer = () => {
     return (
-        <footer className="w-full mt-20 border-t border-white/5 bg-[#0D0D12]/80 backdrop-blur-xl z-10 relative">
-            <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-sm text-gray-400">
+        <footer className="relative z-10 border-t border-white/5 bg-black/20 backdrop-blur-sm mt-20">
+            <div className="max-w-[1440px] mx-auto px-5 py-12 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0">
 
-                    {/* Brand Column */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-white font-serif font-bold text-lg">
-                            <Globe size={20} className="text-blue-500" />
-                            <span>Polymarket News</span>
-                        </div>
-                        <p className="leading-relaxed opacity-80">
-                            La terminal de inteligencia financiera descentralizada.
-                            Noticias verificables, mercados predictivos y soberanía individual.
-                        </p>
-                    </div>
-
-                    {/* Ecosystem */}
-                    <div className="space-y-4">
-                        <h3 className="text-white font-bold uppercase tracking-wider text-xs">Ecosistema</h3>
-                        <ul className="space-y-2">
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Smart Contracts</a></li>
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Whitepaper</a></li>
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Auditorías</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Support */}
-                    <div className="space-y-4">
-                        <h3 className="text-white font-bold uppercase tracking-wider text-xs">Soporte</h3>
-                        <ul className="space-y-2">
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Documentación</a></li>
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Discord</a></li>
-                            <li><a href="#" className="hover:text-blue-400 transition-colors">Github Issues</a></li>
-                        </ul>
-                    </div>
-
-                    {/* System Status */}
-                    <div className="space-y-4">
-                        <h3 className="text-white font-bold uppercase tracking-wider text-xs">Estado del Sistema</h3>
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between p-2 rounded bg-white/5 border border-white/5">
-                                <span className="flex items-center gap-2 text-xs">
-                                    <img src="https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png" alt="Matic" className="w-4 h-4 opacity-80" />
-                                    Polygon PoS
-                                </span>
-                                <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    Operational
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between p-2 rounded bg-white/5 border border-white/5">
-                                <span className="flex items-center gap-2 text-xs">
-                                    <Cpu size={14} className="text-purple-400" />
-                                    The Graph
-                                </span>
-                                <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    Synced
-                                </span>
-                            </div>
-                        </div>
-                        <div className="pt-2 border-t border-white/5">
-                            <SystemStatus />
-                        </div>
-                    </div>
+                {/* Brand */}
+                <div className="text-center md:text-left">
+                    <h5 className="text-xl font-bold text-white tracking-tight">Humanid.fi</h5>
+                    <p className="text-xs text-[#888899] mt-2 font-mono">
+                        Sovereign Intelligence & Financial Layer. <br />
+                        Built on Base Sepolia.
+                    </p>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-xs opacity-60">
-                    <p>© 2024 Polymarket News. Open Source.</p>
-                    <div className="flex items-center gap-4 mt-4 md:mt-0">
-                        <a href="#" className="hover:text-white transition-colors"><Twitter size={16} /></a>
-                        <a href="#" className="hover:text-white transition-colors"><Github size={16} /></a>
-                    </div>
+                {/* Links */}
+                <div className="flex gap-8 text-sm text-[#888899]">
+                    <a href="#" className="hover:text-[#00f2ea] transition-colors">Protocol</a>
+                    <a href="#" className="hover:text-[#00f2ea] transition-colors">Security</a>
+                    <a href="#" className="hover:text-[#00f2ea] transition-colors">Governance</a>
+                    <a href="#" className="hover:text-[#00f2ea] transition-colors">Terms</a>
+                </div>
+
+                {/* Status */}
+                <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff9d] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff9d]"></span>
+                    </span>
+                    <span className="text-xs font-mono text-[#00ff9d] tracking-wider">SYSTEM OPTIMAL</span>
                 </div>
             </div>
-        </footer >
+
+            {/* Copyright */}
+            <div className="border-t border-white/5 py-4 text-center">
+                <p className="text-[10px] text-[#444] font-mono uppercase">
+                    © 2024 Humanid.fi Org. All Rights Reserved. Non-Custodial Output.
+                </p>
+            </div>
+        </footer>
     );
-}
+};

@@ -17,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 import BackgroundVideo from '@/components/layout/BackgroundVideo';
+import { BootSequence } from '@/components/layout/BootSequence';
+import { Footer } from '@/components/layout/Footer';
 
 // ...
 
@@ -28,12 +30,14 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${mono.variable}`}>
             <body className="bg-transparent text-white relative min-h-screen">
+                <BootSequence />
                 <BackgroundVideo />
                 <Providers>
                     <AppProvider>
                         <WorldProvider>
                             <VoidShell>
                                 {children}
+                                <Footer />
                             </VoidShell>
                             <Toaster richColors theme="dark" />
                         </WorldProvider>
