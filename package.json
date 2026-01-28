@@ -17,6 +17,9 @@
     "node": "20.x"
   },
   "dependencies": {
+    "@gnosis.pm/conditional-tokens-contracts": "^1.0.3",
+    "@gnosis.pm/conditional-tokens-market-makers": "^1.8.1",
+    "@gnosis.pm/util-contracts": "^3.0.0-alpha.3",
     "@openzeppelin/contracts": "^5.4.0",
     "@prisma/client": "5.19.0",
     "@radix-ui/react-slot": "^1.2.4",

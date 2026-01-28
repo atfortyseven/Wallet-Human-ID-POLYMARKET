@@ -2,4 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as humanFiGovernanceSol from "./HumanFiGovernance.sol";
+export { MockERC20__factory } from "./MockERC20__factory";
 export { MockWLD__factory } from "./MockWLD__factory";

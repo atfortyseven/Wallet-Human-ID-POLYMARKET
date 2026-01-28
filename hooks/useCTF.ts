@@ -53,7 +53,8 @@ const CTF_ABI = [
 
 // Addresses (ENV variables or constants)
 const CTF_ADDRESS = process.env.NEXT_PUBLIC_CTF_ADDRESS as `0x${string}`;
-const COLLATERAL_TOKEN = process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS as `0x${string}`; // Using WLD as collateral
+const COLLATERAL_TOKEN = process.env.NEXT_PUBLIC_COLLATERAL_TOKEN_ADDRESS as `0x${string}`; // Deployed MockERC20
+
 
 export function useCTF() {
     const { address } = useAccount();

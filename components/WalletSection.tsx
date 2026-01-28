@@ -31,6 +31,7 @@ import { useProposals } from "@/hooks/useProposals";
 import { useNetWorth } from "@/hooks/useNetWorth"; // New Hook
 import { ArrowUpRight, ArrowDownRight, RefreshCw } from "lucide-react"; // New Icons
 import { useFPMM } from "@/hooks/useFPMM"; // [NEW] Gnosis Hook
+import { useCTF } from "@/hooks/useCTF"; // [NEW] Gnosis Hook
 
 // removed local formatCurrency
 // const formatCurrency = ...  <-- Using global context instead
@@ -123,6 +124,26 @@ export default function WalletSection() {
         }
     };
 
+    // [NEW] CTF Hook (Redemption)
+    const { redeemPositions, isPending: isRedeeming } = useCTF();
+
+    const handleClaim = async () => {
+        if (unclaimedRoyalties <= 0) {
+            toast.error("No winnings to claim.");
+            return;
+        }
+        try {
+            // Mock Condition ID for now - in production this comes from the specific market
+            const conditionId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            redeemPositions(conditionId); // Note: This function requires string input for amount in useCTF logic? Wait, redeemPositions only takes conditionId in the hook implementation I wrote.
+            // Let's check hook signature. It takes conditionId.
+            toast.success("Redemption transaction sent!");
+        } catch (e) {
+            console.error(e);
+            toast.error("Redemption failed");
+        }
+    };
+
     const handleTrade = async () => {
         if (!isConnected) {
             toast.error("Wallet not connected. Connecting...");
@@ -148,6 +169,28 @@ export default function WalletSection() {
         setZapAmount((wldVal * percent).toFixed(2));
     };
 
+    const handleStandardConnect = () => {
+        // Fallback to the first available connector (usually Injected/MetaMask) that ISN'T WalletConnect if possible, 
+        // or just show the modal if multiple exist.
+        // For simplicity, we try the 'injected' one first, or just open generic connect.
+
+        // If we just call connect(), Wagmi usually opens a modal if multiple connectors are available.
+        // But here we want to avoid the specific World ID one if possible, or just treat it as a generic wallet.
+        const injected = connectors.find(c => c.id === 'injected');
+        if (injected) {
+            connect({ connector: injected });
+        } else {
+            // Fallback: Open standard connect interaction (might show modal depending on setup)
+            // If only WalletConnect is configured, this might just do the same thing, 
+            // but usually 'injected' is present for MetaMask.
+            if (connectors.length > 0) {
+                connect({ connector: connectors[0] });
+            } else {
+                toast.error("No wallet connector found");
+            }
+        }
+    };
+
     if (!mounted) return null;
 
     // Allow access if either wallet is connected OR World ID is authenticated
@@ -159,13 +202,23 @@ export default function WalletSection() {
                     <h2 className="text-2xl font-bold text-white mb-2">Authentication Required</h2>
                     <p className="text-neutral-400 mb-8">Please sign in with World ID or connect your wallet to access the Void Terminal.</p>
 
-                    <button
-                        onClick={handleConnect}
-                        className="px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-neutral-200 transition-colors flex items-center gap-2 mx-auto"
-                    >
-                        <Zap className="w-5 h-5" />
-                        Conectar World ID
-                    </button>
+                    <div className="flex flex-col gap-4 max-w-xs mx-auto">
+                        <button
+                            onClick={handleConnect}
+                            className="w-full px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Zap className="w-5 h-5" />
+                            Conectar World ID
+                        </button>
+
+                        <button
+                            onClick={handleStandardConnect}
+                            className="w-full px-8 py-4 bg-neutral-800 text-neutral-300 rounded-full font-bold text-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 border border-neutral-700"
+                        >
+                            <Wallet className="w-5 h-5" />
+                            Connect Wallet
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -485,9 +538,24 @@ export default function WalletSection() {
                             </div>
                         </div>
 
-                        <button className="w-full mt-auto py-3 bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-600 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all flex justify-center items-center gap-2">
-                            RECLAMAR
-                            <ArrowRightLeft size={16} />
+
+
+                        <button
+                            onClick={handleClaim}
+                            disabled={isRedeeming || unclaimedRoyalties <= 0}
+                            className="w-full mt-auto py-3 bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-600 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isRedeeming ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={16} />
+                                    CLAIMING...
+                                </>
+                            ) : (
+                                <>
+                                    RECLAMAR
+                                    <ArrowRightLeft size={16} />
+                                </>
+                            )}
                         </button>
                     </motion.div >
 

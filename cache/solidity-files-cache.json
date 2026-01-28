@@ -492,6 +492,609 @@
       "artifacts": [
         "MockWLD"
       ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\ConditionalTokens.sol": {
+      "lastModificationDate": 1769553576368,
+      "contentHash": "d7c9bebb097d6760f87d93f5c2e19aab",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/ConditionalTokens.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
+        "./ERC1155/ERC1155.sol",
+        "./CTHelpers.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.1"
+      ],
+      "artifacts": [
+        "ConditionalTokens"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-market-makers\\contracts\\FixedProductMarketMakerFactory.sol": {
+      "lastModificationDate": 1769553576490,
+      "contentHash": "59fbae726d2b0f1df8d52b7ab44c55c6",
+      "sourceName": "@gnosis.pm/conditional-tokens-market-makers/contracts/FixedProductMarketMakerFactory.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/ConditionalTokens.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/CTHelpers.sol",
+        "@gnosis.pm/util-contracts/contracts/ConstructedCloneFactory.sol",
+        "./FixedProductMarketMaker.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155TokenReceiver.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.1"
+      ],
+      "artifacts": [
+        "FixedProductMarketMakerFactory"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\CTHelpers.sol": {
+      "lastModificationDate": 1769553576380,
+      "contentHash": "a3a6588ef2e157ec675ed6949975974e",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/CTHelpers.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.1"
+      ],
+      "artifacts": [
+        "CTHelpers"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\openzeppelin-solidity\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1769553579053,
+      "contentHash": "235c86fd7b8b56863c0a83947451d78b",
+      "sourceName": "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\ERC1155\\ERC1155.sol": {
+      "lastModificationDate": 1769553576419,
+      "contentHash": "724da2ee14476194d3eaa4634605a230",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC1155.sol",
+        "./IERC1155TokenReceiver.sol",
+        "openzeppelin-solidity/contracts/math/SafeMath.sol",
+        "openzeppelin-solidity/contracts/utils/Address.sol",
+        "openzeppelin-solidity/contracts/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC1155"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\openzeppelin-solidity\\contracts\\math\\SafeMath.sol": {
+      "lastModificationDate": 1769553578999,
+      "contentHash": "cf13b2e67c9912b96f0126c5bc56ff43",
+      "sourceName": "openzeppelin-solidity/contracts/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\openzeppelin-solidity\\contracts\\introspection\\ERC165.sol": {
+      "lastModificationDate": 1769553578983,
+      "contentHash": "783ac0d2bea808e5c6ed1957904893df",
+      "sourceName": "openzeppelin-solidity/contracts/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\openzeppelin-solidity\\contracts\\utils\\Address.sol": {
+      "lastModificationDate": 1769553579104,
+      "contentHash": "d665e9fb5a1aacd49bf733d16351b09b",
+      "sourceName": "openzeppelin-solidity/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\ERC1155\\IERC1155.sol": {
+      "lastModificationDate": 1769553576527,
+      "contentHash": "71ad44a1d6f8abf30e90e1b0a8a5532b",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/IERC1155.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC1155"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\ERC1155\\IERC1155TokenReceiver.sol": {
+      "lastModificationDate": 1769553576550,
+      "contentHash": "48cca24388b8fc44e88e643f847aa58d",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/IERC1155TokenReceiver.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC1155TokenReceiver"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\openzeppelin-solidity\\contracts\\introspection\\IERC165.sol": {
+      "lastModificationDate": 1769553578988,
+      "contentHash": "c7900687027a9735b5cd586fd492a8b4",
+      "sourceName": "openzeppelin-solidity/contracts/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\util-contracts\\contracts\\ConstructedCloneFactory.sol": {
+      "lastModificationDate": 1769553969121,
+      "contentHash": "e5685b47f9d320a97cda1ef1573393bc",
+      "sourceName": "@gnosis.pm/util-contracts/contracts/ConstructedCloneFactory.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24 ^0.5.1"
+      ],
+      "artifacts": [
+        "ConstructedCloneFactory"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-market-makers\\contracts\\FixedProductMarketMaker.sol": {
+      "lastModificationDate": 1769553576444,
+      "contentHash": "adfd75c7773bde62b5325c214328fde9",
+      "sourceName": "@gnosis.pm/conditional-tokens-market-makers/contracts/FixedProductMarketMaker.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/math/SafeMath.sol",
+        "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/ConditionalTokens.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/CTHelpers.sol",
+        "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155TokenReceiver.sol",
+        "./ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.1"
+      ],
+      "artifacts": [
+        "CeilDiv",
+        "FixedProductMarketMaker",
+        "FixedProductMarketMakerData"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-contracts\\contracts\\ERC1155\\ERC1155TokenReceiver.sol": {
+      "lastModificationDate": 1769553576448,
+      "contentHash": "7cd39d2ae749492bd48d70a4c159e9b9",
+      "sourceName": "@gnosis.pm/conditional-tokens-contracts/contracts/ERC1155/ERC1155TokenReceiver.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC1155TokenReceiver.sol",
+        "openzeppelin-solidity/contracts/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC1155TokenReceiver"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\node_modules\\@gnosis.pm\\conditional-tokens-market-makers\\contracts\\ERC20.sol": {
+      "lastModificationDate": 1769553576428,
+      "contentHash": "4a7d556ae39416b88eb3fd6677ca383a",
+      "sourceName": "@gnosis.pm/conditional-tokens-market-makers/contracts/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
+        "openzeppelin-solidity/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "C:\\Users\\admin\\.gemini\\antigravity\\scratch\\Wallet Human Polymarket ID\\contracts\\MockERC20.sol": {
+      "lastModificationDate": 1769553561181,
+      "contentHash": "16ec261669750e706e6ec9c2e4818fd7",
+      "sourceName": "contracts/MockERC20.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MockERC20"
+      ]
     }
   }
 }

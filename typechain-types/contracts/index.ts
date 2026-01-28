@@ -3,4 +3,5 @@
 /* eslint-disable */
 import type * as humanFiGovernanceSol from "./HumanFiGovernance.sol";
 export type { humanFiGovernanceSol };
+export type { MockERC20 } from "./MockERC20";
 export type { MockWLD } from "./MockWLD";
