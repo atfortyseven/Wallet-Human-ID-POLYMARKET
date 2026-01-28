@@ -16,27 +16,31 @@ const MARKET_ABI = [
     },
     {
         inputs: [],
-        name: "getPoolBalances", // Función estándar en Gnosis FPMM
+        name: "getPoolBalances",
         outputs: [{ name: "", type: "uint256[]" }],
         stateMutability: "view",
         type: "function",
     },
     {
         inputs: [],
-        name: "totalSupply", // Para estimar volumen/liquidez
+        name: "totalSupply",
         outputs: [{ name: "", type: "uint256" }],
         stateMutability: "view",
         type: "function",
     }
 ] as const;
 
+// CORRECCIÓN: Interfaz completa con todas las propiedades que usamos en el UI
 export interface MarketData {
+    id: string;
     address: string;
     title: string;
+    category: string;
     probability: number;
     volume: string;
     liquidity: string;
-    category: string;
+    endDate: string;
+    participants: number;
 }
 
 export const useMarkets = () => {
@@ -46,48 +50,43 @@ export const useMarkets = () => {
 
     useEffect(() => {
         const fetchMarkets = async () => {
+            // Si no hay cliente o dirección, paramos
             if (!publicClient || !FACTORY_ADDRESS) {
-                console.warn("Faltan configuraciones (Provider o Factory Address)");
                 setIsLoading(false);
                 return;
             }
 
             try {
-                // 1. Log Scraping: Buscamos mercados creados en la blockchain
+                // 1. Log Scraping
                 const logs = await publicClient.getLogs({
                     address: FACTORY_ADDRESS,
                     event: parseAbiItem('event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint256 fee)'),
                     fromBlock: 'earliest'
                 });
 
-                // 2. Multicall Virtual: Procesamos cada mercado en paralelo
+                // 2. Multicall Virtual
                 const marketPromises = logs.map(async (log) => {
                     const marketAddress = log.args.fixedProductMarketMaker;
                     if (!marketAddress) return null;
 
                     try {
-                        // Leemos contrato: Pregunta, Balances y Supply
-                        // Usamos multicall implícito de viem/wagmi si es posible, o llamadas directas
                         const [question, balances, totalSupply] = await Promise.all([
                             publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'question' }).catch(() => "Mercado Sin Título"),
                             publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'getPoolBalances' }).catch(() => [0n, 0n]),
                             publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'totalSupply' }).catch(() => 0n),
                         ]);
 
-                        // 3. Matemática Financiera: Calculamos la probabilidad implícita
-                        // Precio = BalanceA / (BalanceA + BalanceB)
+                        // 3. Matemática Financiera
                         let probability = 50;
-                        const balYes = Number(formatEther(balances[0] as bigint)); // Asumimos index 0 = YES (depende del setup, a veces es 1)
+                        const balYes = Number(formatEther(balances[0] as bigint));
                         const balNo = Number(formatEther(balances[1] as bigint));
 
                         if (balYes + balNo > 0) {
-                            // Invertimos la lógica si es necesario según como hayas ordenado los outcomes
-                            // En Gnosis CPMM estándar: Outcome tokens se mintean en ratio.
-                            // Simplificación: Probabilidad = Proporción del pool contrario (porque mas barato = mas probable? No, en CPMM: P = B / (A+B))
                             probability = (balNo / (balYes + balNo)) * 100;
                         }
 
-                        return {
+                        // Retornamos el objeto que coincide EXACTAMENTE con la interfaz MarketData
+                        const marketObj: MarketData = {
                             id: marketAddress,
                             address: marketAddress,
                             title: question as string,
@@ -98,6 +97,9 @@ export const useMarkets = () => {
                             endDate: "Open",
                             participants: 0
                         };
+
+                        return marketObj;
+
                     } catch (err) {
                         console.error(`Error procesando mercado ${marketAddress}`, err);
                         return null;
@@ -105,8 +107,12 @@ export const useMarkets = () => {
                 });
 
                 const results = await Promise.all(marketPromises);
-                // Filtramos nulos y mostramos los más recientes primero
-                setMarkets(results.filter((m): m is MarketData => m !== null).reverse());
+
+                // CORRECCIÓN: Filtrado explícito para satisfacer al compilador de TS
+                const validMarkets = results.filter((m): m is MarketData => m !== null);
+
+                // Invertimos para mostrar los nuevos primero
+                setMarkets(validMarkets.reverse());
 
             } catch (error) {
                 console.error("Error crítico fetching markets:", error);
