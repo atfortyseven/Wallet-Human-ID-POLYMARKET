@@ -170,23 +170,23 @@ export default function WalletSection() {
     };
 
     const handleStandardConnect = () => {
-        // Fallback to the first available connector (usually Injected/MetaMask) that ISN'T WalletConnect if possible, 
-        // or just show the modal if multiple exist.
-        // For simplicity, we try the 'injected' one first, or just open generic connect.
-
-        // If we just call connect(), Wagmi usually opens a modal if multiple connectors are available.
-        // But here we want to avoid the specific World ID one if possible, or just treat it as a generic wallet.
+        // 1. Try Injected (MetaMask, Coinbase, etc.)
         const injected = connectors.find(c => c.id === 'injected');
-        if (injected) {
+
+        // 2. Try WalletConnect (Universal QR) - This is what the user wants fixed
+        const wc = connectors.find(c => c.id === 'walletConnect');
+
+        if (injected && injected.ready) {
             connect({ connector: injected });
+        } else if (wc) {
+            console.log("Triggering WalletConnect QR with connector:", wc);
+            connect({ connector: wc });
         } else {
-            // Fallback: Open standard connect interaction (might show modal depending on setup)
-            // If only WalletConnect is configured, this might just do the same thing, 
-            // but usually 'injected' is present for MetaMask.
+            // Fallback: Connect first available
             if (connectors.length > 0) {
                 connect({ connector: connectors[0] });
             } else {
-                toast.error("No wallet connector found");
+                toast.error("No wallet connectors found");
             }
         }
     };
@@ -204,16 +204,8 @@ export default function WalletSection() {
 
                     <div className="flex flex-col gap-4 max-w-xs mx-auto">
                         <button
-                            onClick={handleConnect}
-                            className="w-full px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2"
-                        >
-                            <Zap className="w-5 h-5" />
-                            Conectar World ID
-                        </button>
-
-                        <button
                             onClick={handleStandardConnect}
-                            className="w-full px-8 py-4 bg-neutral-800 text-neutral-300 rounded-full font-bold text-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 border border-neutral-700"
+                            className="w-full px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
                         >
                             <Wallet className="w-5 h-5" />
                             Connect Wallet
@@ -294,7 +286,7 @@ export default function WalletSection() {
                         }
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <MainVault onConnect={handleConnect} />
+                        <MainVault onConnect={handleStandardConnect} />
                     </motion.div >
 
                     {/* 2. Action Center (Tabs + Content) */}

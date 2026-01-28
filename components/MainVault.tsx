@@ -64,29 +64,21 @@ export const MainVault = ({ onConnect }: MainVaultProps) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-6 relative z-10">
-                <div>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-widest">WLD Balance</p>
-                    <p className="text-xl font-mono font-semibold">
-                        {isLoading ? '---' : `${parseFloat(balance).toFixed(4)}`}
-                    </p>
-                </div>
-                <div className="col-span-2">
-                    <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Status</p>
-                    {status === 'connected' ? (
-                        <p className="text-sm font-bold text-emerald-400 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                            CONNECTED
-                        </p>
-                    ) : (
-                        <button
-                            onClick={handleUniversalConnect}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white text-black rounded-lg font-bold text-xs hover:bg-gray-200 transition-colors shadow-lg hover:shadow-xl"
-                        >
-                            CONNECT WORLD APP
-                        </button>
-                    )}
-                </div>
+            {/* Bottom Section: Status & Connect */}
+            <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
+                {isConnected ? (
+                    <div className="flex items-center gap-2 text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-lg w-fit">
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                        <span className="text-sm font-bold">WALLET CONNECTED</span>
+                    </div>
+                ) : (
+                    <button
+                        onClick={onConnect}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-black rounded-xl font-bold text-sm hover:bg-neutral-200 transition-colors shadow-lg hover:shadow-xl"
+                    >
+                        CONNECT WALLET
+                    </button>
+                )}
             </div>
         </div>
     )

@@ -1,42 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GlassCard, GlassBadge, ProgressBar } from './ui/GlassComponents';
-import { TrendingUp, Clock, Users, ArrowRight } from 'lucide-react';
+import { TrendingUp, Clock, Users, ArrowRight, AlertCircle, BarChart3 } from 'lucide-react';
+import { useMarkets } from '../hooks/useMarkets';
 
-// 1. Datos Mock de "Alto Valor"
-const MOCK_MARKETS = Array.from({ length: 15 }).map((_, i) => ({
-    id: i,
-    title: [
-        "¿Aprobará la SEC el ETF de Ethereum este mes?",
-        "¿Llegará Bitcoin a $100k antes de Q4?",
-        "¿Ganará Real Madrid la Champions League?",
-        "¿La inflación de EE.UU bajará del 2.5%?",
-        "¿Superará GPT-5 el test de Turing?",
-        "¿Elon Musk comprará otra red social?",
-        "¿Base superará a Arbitrum en TVL?",
-        "¿Lanzamiento de GTA VI antes de diciembre?",
-        "¿Apple lanzará un anillo inteligente?",
-        "¿Precio del Oro alcanzará máximo histórico?",
-        "¿Elecciones en UK: Mayoría laborista?",
-        "¿Solana mantendrá 100% uptime este mes?",
-        "¿Se descubrirá vida en Marte (microbiana)?",
-        "¿Netflix prohibirá compartir contraseñas globalmente?",
-        "¿Mark Zuckerberg ganará la pelea contra Musk?"
-    ][i],
-    category: ["Cripto", "Economía", "Deportes", "Tech", "Política"][i % 5],
-    volume: Math.floor(Math.random() * 500000) + 10000,
-    probability: Math.floor(Math.random() * 80) + 10,
-    endDate: "24h",
-    participants: Math.floor(Math.random() * 1000)
-}));
-
-// Variantes para animacion en cascada (Stagger)
+// Animaciones optimizadas
 const container = {
     hidden: { opacity: 0 },
-    show: {
-        opacity: 1,
-        transition: { staggerChildren: 0.1 }
-    }
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
 const item = {
@@ -45,70 +16,97 @@ const item = {
 };
 
 export const MarketFeed = () => {
-    return (
-        <div className="w-full max-w-7xl mx-auto mt-20">
+    const { markets, isLoading } = useMarkets();
 
-            {/* Título de la Sección */}
+    return (
+        <div className="w-full max-w-7xl mx-auto mt-20 pb-20">
+
+            {/* Header Sección */}
             <div className="flex items-center justify-between mb-8 px-4">
                 <h3 className="text-2xl font-bold text-white flex items-center gap-2">
                     <TrendingUp className="text-cyan-400" />
-                    Mercados en Tendencia
+                    Mercados en Base Sepolia
                 </h3>
-                <span className="text-blue-200/50 text-sm font-medium">15 Activos</span>
+                <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-200 text-xs font-mono">
+                    {isLoading ? "Sincronizando..." : `${markets.length} Activos`}
+                </span>
             </div>
 
-            {/* Grid de Artículos */}
-            <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4"
-            >
-                {MOCK_MARKETS.map((market) => (
-                    <motion.div key={market.id} variants={item}>
-                        <GlassCard className="h-full p-6 hover:bg-white/15 transition-colors cursor-pointer group">
+            {/* Lógica de Renderizado */}
+            {isLoading ? (
+                // Estado: Cargando (Skeleton UI)
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-[280px] rounded-3xl bg-white/5 animate-pulse border border-white/5" />
+                    ))}
+                </div>
+            ) : markets.length === 0 ? (
+                // Estado: Vacío
+                <GlassCard className="text-center py-20 mx-4 border-dashed border-white/20">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="text-white/40" size={32} />
+                    </div>
+                    <h3 className="text-xl text-white font-bold">No hay mercados activos</h3>
+                    <p className="text-blue-200/50 mt-2 max-w-md mx-auto">
+                        La blockchain está tranquila. Sé el primero en crear una predicción arriba.
+                    </p>
+                </GlassCard>
+            ) : (
+                // Estado: Data Real
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4"
+                >
+                    {markets.map((market) => (
+                        <motion.div key={market.address} variants={item}>
+                            <GlassCard className="h-full p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 cursor-pointer group flex flex-col relative overflow-hidden">
 
-                            {/* Header de la Tarjeta */}
-                            <div className="flex justify-between items-start mb-4">
-                                <GlassBadge color={market.category === 'Cripto' ? 'purple' : 'blue' as any}>
-                                    {market.category}
-                                </GlassBadge>
-                                <div className="flex items-center gap-1 text-xs text-blue-200/60 bg-black/20 px-2 py-1 rounded-full">
-                                    <Clock size={12} />
-                                    <span>{market.endDate} left</span>
+                                {/* Decoración de fondo hover */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                {/* Badges Superiores */}
+                                <div className="flex justify-between items-start mb-4 relative z-10">
+                                    <GlassBadge color="blue">Predicción</GlassBadge>
+                                    <div className="flex items-center gap-1 text-[10px] font-bold text-green-300 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full uppercase tracking-wide">
+                                        En Curso
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Título Principal */}
-                            <h4 className="text-lg font-bold text-white leading-snug mb-4 group-hover:text-cyan-300 transition-colors">
-                                {market.title}
-                            </h4>
+                                {/* Título del Mercado */}
+                                <h4 className="text-xl font-bold text-white leading-tight mb-4 group-hover:text-cyan-300 transition-colors line-clamp-3 min-h-[4.5rem]">
+                                    {market.title}
+                                </h4>
 
-                            {/* Data Visualization (Odds) */}
-                            <div className="space-y-3 mb-6">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-green-300 font-medium">SÍ {market.probability}%</span>
-                                    <span className="text-red-300 font-medium">NO {100 - market.probability}%</span>
+                                {/* Sección de Probabilidades (El núcleo del valor) */}
+                                <div className="space-y-3 mb-6 mt-auto relative z-10">
+                                    <div className="flex justify-between text-sm font-medium">
+                                        <span className="text-cyan-200">SÍ {market.probability}%</span>
+                                        <span className="text-purple-200">NO {100 - market.probability}%</span>
+                                    </div>
+                                    {/* Barra visual de probabilidad */}
+                                    <ProgressBar value={market.probability} color="cyan" />
                                 </div>
-                                <ProgressBar value={market.probability} />
-                            </div>
 
-                            {/* Footer / Stats */}
-                            <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-auto">
-                                <div className="flex items-center gap-2 text-xs text-blue-100/60">
-                                    <Users size={14} />
-                                    <span>{market.participants} Traders</span>
-                                </div>
-                                <div className="flex items-center gap-1 text-xs font-mono text-cyan-200">
-                                    ${(market.volume / 1000).toFixed(1)}k Vol
-                                    <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-cyan-400" />
-                                </div>
-                            </div>
+                                {/* Footer de Métricas */}
+                                <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-2">
+                                    <div className="flex items-center gap-2 text-xs text-blue-200/50 font-mono">
+                                        <BarChart3 size={14} />
+                                        <span>Vol: {Number(market.volume).toFixed(0)} TKN</span>
+                                    </div>
 
-                        </GlassCard>
-                    </motion.div>
-                ))}
-            </motion.div>
+                                    <div className="flex items-center gap-1 text-xs font-bold text-cyan-400 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        OPERAR
+                                        <ArrowRight size={14} className="-translate-x-1 group-hover:translate-x-0 transition-transform" />
+                                    </div>
+                                </div>
+
+                            </GlassCard>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            )}
         </div>
     );
 };
