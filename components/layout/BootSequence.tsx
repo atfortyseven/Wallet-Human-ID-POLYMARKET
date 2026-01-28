@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- ZK LORE: Textos reales de criptografía ---
 const ZK_LOGS = [
-    "INITIALIZING_CURVE_BN254...",
+    "SYSTEM_INITIATED_BN254...",
     "GENERATING_WITNESS_PARAMETERS...",
     "COMPUTING_MERKLE_ROOT_HASH...",
     "NON_INTERACTIVE_CHALLENGE_ACCEPTED...",

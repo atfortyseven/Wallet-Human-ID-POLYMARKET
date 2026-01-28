@@ -126,11 +126,13 @@ model IntelItem {
   id             String   @id @default(cuid())
   source         String
   title          String
-  category       String
+  category       String   @default("FINANCE")
   url            String   @unique
-  publishedAt    DateTime
+  publishedAt    DateTime @default(now())
   sentimentScore Float?
   aiSummary      String?  @db.Text
+  priority       String   @default("NORMAL")
+  createdAt      DateTime @default(now())
 
   @@index([publishedAt])
 }

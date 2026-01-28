@@ -1,4 +1,5 @@
 import { createAppKit } from '@reown/appkit/react'
+// Config clean-up verification
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { mainnet, optimism, base, baseSepolia, arbitrum, polygon, type AppKitNetwork } from '@reown/appkit/networks'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
