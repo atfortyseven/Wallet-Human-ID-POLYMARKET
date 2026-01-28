@@ -27,26 +27,12 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* SECCIÓN: News Feed (Restored & Prioritized) */}
-                <section className="py-20 border-t border-white/5 relative">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
-
-                    <div className="mb-12 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 mb-4">
-                            Global Intel Feed
-                        </h2>
-                        <p className="text-blue-200/50 max-w-2xl mx-auto">
-                            Real-time intelligence from the world's leading sources.
-                        </p>
-                    </div>
-
-                    <NewsGrid category="general" />
-                </section>
+                {/* SECCIÓN: News Feed (Global Intel Engine) */}
+                <NewsGrid />
 
                 {/* SECCIÓN MARKETS: Mercados en Base Sepolia */}
-                <section className="py-20 border-t border-white/5 relative">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
-                    {/* MarketFeed ya tiene su propio header "Mercados en Base Sepolia" */}
+                <section className="py-20 relative">
+                    {/* El boundary visual ya está en NewsGrid, así que aquí solo cargamos el feed */}
                     <MarketFeed />
                 </section>
 
