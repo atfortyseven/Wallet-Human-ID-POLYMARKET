@@ -23,7 +23,7 @@ export const MarketFeed = () => {
     const router = useRouter();
 
     return (
-        <div className="w-full max-w-7xl mx-auto mt-20 pb-20">
+        <div className="w-full max-w-[1440px] mx-auto mt-20 pb-20 px-5">
 
             {/* Header Sección */}
             <div className="flex items-center justify-between mb-8 px-4">

@@ -204,29 +204,33 @@ export const NewsGrid = () => {
 
             {/* --- MASTER HEADER --- */}
             <header className="flex flex-col md:flex-row justify-between items-center py-8 mb-10 border-b border-white/10 gap-6 relative">
-                <div className="font-mono text-xs text-[#888899]">
+
+                {/* 1. Time Widget (Desktop: Left, Mobile: 2nd) */}
+                <div className="font-mono text-xs text-[#888899] order-2 md:order-1">
                     {currentTime}
                 </div>
 
-                <div className="absolute left-1/2 -translate-x-1/2 top-4 md:top-auto md:relative md:left-auto md:transform-none order-first md:order-none cursor-pointer group">
-                    <div className="glass px-8 py-3 rounded-xl relative border-white/10 group-hover:border-[#00f2ea] transition-all duration-500 overflow-hidden">
+                {/* 2. Title (Desktop: Center Absolute, Mobile: 1st) */}
+                <div className="order-1 md:order-2 md:absolute md:left-1/2 md:-translate-x-1/2 cursor-pointer group w-full md:w-auto flex justify-center">
+                    <div className="glass px-8 py-3 rounded-xl relative border-white/10 group-hover:border-[#00f2ea] transition-all duration-500 overflow-hidden w-full md:w-auto text-center">
                         <div className="absolute inset-0 bg-[#00f2ea]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-white to-[#888899] font-sans tracking-tight relative z-10">
+                        <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-white to-[#888899] font-sans tracking-tight relative z-10">
                             Humanid.fi
                         </h1>
-                        <span className="block text-[0.6rem] text-[#00f2ea] tracking-[3px] font-mono text-center uppercase md:mt-[-5px]">
+                        <span className="block text-[0.5rem] md:text-[0.6rem] text-[#00f2ea] tracking-[3px] font-mono text-center uppercase md:mt-[-5px]">
                             Decentralized Intel Core
                         </span>
                     </div>
                 </div>
 
-                <div className="glass flex items-center gap-4 px-5 py-2.5 rounded-full border-white/10 hover:border-[#00f2ea] transition-colors bg-black/30">
+                {/* 3. Weather Widget (Desktop: Right, Mobile: 3rd) */}
+                <div className="order-3 glass flex items-center gap-4 px-5 py-2.5 rounded-full border-white/10 hover:border-[#00f2ea] transition-colors bg-black/30 w-full md:w-auto justify-center">
                     <div className="text-2xl">☁️</div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col text-left">
                         <span className="font-bold text-[#00f2ea] text-lg leading-none">{weather.temp}°C</span>
                         <input
                             type="text"
-                            className="weather-loc font-mono text-xs text-[#888899] cursor-text uppercase"
+                            className="weather-loc font-mono text-xs text-[#888899] cursor-text uppercase bg-transparent outline-none w-24 focus:border-b focus:border-[#00f2ea]"
                             value={weather.city}
                             onChange={(e) => setWeather({ ...weather, city: e.target.value })}
                             onBlur={(e) => updateWeather(e.target.value)}
