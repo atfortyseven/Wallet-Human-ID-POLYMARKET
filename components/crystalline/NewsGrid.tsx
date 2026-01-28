@@ -3,35 +3,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- CONFIGURACIÓN Y BASES DE DATOS SIMULADAS ---
+// --- CONFIG & DATA BASES ---
 const CATEGORIES = [
     "Trending", "Breaking", "New", "Politics", "Sports", "Crypto",
     "Finance", "Geopolitics", "Earnings", "Tech", "Culture",
-    "World", "Economy", "Climate & Science", "Elections", "Mentions"
+    "World", "Economy", "Climate", "Elections", "Mentions"
 ];
 
-const CONTENT_BASES = {
-    titles: [
-        "Impacto global tras el anuncio oficial de", "Nuevas regulaciones afectan directamente a",
-        "El mercado reacciona con volatilidad ante", "Descubrimiento clave cambia el panorama de",
-        "Análisis exclusivo: Lo que nadie vio sobre", "Crisis inminente en el sector de",
-        "Récord histórico alcanzado hoy en", "Fusión estratégica entre gigantes de",
-        "La inteligencia artificial transforma", "Protestas masivas tras la aprobación de"
-    ],
-    bodies: [
-        "En un desarrollo sorprendente que ha sacudido los cimientos del sector, los analistas confirman que las tendencias actuales apuntan a un cambio de paradigma irreversible. Las fuentes oficiales han verificado los datos, mostrando una correlación directa entre los eventos de la última semana y la respuesta del mercado global.",
-        "Expertos de alto nivel sugieren cautela. La volatilidad observada en las últimas 24 horas no tiene precedentes, y se espera que las próximas declaraciones oficiales definan el curso de acción para el resto del trimestre fiscal. La implementación de nuevas tecnologías ha sido el catalizador principal.",
-        "El informe detallado publicado esta mañana revela discrepancias significativas con las previsiones anteriores. Esto obliga a una reestructuración inmediata de las estrategias a largo plazo. La comunidad internacional observa con atención, dado que las implicaciones geopolíticas son vastas y complejas.",
-        "Con la confirmación verificada de múltiples agencias, estamos ante uno de los hitos más importantes de la década. La integración de sistemas descentralizados está permitiendo una eficiencia nunca antes vista, aunque los riesgos de seguridad siguen siendo un tema de debate caliente en las mesas directivas."
-    ]
-};
+const TITLES_DB = [
+    "Descentralización Absoluta: El fin de los intermediarios en",
+    "Protocolo Activado: Nueva capa de seguridad para",
+    "Identidad Soberana: Usuarios reclaman control sobre",
+    "Liquidación Instantánea: Récord de volumen en nodos de",
+    "Fallo en Dinero Fiat: Inversores mueven capital a",
+    "Verificación Biométrica: El nuevo estándar en",
+    "Consenso Global: Redes validadas aprueban cambios en",
+    "Hashrate Histórico: La seguridad de la red supera a",
+    "Smart Contracts: Automatización jurídica reemplaza a",
+    "Tokenización de Activos Reales: El impacto en"
+];
 
-// --- UTILIDADES ---
-const getTodayDate = () => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date().toLocaleDateString('es-ES', options);
-};
+const INFO_TOPICS = [
+    "Sovereign ID", "Zero-Knowledge Proofs", "DAO Governance", "Treasury V2",
+    "Ledger Security", "Node Validators", "P2P Settlement", "Smart Wallets",
+    "DeFi Bridge", "Layer 2 Scaling", "NFT Utility", "Biometric Hash",
+    "Privacy Core", "Audit Logs", "Tokenomics", "Staking Pools",
+    "Cross-Chain Ops", "API Gateways", "User Rights", "Immutable Storage"
+];
 
+// --- INTERFACES ---
 interface NewsItem {
     id: string;
     category: string;
@@ -41,107 +41,168 @@ interface NewsItem {
     content: string;
 }
 
-export const NewsGrid = ({ category: initialCategory = "Trending" }: { category?: string }) => {
-    const [currentCategory, setCurrentCategory] = useState(initialCategory);
+export const NewsGrid = () => {
+    // STATE
+    const [activeCategory, setActiveCategory] = useState("Trending");
     const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+    const [weather, setWeather] = useState({ temp: "--", city: "Madrid" });
+    const [currentTime, setCurrentTime] = useState("Initializing...");
     const [loading, setLoading] = useState(false);
 
-    // Set para evitar duplicados en la sesión actual
-    const processedNewsIds = useRef(new Set<string>());
-
-    // --- MOTOR DE GENERACIÓN (MOCK ENGINE) ---
-    const generateUniqueNewsItem = (cat: string, index: number): NewsItem => {
-        const seed = Math.random();
-        const titleBase = CONTENT_BASES.titles[Math.floor(seed * CONTENT_BASES.titles.length)];
-        const bodyBase = CONTENT_BASES.bodies[Math.floor(Math.random() * CONTENT_BASES.bodies.length)];
-        const specificTopic = `${cat} Protocol ${index + 204}`;
-
-        // Mapeo simula keywords para imágenes
-        const catMap: Record<string, string> = {
-            'Trending': 'news', 'Breaking': 'emergency', 'New': 'fresh', 'Politics': 'government',
-            'Sports': 'stadium', 'Crypto': 'bitcoin', 'Finance': 'chart', 'Geopolitics': 'map',
-            'Earnings': 'money', 'Tech': 'robot', 'Culture': 'art', 'World': 'earth',
-            'Economy': 'bank', 'Climate & Science': 'laboratory', 'Elections': 'vote', 'Mentions': 'social'
-        };
-        const keyword = catMap[cat] || 'news';
-
-        // Picsum con semilla única por ID para consistencia visual (anti-flicker)
-        const uniqueId = `news-${cat}-${index}`;
-        const randomImg = `https://picsum.photos/seed/${uniqueId}/600/400`;
-
-        return {
-            id: uniqueId,
-            category: cat.toUpperCase(),
-            date: getTodayDate(),
-            title: `${titleBase} ${specificTopic}`,
-            image: randomImg,
-            content: `${bodyBase} Este evento marca un punto de inflexión para ${cat}, donde la lógica del mercado y la intervención humana convergen.`
-        };
-    };
-
-    const loadFeed = (cat: string) => {
-        setLoading(true);
-        // Simulación de delay de red
-        setTimeout(() => {
-            const newItems: NewsItem[] = [];
-            processedNewsIds.current.clear(); // Reset simple por vista
-
-            for (let i = 0; i < 50; i++) { // 50 Items solicitados
-                const item = generateUniqueNewsItem(cat, i);
-                if (processedNewsIds.current.has(item.id)) continue;
-
-                processedNewsIds.current.add(item.id);
-                newItems.push(item);
-            }
-
-            setNewsItems(newItems);
-            setLoading(false);
-        }, 600);
-    };
-
-    // Efecto inicial y cambio de categoría
+    // Weather Init
     useEffect(() => {
-        loadFeed(currentCategory);
-    }, [currentCategory]);
+        const savedCity = localStorage.getItem('humanid_city') || "Madrid";
+        updateWeather(savedCity);
+    }, []);
+
+    // Time Widget
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date().toUTCString().replace('GMT', 'UTC // SYSTEM ACTIVE'));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // Feed Loader matches Category
+    useEffect(() => {
+        generateFeed(activeCategory);
+    }, [activeCategory]);
+
+    // --- LOGIC: WEATHER ---
+    const updateWeather = async (city: string) => {
+        try {
+            // 1. Get Lat/Lon
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=es&format=json`);
+            const geoData = await geoRes.json();
+
+            if (!geoData.results) throw new Error("City not found");
+
+            const { latitude, longitude, name } = geoData.results[0];
+
+            // 2. Get Weather
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+            const weatherData = await weatherRes.json();
+
+            setWeather({
+                temp: `${weatherData.current_weather.temperature}`,
+                city: name
+            });
+            localStorage.setItem('humanid_city', name);
+
+        } catch (e) {
+            console.log("Weather offline mode");
+            setWeather({ temp: "22", city: city }); // Fallback
+        }
+    };
+
+    // --- LOGIC: FEED ---
+    const generateFeed = (category: string) => {
+        setLoading(true);
+        // Simulate network delay for "Realness"
+        setTimeout(() => {
+            const items: NewsItem[] = [];
+            for (let i = 0; i < 50; i++) {
+                const randTitle = TITLES_DB[Math.floor(Math.random() * TITLES_DB.length)];
+                const imgId = 10 + i;
+                // Picsum seed unique per item
+                const imgUrl = `https://picsum.photos/seed/${category}${i}/600/400`;
+
+                items.push({
+                    id: `${category}-${i}-${Date.now()}`,
+                    category: category,
+                    date: new Date().toLocaleDateString(),
+                    title: `${randTitle} ${category}`,
+                    image: imgUrl,
+                    content: `Análisis crítico del bloque ${Date.now().toString().slice(-6)}. La validación de los datos sugiere una ruptura con los modelos tradicionales. Este evento marca un hito en la adopción de infraestructuras no fiduciarias, asegurando la inmutabilidad de la información presentada.`
+                });
+            }
+            setNewsItems(items);
+            setLoading(false);
+        }, 400);
+    };
+
 
     return (
-        <section id="global-intel-wrapper" className="max-w-[1400px] mx-auto p-5 font-sans">
-            {/* --- ESTILOS INYECTADOS (CSS Scopeado para este componente) --- */}
+        <section className="font-sans text-white max-w-[1440px] mx-auto px-5">
+            {/* --- SCOPED STYLES (Ported from Artifact) --- */}
             <style jsx>{`
                 :global(:root) {
-                    --glass-bg: rgba(20, 20, 30, 0.6);
-                    --glass-border: rgba(255, 255, 255, 0.1);
-                    --glass-shine: rgba(255, 255, 255, 0.05);
-                    --accent-color: #00f2ea;
+                    --bg-panel: rgba(20, 20, 30, 0.4);
+                    --glass-border: rgba(255, 255, 255, 0.08);
+                    --accent-cyan: #00f2ea;
+                    --accent-purple: #7000ff;
+                    --text-muted: #888899;
+                    --success: #00ff9d;
                 }
+                
+                .glass {
+                    background: var(--bg-panel);
+                    backdrop-filter: blur(16px);
+                    border: 1px solid var(--glass-border);
+                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+                }
+
+                /* NAVIGATION SCROLL HIDER */
                 .intel-nav::-webkit-scrollbar { display: none; }
                 .intel-nav { -ms-overflow-style: none; scrollbar-width: none; }
+
+                /* WEATHER INPUT RESET */
+                .weather-loc { background: transparent; border: none; color: #fff; width: 100px; outline: none; }
+                .weather-loc:focus { border-bottom: 1px solid var(--accent-cyan); }
                 
-                .glass-card-hover:hover {
+                /* CARD HOVER EFFECTS */
+                .news-card-hover:hover {
                     transform: translateY(-5px);
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-                    border-color: rgba(255,255,255,0.25);
+                    border-color: var(--accent-cyan);
                 }
-                .card-image { transition: transform 0.5s ease; }
-                .glass-card-hover:hover .card-image { transform: scale(1.05); }
+                .news-card-hover:hover img { transform: scale(1.1); }
             `}</style>
 
-            {/* --- HEADER --- */}
-            <div className="mb-6 border-b border-white/10 pb-4">
-                {/* Título manejado en page.tsx, pero mantenemos estructura interna si es necesario */}
-            </div>
+            {/* --- MASTER HEADER --- */}
+            <header className="flex flex-col md:flex-row justify-between items-center py-8 mb-10 border-b border-white/10 gap-6 relative">
+                <div className="font-mono text-xs text-[#888899]">
+                    {currentTime}
+                </div>
 
-            {/* --- NAVIGATION MENU --- */}
-            <nav className="intel-nav flex gap-4 overflow-x-auto pb-5 mb-5">
+                <div className="absolute left-1/2 -translate-x-1/2 top-4 md:top-auto md:relative md:left-auto md:transform-none order-first md:order-none cursor-pointer group">
+                    <div className="glass px-8 py-3 rounded-xl relative border-white/10 group-hover:border-[#00f2ea] transition-all duration-500 overflow-hidden">
+                        <div className="absolute inset-0 bg-[#00f2ea]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-white to-[#888899] font-sans tracking-tight relative z-10">
+                            Humanid.fi
+                        </h1>
+                        <span className="block text-[0.6rem] text-[#00f2ea] tracking-[3px] font-mono text-center uppercase md:mt-[-5px]">
+                            Decentralized Intel Core
+                        </span>
+                    </div>
+                </div>
+
+                <div className="glass flex items-center gap-4 px-5 py-2.5 rounded-full border-white/10 hover:border-[#00f2ea] transition-colors bg-black/30">
+                    <div className="text-2xl">☁️</div>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-[#00f2ea] text-lg leading-none">{weather.temp}°C</span>
+                        <input
+                            type="text"
+                            className="weather-loc font-mono text-xs text-[#888899] cursor-text uppercase"
+                            value={weather.city}
+                            onChange={(e) => setWeather({ ...weather, city: e.target.value })}
+                            onBlur={(e) => updateWeather(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && updateWeather(e.currentTarget.value)}
+                        />
+                    </div>
+                </div>
+            </header>
+
+            {/* --- NAVIGATION --- */}
+            <nav className="intel-nav flex gap-3 overflow-x-auto pb-5 mb-5">
                 {CATEGORIES.map((cat) => (
                     <button
                         key={cat}
-                        onClick={() => setCurrentCategory(cat)}
+                        onClick={() => setActiveCategory(cat)}
                         className={`
-                            px-5 py-2.5 rounded-full text-sm whitespace-nowrap transition-all duration-300 backdrop-blur-md border
-                            ${currentCategory === cat
-                                ? 'bg-[#00f2ea]/15 border-[#00f2ea] text-[#00f2ea] shadow-[0_0_15px_rgba(0,242,234,0.2)]'
-                                : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'}
+                            px-6 py-3 rounded-lg text-sm font-mono uppercase tracking-wider transition-all duration-300 border
+                            ${activeCategory === cat
+                                ? 'bg-[#00f2ea]/10 border-[#00f2ea] text-white shadow-[0_0_15px_rgba(0,242,234,0.1)]'
+                                : 'bg-white/5 border-white/10 text-[#888899] hover:bg-white/10 hover:text-white'}
                         `}
                     >
                         {cat}
@@ -149,41 +210,40 @@ export const NewsGrid = ({ category: initialCategory = "Trending" }: { category?
                 ))}
             </nav>
 
-            {/* --- FEED GRID --- */}
-            <div className="min-h-[500px]">
+            {/* --- FEED CORE --- */}
+            <div className="min-h-[600px] mt-5">
                 {loading ? (
-                    <div className="col-span-2 text-center py-20 text-[#00f2ea] animate-pulse font-mono text-lg">
-                        Analizando datos globales en tiempo real...
+                    <div className="flex justify-center items-center h-64 font-mono text-[#00f2ea] animate-pulse">
+                        [ DECRYPTING NODE STREAM... ]
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <AnimatePresence mode='popLayout'>
                             {newsItems.map((item, index) => (
                                 <motion.div
                                     key={item.id}
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                    className="glass-card-hover bg-[#14141e]/60 border border-white/10 rounded-2xl p-5 backdrop-blur-xl relative flex flex-col overflow-hidden group"
+                                    transition={{ duration: 0.4, delay: index * 0.02 }}
+                                    className="news-card-hover glass rounded-xl overflow-hidden relative group transition-all duration-400"
                                 >
-                                    <div className="w-full h-[220px] rounded-lg overflow-hidden mb-5 relative">
+                                    <div className="h-[240px] w-full overflow-hidden relative">
                                         <img
                                             src={item.image}
-                                            alt={item.title}
-                                            className="card-image w-full h-full object-cover"
+                                            alt="Intel"
+                                            className="w-full h-full object-cover transition-transform duration-700"
                                             loading="lazy"
                                         />
                                     </div>
-                                    <div className="flex justify-between text-xs text-neutral-400 mb-4 uppercase tracking-widest font-mono">
-                                        <span>{item.date}</span>
-                                        <span className="text-[#00f2ea] font-bold">#{item.category}</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl md:text-2xl font-semibold text-white mb-3 leading-tight">
+                                    <div className="p-6">
+                                        <div className="flex justify-between mb-4 text-xs font-mono text-[#00f2ea]">
+                                            <span>{item.date}</span>
+                                            <span>// {item.category.toUpperCase()} NODE {index + 1}</span>
+                                        </div>
+                                        <h3 className="text-2xl font-semibold mb-4 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-[#bbbbbb]">
                                             {item.title}
                                         </h3>
-                                        <p className="text-neutral-300 text-sm leading-relaxed text-justify">
+                                        <p className="text-[#a0a0b0] text-sm leading-relaxed text-justify">
                                             {item.content}
                                         </p>
                                     </div>
@@ -194,15 +254,53 @@ export const NewsGrid = ({ category: initialCategory = "Trending" }: { category?
                 )}
             </div>
 
-            {/* --- SEPOLIA MARKETS BOUNDARY --- */}
-            <div className="mt-16 pt-10 border-t-2 border-dashed border-white/10 text-center relative">
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 px-5 text-[#00f2ea] text-xs font-bold tracking-[0.2em] uppercase">
-                    Mercados en Base Sepolia
+            {/* --- SEPOLIA BOUNDARY --- */}
+            <div className="mt-20 mb-16 pt-10 border-t border-dashed border-white/10 text-center relative">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-black border border-[#7000ff] text-[#7000ff] px-5 py-1 text-xs font-mono uppercase tracking-[2px] shadow-[0_0_15px_rgba(112,0,255,0.3)]">
+                    Sepolia Markets Boundary // User Generated Layer
                 </span>
-                <p className="text-neutral-500 text-xs mt-2 font-mono">
-                    Below starts the User Generated Markets Layer
-                </p>
             </div>
+
+            {/* --- IDENTITY & INFO LAYER (Bottom Grid) --- */}
+            <div className="mb-24">
+
+                {/* Docs Wrapper */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div className="glass p-10 rounded-xl relative overflow-hidden group hover:border-[#00f2ea] transition-colors">
+                        <h3 className="text-3xl font-bold mb-2 relative z-10">Whitepaper v2.0</h3>
+                        <p className="text-[#888899] relative z-10 max-w-[80%]">The technical manifesto for sovereign identity.</p>
+                        <div className="absolute -right-5 -bottom-5 text-9xl opacity-5 grayscale group-hover:grayscale-0 transition-all">📄</div>
+                    </div>
+                    <div className="glass p-10 rounded-xl relative overflow-hidden group hover:border-[#7000ff] transition-colors border-[#7000ff]/30">
+                        <h3 className="text-3xl font-bold mb-2 relative z-10 text-[#7000ff]">Announcements</h3>
+                        <p className="text-[#888899] relative z-10 max-w-[80%]">Official protocol updates and governance votes.</p>
+                        <div className="absolute -right-5 -bottom-5 text-9xl opacity-5 grayscale group-hover:grayscale-0 transition-all">📢</div>
+                    </div>
+                </div>
+
+                <div className="mb-10 pl-5 border-l-4 border-[#00f2ea]">
+                    <h4 className="text-lg uppercase tracking-widest font-semibold">Identity Financial Nodes</h4>
+                    <p className="text-[#888899] text-sm mt-1">40 verified elements of the Humanid.fi ecosystem.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {/* Render 40 Nodes */}
+                    {Array.from({ length: 40 }).map((_, i) => (
+                        <div key={i} className="glass p-5 rounded-lg border-white/5 hover:bg-[#00f2ea]/5 hover:border-[#00f2ea] transition-all cursor-pointer flex flex-col justify-between min-h-[120px]">
+                            <span className="font-mono text-[0.65rem] text-[#888899] opacity-50">
+                                BLOCK_REF: 0x{(i + 100).toString(16).toUpperCase()}
+                            </span>
+                            <div className="font-semibold text-sm mt-2 text-white">
+                                {INFO_TOPICS[i % INFO_TOPICS.length]} // M{i + 1}
+                            </div>
+                            <div className="text-[0.65rem] text-[#00ff9d] mt-auto pt-2">
+                                ● OPERATIONAL
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </section>
     );
 };

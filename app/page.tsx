@@ -16,8 +16,8 @@ export default function Home() {
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
+            {/* 2. Contenedor Principal (Hero) */}
             <div className="relative z-10 container mx-auto px-4">
-
                 {/* SECCIÓN HERO: Crear Mercado (Mantenemos como principal) */}
                 <section className="min-h-[85vh] flex flex-col items-center justify-center pt-20 relative">
                     <CreateMarketForm />
@@ -26,16 +26,18 @@ export default function Home() {
                         <ArrowDown size={24} />
                     </div>
                 </section>
+            </div>
 
-                {/* SECCIÓN: News Feed (Global Intel Engine) */}
+            {/* SECCIÓN: News Feed (Global Intel Engine - Full Width Control) */}
+            <div className="relative z-10">
                 <NewsGrid />
+            </div>
 
-                {/* SECCIÓN MARKETS: Mercados en Base Sepolia */}
+            {/* SECCIÓN MARKETS: Mercados en Base Sepolia */}
+            <div className="relative z-10 container mx-auto px-4">
                 <section className="py-20 relative">
-                    {/* El boundary visual ya está en NewsGrid, así que aquí solo cargamos el feed */}
                     <MarketFeed />
                 </section>
-
             </div>
         </main>
     );
