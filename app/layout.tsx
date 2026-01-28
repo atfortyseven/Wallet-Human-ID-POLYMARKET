@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from '@/components/Providers';
@@ -17,7 +17,17 @@ import RegisterSW from '@/components/pwa/RegisterSW';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
+export const viewport: Viewport = {
+
+
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    themeColor: '#000000',
+};
+
 export const metadata: Metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://humanid.fi'),
     title: 'HumanID.fi | The Void Wallet',
     description: 'Sybil-resistant financial engine for Polymarket. Built on Base Sepolia.',
     openGraph: {
@@ -27,7 +37,7 @@ export const metadata: Metadata = {
         siteName: 'HumanID.fi',
         images: [
             {
-                url: 'https://humanid.fi/og-void.jpg',
+                url: '/og-void.jpg', // Relative path now works with metadataBase
                 width: 1200,
                 height: 630,
                 alt: 'HumanID Upgrade',
@@ -41,12 +51,7 @@ export const metadata: Metadata = {
         title: 'HumanID.fi | The Void Wallet',
         description: 'Sybil-resistant financial engine for Polymarket.',
         creator: '@HumanID_fi',
-        images: ['https://humanid.fi/og-void.jpg'],
-    },
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
+        images: ['/og-void.jpg'],
     },
 };
 
