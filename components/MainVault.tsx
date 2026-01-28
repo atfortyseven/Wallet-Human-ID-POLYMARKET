@@ -1,53 +1,64 @@
 // components/MainVault.tsx
 import { useWLD } from '../hooks/useWLD'
-import { useChainId, useAccount, useConnect } from 'wagmi';
+import { useChainId, useAccount, useConnect, useSwitchChain } from 'wagmi';
 
 interface MainVaultProps {
     onConnect?: () => void;
 }
 
-// Función para obtener nombre y color según ID
-const getNetworkDetails = (chainId: number | undefined) => {
-    switch (chainId) {
-        case 10: return { name: 'Optimism', color: 'bg-red-500' }; // World App runs here
-        case 1: return { name: 'Mainnet', color: 'bg-blue-500' };
-        case 42161: return { name: 'Arbitrum', color: 'bg-blue-600' };
-        case 8453: return { name: 'Base', color: 'bg-blue-500' };
-        case 137: return { name: 'Polygon', color: 'bg-purple-500' };
-        default: return { name: 'Unknown Network', color: 'bg-yellow-500' };
-    }
-};
-
 export const MainVault = ({ onConnect }: MainVaultProps) => {
-    const { balance, symbol, status, isLoading } = useWLD()
+    const { balance, isLoading } = useWLD()
     const chainId = useChainId();
-    const { isConnected } = useAccount();
+    const { isConnected, chain } = useAccount();
     const { connect, connectors } = useConnect();
-    const network = getNetworkDetails(chainId);
+    const { switchChain } = useSwitchChain();
 
-    const handleUniversalConnect = () => {
-        // Buscamos el conector de WalletConnect para máxima compatibilidad con World App
-        const connector = connectors.find((c) => c.id === 'walletConnect');
-        if (connector) {
-            connect({ connector });
-        } else {
-            // Fallback por si no se encuentra
-            if (onConnect) onConnect();
+    // Logic for Network Badge
+    const getNetworkState = () => {
+        if (!isConnected) return { name: 'DISCONNECTED', color: 'bg-red-500', isError: true };
+
+        // Use chain?.id from useAccount for real-time provider state, fallback to useChainId
+        const activeChainId = chain?.id || chainId;
+
+        switch (activeChainId) {
+            case 10: return { name: 'OPTIMISM', color: 'bg-emerald-500', targetChainId: 10 };
+            case 8453: return { name: 'BASE', color: 'bg-emerald-500', targetChainId: 8453 };
+            case 11155420: return { name: 'OP SEPOLIA', color: 'bg-blue-500', targetChainId: 11155420 };
+            case 84532: return { name: 'BASE SEPOLIA', color: 'bg-blue-500', targetChainId: 84532 };
+            default: return { name: 'WRONG NETWORK', color: 'bg-red-500', isError: true };
+        }
+    };
+
+    const network = getNetworkState();
+
+    const handleBadgeClick = () => {
+        if (network.isError && isConnected) {
+            // Default to Optimism if wrong network
+            switchChain({ chainId: 10 });
         }
     };
 
     return (
         <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
             {/* Background Glow for Connected State */}
-            {status === 'connected' && (
+            {isConnected && !network.isError && (
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] -z-0" />
             )}
 
-            {/* Network Indicator (Dynamic) */}
-            <div className="relative z-10 flex items-center gap-2 mb-6">
+            {/* Network Indicator (Dynamic & Interactive) */}
+            <button
+                onClick={handleBadgeClick}
+                disabled={!network.isError}
+                className={`relative z-10 flex items-center gap-2 mb-6 transition-opacity hover:opacity-80 ${network.isError ? 'cursor-pointer' : 'cursor-default'}`}
+            >
                 <div className={`h-2.5 w-2.5 rounded-full ${network.color} animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.2)]`} />
-                <span className="text-xs font-bold tracking-widest text-neutral-400 uppercase">{network.name}</span>
-            </div>
+                <span className={`text-xs font-bold tracking-widest uppercase ${network.isError ? 'text-red-400' : 'text-neutral-400'}`}>
+                    {network.name}
+                </span>
+                {network.isError && isConnected && (
+                    <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded ml-2 border border-red-500/20">SWITCH</span>
+                )}
+            </button>
 
             <div className="flex justify-between items-start mb-6 relative z-10">
                 <div>
