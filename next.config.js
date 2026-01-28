@@ -25,7 +25,38 @@ const nextConfig = {
         config.resolve.fallback = { fs: false, net: false, tls: false };
         config.externals.push('pino-pretty', 'lokijs', 'encoding');
         return config;
-    }
+    },
+
+    // 5. SECURITY HEADERS (Operation Citadel)
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Content-Security-Policy',
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'none';",
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'DENY',
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff',
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin',
+                    },
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;
