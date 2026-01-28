@@ -1,17 +1,28 @@
 {
-    "name": "Polymarket News",
-    "short_name": "PolyNews",
-    "description": "Your Identity-First Wallet for Prediction Markets",
+    "name": "Humanid.fi | The Void Wallet",
+    "short_name": "HumanID",
+    "description": "Sovereign Intelligence & Decentralized Identity Protocol.",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#0D0D12",
-    "theme_color": "#0D0D12",
+    "background_color": "#030305",
+    "theme_color": "#000000",
+    "orientation": "portrait",
     "icons": [
         {
-            "src": "/favicon.ico",
-            "sizes": "64x64 32x32 24x24 16x16",
-            "type": "image/x-icon"
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/maskable-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
-    ],
-    "orientation": "portrait"
+    ]
 }

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* UNIVERSAL A11Y FOCUS */
+:focus-visible {
+  outline: 2px solid #00f2ea;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(0, 242, 234, 0.1);
+  border-radius: 2px;
+}
+
 @layer base {
   :root {
     --background: #000000;
