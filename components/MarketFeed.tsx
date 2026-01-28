@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GlassCard, GlassBadge, ProgressBar } from './ui/GlassComponents';
+import { RiskBadge } from './crystalline/RiskBadge';
 import { TrendingUp, Clock, Users, ArrowRight, AlertCircle, BarChart3 } from 'lucide-react';
 import { useMarkets } from '../hooks/useMarkets';
 import { useRouter } from 'next/navigation';
@@ -75,9 +76,11 @@ export const MarketFeed = () => {
 
                                 {/* Badges Superiores */}
                                 <div className="flex justify-between items-start mb-4 relative z-10">
-                                    <GlassBadge color="blue">Predicción</GlassBadge>
-                                    <div className="flex items-center gap-1 text-[10px] font-bold text-green-300 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full uppercase tracking-wide">
-                                        En Curso
+                                    <div className="flex items-center gap-2">
+                                        <RiskBadge level={market.riskLevel || 'LOW'} />
+                                        <div className="flex items-center gap-1 text-[10px] font-bold text-green-300 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full uppercase tracking-wide">
+                                            En Curso
+                                        </div>
                                     </div>
                                 </div>
 

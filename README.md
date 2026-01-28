@@ -9,7 +9,7 @@
 
 ---
 
-## Core Architecture (The Crystalline System)
+## 💎 Core Architecture (The Crystalline System)
 
 This project implements a **"Glassmorphism" Design System** (Crystalline UI) that reflects the transparency of the underlying blockchain protocols.
 

@@ -41,6 +41,7 @@ export interface MarketData {
     liquidity: string;
     endDate: string;
     participants: number;
+    riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 }
 
 export const useMarkets = () => {
@@ -64,7 +65,21 @@ export const useMarkets = () => {
                     fromBlock: 'earliest'
                 });
 
-                // 2. Multicall Virtual
+                // 2a. Fetch Risk Metadata from our API
+                let riskMap: Record<string, string> = {};
+                try {
+                    const res = await fetch('/api/markets');
+                    if (res.ok) {
+                        const data = await res.json();
+                        data.forEach((m: any) => {
+                            riskMap[m.slug.toLowerCase()] = m.riskLevel;
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Failed to fetch risk metadata", e);
+                }
+
+                // 2b. Multicall Virtual
                 const marketPromises = logs.map(async (log) => {
                     const marketAddress = log.args.fixedProductMarketMaker;
                     if (!marketAddress) return null;
@@ -95,7 +110,8 @@ export const useMarkets = () => {
                             liquidity: (balYes + balNo).toFixed(2),
                             probability: Math.round(probability),
                             endDate: "Open",
-                            participants: 0
+                            participants: 0,
+                            riskLevel: (riskMap[marketAddress.toLowerCase()] as any) || 'LOW'
                         };
 
                         return marketObj;
