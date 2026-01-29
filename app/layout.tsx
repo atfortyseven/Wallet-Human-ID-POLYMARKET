@@ -76,14 +76,14 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${mono.variable}`}>
             <body className="relative min-h-screen">
-                <RegisterSW />
-                <TermsGate />
-                <GeoBlocker />
-                <BootSequence />
-                <BackgroundVideo />
-                <BaseGasWidget />
-                <GlobalErrorBoundary>
-                    <Providers>
+                <Providers>
+                    <GlobalErrorBoundary>
+                        <RegisterSW />
+                        <TermsGate />
+                        <GeoBlocker />
+                        <BootSequence />
+                        <BackgroundVideo />
+                        <BaseGasWidget />
                         <AppProvider>
                             <WorldProvider>
                                 <VoidShell>
@@ -93,8 +93,8 @@ export default function RootLayout({
                                 <Toaster richColors theme="dark" />
                             </WorldProvider>
                         </AppProvider>
-                    </Providers>
-                </GlobalErrorBoundary>
+                    </GlobalErrorBoundary>
+                </Providers>
             </body>
         </html>
     );
