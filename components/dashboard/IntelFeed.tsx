@@ -36,18 +36,11 @@ export function IntelFeed() {
             <div className="absolute inset-0 z-0 opacity-20 bg-[url('/assets/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black,transparent)]"></div>
 
             {/* --- HEADER --- */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20 z-20">
-                {/* Header removed for cleaner UI */}
-            </div>
-
             {/* --- CONTENIDO PRINCIPAL (Z-20) --- */}
             <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
 
-                {/* Space to see 3D background */}
-
-
                 {/* --- CONTENIDO DE DATOS (SCROLLABLE) --- */}
-                <div className="flex-1 p-4 overflow-y-auto relative z-20 custom-scrollbar">
+                <div className="flex-1 px-4 pb-4 pt-0 overflow-y-auto relative z-20 custom-scrollbar">
                     <AnimatePresence mode='wait'>
 
                         {/* --- TAB: LIVE (Governance Proposals) --- */}
