@@ -63,12 +63,50 @@ export async function middleware(request: NextRequest) {
         response.headers.set('Access-Control-Allow-Credentials', 'true');
     }
 
-    // Security Headers
+    // 🛡️ ENTERPRISE-GRADE SECURITY HEADERS
+
+    // Prevent MIME type sniffing
     response.headers.set('X-Content-Type-Options', 'nosniff');
+
+    // Prevent clickjacking
     response.headers.set('X-Frame-Options', 'DENY');
+
+    // XSS Protection (legacy browsers)
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    // Referrer Policy
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    response.headers.set('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: wss: data: blob:; img-src 'self' https: data: blob:; frame-ancestors 'none';");
-    response.headers.set('Permissions-Policy', "camera=(), microphone=(), geolocation=()");
+
+    // Permissions Policy - Disable sensitive features
+    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+
+    // Content Security Policy - More restrictive
+    // Note: Keeping unsafe-inline/unsafe-eval for Next.js dev mode compatibility
+    // In strict production, these should be replaced with nonces
+    const csp = [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://worldcoin.org",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https: blob:",
+        "font-src 'self' data:",
+        "connect-src 'self' https://worldcoin.org https://developer.worldcoin.org wss: https:",
+        "frame-src 'self' https://worldcoin.org",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'"
+    ].join('; ');
+    response.headers.set('Content-Security-Policy', csp);
+
+    // HSTS - Force HTTPS for 1 year (only in production)
+    if (process.env.NODE_ENV === 'production') {
+        response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+
+    // HTTPS Redirect in production
+    if (process.env.NODE_ENV === 'production' && !request.url.startsWith('https://')) {
+        const httpsUrl = request.url.replace(/^http:/, 'https:');
+        return NextResponse.redirect(httpsUrl, 301);
+    }
 
     // Geo-Block logic (Compliance)
     const country = request.geo?.country || request.headers.get('x-vercel-ip-country') || 'XX';

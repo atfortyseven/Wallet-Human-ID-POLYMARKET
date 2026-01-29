@@ -114,19 +114,51 @@ model User {
 // ----------------------------------------------------------------------------
 
 model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
-  sessionToken String   @unique
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  lastActivity DateTime @default(now())
-  ipAddress    String?
-  userAgent    String?
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  sessionToken  String   @unique
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  lastActivity  DateTime @default(now())
+  ipAddress     String?
+  userAgent     String?
+  fingerprint   String?  // [NEW] Browser fingerprint for session hijacking detection
+  isCompromised Boolean  @default(false) // [NEW] Flag for suspicious sessions
 
   @@index([userId])
   @@index([expiresAt])
   @@index([sessionToken])
+  @@index([fingerprint])
+}
+
+// ----------------------------------------------------------------------------
+// 2.2. SECURITY MONITORING
+// ----------------------------------------------------------------------------
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  type      String   // 'LOGIN', 'LOGOUT', 'IP_CHANGE', 'FINGERPRINT_MISMATCH', 'RATE_LIMIT', 'BLOCKED', 'FAILED_LOGIN'
+  userId    String?
+  ipAddress String
+  userAgent String?
+  metadata  Json?
+  severity  String   // 'INFO', 'WARNING', 'CRITICAL'
+  timestamp DateTime @default(now())
+
+  @@index([type, timestamp])
+  @@index([userId, timestamp])
+  @@index([ipAddress, timestamp])
+}
+
+model BlockedIP {
+  id        String    @id @default(cuid())
+  ipAddress String    @unique
+  reason    String
+  blockedAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([ipAddress])
 }
 
 // ----------------------------------------------------------------------------

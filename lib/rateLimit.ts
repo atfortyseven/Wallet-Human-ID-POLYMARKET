@@ -1,91 +1,48 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { LRUCache } from 'lru-cache';
 
-/**
- * Rate Limiter Middleware
- * 
- * Prevents abuse by limiting requests per user
- * - Max 10 gasless transactions per user per day
- * - Max 100 requests per IP per hour
- */
-
-interface RateLimitConfig {
-    maxRequestsPerUser: number;
-    maxRequestsPerIP: number;
-    windowMs: number;
-}
-
-const config: RateLimitConfig = {
-    maxRequestsPerUser: 10, // per day
-    maxRequestsPerIP: 100, // per hour
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+type RateLimitOptions = {
+    uniqueTokenPerInterval?: number;
+    interval?: number;
 };
 
-// In-memory store for IP tracking (use Redis in production)
-const ipStore = new Map<string, { count: number; resetAt: number }>();
+export function rateLimit(options?: RateLimitOptions) {
+    const tokenCache = new LRUCache<string, number[]>({
+        max: options?.uniqueTokenPerInterval || 500,
+        ttl: options?.interval || 60000, // Default 1 minute
+    });
 
-export async function checkRateLimit(
-    address: string | null,
-    ip: string | null
-): Promise<{ allowed: boolean; reason?: string }> {
+    return {
+        check: async (limit: number, token: string): Promise<{ success: boolean; remaining: number }> => {
+            const tokenCount = tokenCache.get(token) || [0];
 
-    // Check user-based rate limit
-    if (address) {
-        const oneDayAgo = new Date(Date.now() - config.windowMs);
-
-        const userTxCount = await prisma.proposalVote.count({
-            where: {
-                voterAddress: address.toLowerCase(),
-                votedAt: { gte: oneDayAgo },
-            },
-        });
-
-        if (userTxCount >= config.maxRequestsPerUser) {
-            return {
-                allowed: false,
-                reason: `Rate limit exceeded. Max ${config.maxRequestsPerUser} transactions per day.`,
-            };
-        }
-    }
-
-    // Check IP-based rate limit
-    if (ip) {
-        const now = Date.now();
-        const ipData = ipStore.get(ip);
-
-        if (ipData) {
-            if (now < ipData.resetAt) {
-                if (ipData.count >= config.maxRequestsPerIP) {
-                    return {
-                        allowed: false,
-                        reason: "Too many requests from this IP. Try again later.",
-                    };
-                }
-                ipData.count++;
-            } else {
-                // Reset window
-                ipStore.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 }); // 1 hour
+            if (tokenCount[0] === 0) {
+                tokenCache.set(token, tokenCount);
             }
-        } else {
-            ipStore.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 });
-        }
-    }
 
-    return { allowed: true };
+            tokenCount[0] += 1;
+            const currentUsage = tokenCount[0];
+            const isRateLimited = currentUsage >= limit;
+
+            return {
+                success: !isRateLimited,
+                remaining: Math.max(0, limit - currentUsage),
+            };
+        },
+    };
 }
 
-export function getClientIP(req: NextRequest): string | null {
-    const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded ? forwarded.split(",")[0] : req.headers.get("x-real-ip");
-    return ip || null;
-}
+// Predefined rate limiters for different endpoints
+export const loginRateLimiter = rateLimit({
+    uniqueTokenPerInterval: 500,
+    interval: 15 * 60 * 1000, // 15 minutes
+});
 
-// Cleanup old IP entries every hour
-setInterval(() => {
-    const now = Date.now();
-    for (const [ip, data] of ipStore.entries()) {
-        if (now > data.resetAt) {
-            ipStore.delete(ip);
-        }
-    }
-}, 60 * 60 * 1000);
+export const sessionRateLimiter = rateLimit({
+    uniqueTokenPerInterval: 500,
+    interval: 60 * 1000, // 1 minute
+});
+
+export const logoutRateLimiter = rateLimit({
+    uniqueTokenPerInterval: 500,
+    interval: 60 * 1000, // 1 minute
+});
