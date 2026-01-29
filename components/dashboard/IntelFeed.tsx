@@ -30,11 +30,7 @@ export function IntelFeed() {
 
 
     return (
-        <div className="flex flex-col h-full w-full relative overflow-hidden rounded-3xl bg-black/40 border border-white/10 backdrop-blur-xl shadow-2xl">
-
-            {/* --- GRID BACKGROUND (Static) --- */}
-            <div className="absolute inset-0 z-0 opacity-20 bg-[url('/assets/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black,transparent)]"></div>
-
+        <div className="flex flex-col h-full w-full relative overflow-hidden">
             {/* --- HEADER --- */}
             {/* --- CONTENIDO PRINCIPAL (Z-20) --- */}
             <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
