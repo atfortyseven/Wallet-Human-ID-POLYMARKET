@@ -333,16 +333,16 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 return (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 rounded-xl border border-white/10 bg-white/5 opacity-50 cursor-not-allowed">
-                                <h4 className="font-bold text-white">MoonPay</h4>
+                            <button className="p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#00f2ea] transition-all text-left group">
+                                <h4 className="font-bold text-white group-hover:text-[#00f2ea]">MoonPay</h4>
                                 <p className="text-xs text-gray-500">Credit/Debit Card</p>
-                            </div>
-                            <div className="p-4 rounded-xl border border-white/10 bg-white/5 opacity-50 cursor-not-allowed">
-                                <h4 className="font-bold text-white">Transak</h4>
+                            </button>
+                            <button className="p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#00f2ea] transition-all text-left group">
+                                <h4 className="font-bold text-white group-hover:text-[#00f2ea]">Transak</h4>
                                 <p className="text-xs text-gray-500">Bank Transfer</p>
-                            </div>
+                            </button>
                         </div>
-                        <p className="text-center text-xs text-gray-500 mt-4">Fiat on-ramps are disabled in this region.</p>
+                        <p className="text-center text-xs text-gray-500 mt-4">Select a provider to continue.</p>
                     </div>
                 );
 
