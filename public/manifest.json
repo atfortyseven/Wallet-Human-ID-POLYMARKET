@@ -1,28 +1,47 @@
 {
-    "name": "Humanid.fi | The Void Wallet",
-    "short_name": "HumanID",
-    "description": "Sovereign Intelligence & Decentralized Identity Protocol.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#030305",
-    "theme_color": "#000000",
-    "orientation": "portrait",
-    "icons": [
+    "manifest_version": 3,
+    "name": "HumanID.fi | Sovereign Vault",
+    "version": "2.4.1",
+    "description": "Zero-Knowledge Identity Layer & DeFi Governance. Bankless. Permissionless.",
+    "icons": {
+        "16": "assets/icon-16.png",
+        "48": "assets/icon-48.png",
+        "128": "assets/icon-128.png"
+    },
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Access Vault",
+        "default_icon": {
+            "16": "assets/icon-16.png",
+            "48": "assets/icon-48.png"
+        }
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "unlimitedStorage"
+    ],
+    "host_permissions": [
+        "https://*.humanidfi.com/*",
+        "https://min-api.cryptocompare.com/*",
+        "https://mainnet.base.org/*",
+        "https://wallet-human-polymarket-id-production.up.railway.app/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
         {
-            "src": "/icons/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/icons/icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "/icons/maskable-icon.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+            "resources": [
+                "assets/*",
+                "next/static/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
         }
     ]
 }
