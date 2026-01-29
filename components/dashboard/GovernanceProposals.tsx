@@ -100,7 +100,7 @@ export function GovernanceProposals() {
     return (
         <div className="space-y-4">
             {/* Verified Humans Header */}
-            <div className="text-center mb-8 mt-4">
+            <div className="text-center mb-6">
                 {/* Fingerprint Icon */}
                 <div className="flex justify-center mb-4">
                     <img 
@@ -110,10 +110,9 @@ export function GovernanceProposals() {
                         style={{ filter: 'invert(1) brightness(2)' }}
                     />
                 </div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif' }}>
                     ENCUESTAS CREADAS POR HUMANOS VERIFICADOS
                 </h1>
-                <div className="h-1 w-24 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full" />
             </div>
             
             <div className="flex items-center justify-between text-zinc-400 text-xs mb-2">
