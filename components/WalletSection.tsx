@@ -87,7 +87,7 @@ export default function WalletSection() {
     });
 
     // --- Estado ---
-    const [activeTab, setActiveTab] = useState<'trade' | 'governance' | 'activity'>('trade');
+    const [activeTab, setActiveTab] = useState<'governance' | 'activity'>('governance');
     const [zapAmount, setZapAmount] = useState("");
     const [selectedOutcome, setSelectedOutcome] = useState<0 | 1>(0); // 0 = YES, 1 = NO
     const [mounted, setMounted] = useState(false);
@@ -247,17 +247,7 @@ export default function WalletSection() {
                 {/* Status Badges */}
                 <div className="flex items-center gap-3">
                     {/* Network Badge Removed as per user request (moved to MainVault) */}
-
-                    <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 ${isWorldIDVerified
-                        ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-300"
-                        : "bg-red-500/10 border-red-500/20 text-red-400"
-                        }`}>
-                        <ShieldCheck size={14} />
-                        <span className="text-xs font-bold tracking-wide">
-                            {isWorldIDVerified ? "WORLD ID VERIFIED" : "UNVERIFIED"}
-                        </span>
-                    </div>
-
+                    {/* World ID Badge Removed as per user request */}
                     {/* Global Settings Menu Removed - Moved to VoidShell */}
                 </div>
             </header >
@@ -283,7 +273,7 @@ export default function WalletSection() {
                     <div className="bg-[var(--bg-card)] border border-[var(--border-main)] rounded-3xl overflow-hidden flex flex-col min-h-[500px]">
                         {/* Tabs Header */}
                         <div className="flex border-b border-[var(--border-main)]">
-                            {['trade', 'governance', 'activity'].map((tab) => (
+                            {['governance', 'activity'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab as any)}
@@ -305,102 +295,7 @@ export default function WalletSection() {
                         {/* Tab Content */}
                         <div className="p-6 md:p-8 flex-1 relative overflow-hidden">
                             <AnimatePresence mode="wait">
-                                {activeTab === 'trade' ? (
-                                    <motion.div
-                                        key="trade-panel"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="h-full flex flex-col justify-center max-w-lg mx-auto"
-                                    >
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Market Trading</h3>
-                                            <p className="text-sm text-[var(--text-secondary)] mb-4">Buy YES or NO positions in the prediction market.</p>
-                                        </div>
-
-                                        {/* Market Outcome Toggle */}
-                                        <div className="grid grid-cols-2 gap-4 mb-6">
-                                            <button
-                                                onClick={() => setSelectedOutcome(0)}
-                                                className={`py-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${selectedOutcome === 0
-                                                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                                                    : 'bg-[var(--bg-surface)] border-[var(--border-main)] text-[var(--text-muted)] hover:border-neutral-500'
-                                                    }`}
-                                            >
-                                                <span className="text-2xl font-bold">YES</span>
-                                                <span className="text-xs tracking-widest uppercase">Long Position</span>
-                                            </button>
-                                            <button
-                                                onClick={() => setSelectedOutcome(1)}
-                                                className={`py-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${selectedOutcome === 1
-                                                    ? 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-                                                    : 'bg-[var(--bg-surface)] border-[var(--border-main)] text-[var(--text-muted)] hover:border-neutral-500'
-                                                    }`}
-                                            >
-                                                <span className="text-2xl font-bold">NO</span>
-                                                <span className="text-xs tracking-widest uppercase">Short Position</span>
-                                            </button>
-                                        </div>
-
-                                        {/* Input Box */}
-                                        <div className="bg-[var(--bg-card)] border border-[var(--border-main)] rounded-2xl p-4 mb-4 focus-within:ring-2 focus-within:ring-indigo-500/50 transition-all">
-                                            <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-2 font-mono">
-                                                <span>INVESTMENT</span>
-                                                <span>BAL: {wldVal.toFixed(2)} WLD</span>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <input
-                                                    type="number"
-                                                    placeholder="0.00"
-                                                    value={zapAmount}
-                                                    onChange={(e) => setZapAmount(e.target.value)}
-                                                    className="w-full bg-transparent text-3xl font-mono text-[var(--text-primary)] focus:outline-none placeholder-[var(--text-muted)]"
-                                                />
-                                                <span className="shrink-0 bg-[var(--bg-surface)] text-[var(--text-primary)] px-3 py-1 rounded-lg text-sm font-bold">WLD</span>
-                                            </div>
-                                            {/* Estimated Return */}
-                                            <div className="text-right text-xs text-[var(--text-secondary)] mt-2 font-mono">
-                                                Est. Return: {zapAmount ? (parseFloat(zapAmount) * 1.95).toFixed(2) : '0.00'} Shares (mock)
-                                            </div>
-                                        </div>
-
-                                        {/* Quick Percentages */}
-                                        <div className="flex gap-2 mb-8">
-                                            {[0.25, 0.5, 0.75, 1].map((pct) => (
-                                                <button
-                                                    key={pct}
-                                                    onClick={() => setPercentage(pct)}
-                                                    className="flex-1 py-2 text-xs font-mono font-medium rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)] transition-colors"
-                                                >
-                                                    {pct * 100}%
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        {/* Buy Button */}
-                                        <button
-                                            onClick={handleTrade}
-                                            disabled={isTrading || !zapAmount}
-                                            className={`w-full group relative py-4 text-black rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden transition-colors ${selectedOutcome === 0 ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-red-500 hover:bg-red-400'
-                                                }`}
-                                        >
-                                            <div className="relative z-10 flex items-center justify-center gap-2">
-                                                {isTrading ? (
-                                                    <>
-                                                        <Loader2 className="animate-spin" />
-                                                        <span>EXECUTING...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <TrendingUp className="w-5 h-5 fill-black" />
-                                                        <span>BUY {selectedOutcome === 0 ? 'YES' : 'NO'}</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </button>
-
-                                    </motion.div>
-                                ) : activeTab === 'governance' ? (
+                                {activeTab === 'governance' ? (
                                     <motion.div
                                         key="governance-panel"
                                         initial={{ opacity: 0, x: -20 }}

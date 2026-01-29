@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, Globe, Vote, Lock, AlertTriangle, TrendingUp, TrendingDown, Target, Wallet, Cpu, Fish, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Import Custom Hooks
 import { useAiSentiment } from '@/hooks/useAiSentiment';
 import { useGovSniper } from '@/hooks/useGovSniper';
 import { useYieldHunter } from '@/hooks/useYieldHunter';
+import { GovernanceProposals } from '@/components/dashboard/GovernanceProposals';
 
 import { ZapButton } from '@/components/defi/ZapButton'; // [NEW] Phase 3
 
@@ -52,7 +52,7 @@ export function IntelFeed() {
                 <div className="flex-1 p-4 overflow-y-auto relative z-20 custom-scrollbar">
                     <AnimatePresence mode='wait'>
 
-                        {/* --- TAB: LIVE (Empty - Sentiment removed) --- */}
+                        {/* --- TAB: LIVE (Governance Proposals) --- */}
                         {mode === 'LIVE' && (
                             <motion.div
                                 key="live"
@@ -61,7 +61,7 @@ export function IntelFeed() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-4"
                             >
-                                {/* Feed vacío - GLOBAL SENTIMENT eliminado */}
+                                <GovernanceProposals />
                             </motion.div>
                         )}
 
@@ -84,47 +84,7 @@ export function IntelFeed() {
 
 
 
-                        {/* --- TAB: GOV (Governance) --- */}
-                        {mode === 'GOV' && (
-                            <motion.div
-                                key="gov"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="space-y-3"
-                            >
-                                <div className="flex items-center justify-between text-zinc-400 text-xs mb-2">
-                                    <span><Target size={12} className="inline mr-1" /> Actionable Proposals</span>
-                                    <span className="text-indigo-400">{gov.count} Found</span>
-                                </div>
 
-                                {gov.proposals.length === 0 ? (
-                                    <div className="p-8 text-center text-zinc-500 text-xs">
-                                        No urgent proposals found.
-                                    </div>
-                                ) : (
-                                    gov.proposals.map(prop => (
-                                        <div key={prop.id} className="bg-amber-900/10 border border-amber-500/20 p-4 rounded-xl flex justify-between items-center group hover:bg-amber-900/20 transition-colors">
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-bold">{prop.dao}</span>
-                                                    <span className="text-[10px] text-amber-300 font-mono flex items-center gap-1">
-                                                        <AlertTriangle size={10} /> ENDS IN {prop.endsInHours}H
-                                                    </span>
-                                                </div>
-                                                <h4 className="text-sm font-bold text-white max-w-[180px] truncate">{prop.title}</h4>
-                                            </div>
-                                            <button
-                                                onClick={() => toast.success(`Voted FOR on ${prop.id}`)}
-                                                className="p-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg transition-colors shadow-lg shadow-amber-900/20"
-                                            >
-                                                <Vote size={18} />
-                                            </button>
-                                        </div>
-                                    ))
-                                )}
-                            </motion.div>
-                        )}
 
                         {/* --- TAB: YIELD (DeFi) --- */}
                         {mode === 'YIELD' && (
