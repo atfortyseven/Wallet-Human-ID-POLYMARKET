@@ -36,7 +36,7 @@ function GhostMessengerInner() {
 
     const { data: walletClient } = useWalletClient();
 
-    // Initialize Client
+    // Initialize XMTP Client (V3)
     const handleConnect = async () => {
         if (!walletClient) {
             toast.error("Connect Wallet first");
@@ -45,21 +45,35 @@ function GhostMessengerInner() {
 
         try {
             setIsInitializing(true);
-            console.log('[XMTP] Starting initialization...');
-            console.log('[XMTP] Wallet Client:', walletClient);
+            console.log('[XMTP] Initializing V3 client...');
+            console.log('[XMTP] Wallet address:', walletClient.account.address);
 
             const signer = walletClientToSigner(walletClient);
-            console.log('[XMTP] Signer created:', signer);
+            console.log('[XMTP] Signer created successfully');
 
-            const xmtp = await initialize({ signer });
-            console.log('[XMTP] Client initialized:', xmtp);
+            // V3 initialization with production environment
+            const xmtp = await initialize({
+                signer,
+                options: {
+                    env: 'production' // Use XMTP V3 production network
+                }
+            });
 
+            console.log('[XMTP] V3 client initialized:', xmtp?.address);
             setIsConnected(true);
-            toast.success("Secure Uplink Established");
+            toast.success("🔐 Secure Uplink Established (V3)");
         } catch (e: any) {
             console.error('[XMTP] Initialization failed:', e);
             const errorMsg = e?.message || e?.toString() || 'Unknown error';
-            toast.error(`Failed to initialize: ${errorMsg.slice(0, 50)}`);
+
+            // Provide helpful error messages
+            if (errorMsg.includes('User rejected')) {
+                toast.error("Connection cancelled");
+            } else if (errorMsg.includes('network')) {
+                toast.error("Network error - check your connection");
+            } else {
+                toast.error(`Failed to initialize: ${errorMsg.slice(0, 80)}`);
+            }
         } finally {
             setIsInitializing(false);
         }
