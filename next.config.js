@@ -2,7 +2,7 @@ const isExtension = process.env.EXT_BUILD === 'true';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone', // Changed from isExtension ? 'export' : undefined
+    output: 'standalone',
     trailingSlash: isExtension,
     distDir: isExtension ? 'out' : '.next',
 
@@ -30,19 +30,27 @@ const nextConfig = {
         ignoreDuringBuilds: true
     },
 
-    // RAILWAY / XMTP FIXES
+    // 1. Critical for Docker/Railway builds to find the WASM file
     experimental: {
         serverComponentsExternalPackages: [
             '@xmtp/user-preferences-bindings-wasm',
+            '@xmtp/proto',
             '@xmtp/react-sdk',
             '@xmtp/xmtp-js',
+            'shiki',
             'sharp',
             'onnxruntime-node'
         ]
     },
 
-    // WEBPACK (Wagmi/RainbowKit Polyfills)
+    // 2. Enable Async WebAssembly & Polyfills
     webpack: (config, { webpack }) => {
+        config.experiments = {
+            ...config.experiments,
+            asyncWebAssembly: true,
+            layers: true,
+        };
+
         config.resolve.fallback = { fs: false, net: false, tls: false, buffer: require.resolve('buffer/') };
         config.resolve.alias = {
             ...config.resolve.alias,
