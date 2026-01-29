@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit';
 import { Vote, CheckCircle2, AlertCircle, Loader2, Users, Info } from 'lucide-react';
 import { useAccount, usePublicClient } from 'wagmi';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { VoidButton, VoidInput, VoidCard } from '@/components/VoidUI';
 import { useCTF } from '@/hooks/useCTF';
@@ -27,8 +28,13 @@ interface ProposalFormData {
     category: string;
 }
 
-export function ProposeMarket() {
+interface ProposeMarketProps {
+    onClose?: () => void;
+}
+
+export function ProposeMarket({ onClose }: ProposeMarketProps) {
     const { address, isConnected } = useAccount();
+    const { resetAuth } = useAuth();
     const [isVerified, setIsVerified] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [worldIdProof, setWorldIdProof] = useState<ISuccessResult | null>(null);
@@ -198,6 +204,19 @@ export function ProposeMarket() {
             });
 
             toast.success('Market Successfully Created & Leaded!');
+            
+            // Reset authentication to force re-verification for next poll
+            resetAuth();
+            toast.info('Verificación reseteada. Necesitarás verificarte de nuevo para crear otra encuesta.', {
+                duration: 5000
+            });
+            
+            // Close modal after showing reset notification
+            if (onClose) {
+                setTimeout(() => {
+                    onClose();
+                }, 2000);
+            }
 
             // Reset
             setFormData({

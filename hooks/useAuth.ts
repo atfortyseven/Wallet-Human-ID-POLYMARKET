@@ -32,9 +32,13 @@ export function useAuth() {
         }
     };
 
+    const resetAuth = () => {
+        setIsAuthenticated(false);
+    };
+
     useEffect(() => {
         checkAuth();
     }, []);
 
-    return { isAuthenticated, isLoading, login: checkAuth, logout };
+    return { isAuthenticated, isLoading, login: checkAuth, logout, resetAuth };
 }

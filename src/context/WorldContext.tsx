@@ -19,9 +19,9 @@ const WorldContext = createContext<WorldContextType>({
 export const useWorld = () => useContext(WorldContext);
 
 export const WorldProvider = ({ children }: { children: ReactNode }) => {
-    // 🔓 HACK: Forzamos el estado a TRUE y ponemos un Hash falso para simular
-const [isHuman, setIsHuman] = useState(true);
-const [nullifierHash, setNullifierHash] = useState<string | null>("0x_simulated_proof_hash_123");
+    // Real verification state - starts as false until user verifies
+    const [isHuman, setIsHuman] = useState(false);
+    const [nullifierHash, setNullifierHash] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true); // Default true
 
     // Hidratación: Comprobar si ya se verificó antes

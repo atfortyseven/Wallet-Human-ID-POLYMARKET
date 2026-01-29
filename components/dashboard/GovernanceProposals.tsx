@@ -97,6 +97,23 @@ export function GovernanceProposals() {
 
     return (
         <div className="space-y-4">
+            {/* Verified Humans Header */}
+            <div className="text-center mb-8 mt-4">
+                {/* Fingerprint Icon */}
+                <div className="flex justify-center mb-4">
+                    <img 
+                        src="/fingerprint-inverted.png" 
+                        alt="Human Verification" 
+                        className="w-16 h-16 md:w-20 md:h-20 opacity-80 invert brightness-0 contrast-200"
+                        style={{ filter: 'invert(1) brightness(2)' }}
+                    />
+                </div>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                    ENCUESTAS CREADAS POR HUMANOS VERIFICADOS
+                </h1>
+                <div className="h-1 w-24 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full" />
+            </div>
+            
             <div className="flex items-center justify-between text-zinc-400 text-xs mb-2">
                 <span className="flex items-center gap-1">
                     <Vote size={12} className="inline" /> Encuestas Activas
@@ -135,7 +152,7 @@ export function GovernanceProposals() {
                                     app_id={process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`}
                                     action={`vote_${proposal.id}_${outcome}`}
                                     signal={proposal.id}
-                                    onSuccess={(proof) => handleVote(proposal.id, idx, proof)}
+                                    onSuccess={(proof: ISuccessResult) => handleVote(proposal.id, idx, proof)}
                                     verification_level={VerificationLevel.Orb}
                                 >
                                     {({ open }: { open: () => void }) => (

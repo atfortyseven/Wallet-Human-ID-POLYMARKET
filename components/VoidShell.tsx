@@ -28,21 +28,46 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     const action = "login";
 
     const handleVerify = async (proof: ISuccessResult) => {
-        // ... (keep logic same) ...
         setIsLoading(true);
         const toastId = toast.loading("Verifying identity...");
+
+        console.log("🔐 World ID Verification Started", {
+            app_id,
+            action,
+            hasProof: !!proof,
+            nullifier: proof.nullifier_hash
+        });
+
         try {
             const res = await fetch("/api/auth/verify-world-id", {
-                method: "POST", headers: { "Content-Type": "application/json" },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ proof, walletAddress: address }),
             });
+
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Verification failed");
-            toast.dismiss(toastId); toast.success("Identity Verified!");
-            await login(); router.push("/wallet");
+
+            if (!res.ok) {
+                console.error("❌ Verification failed:", data);
+                throw new Error(data.error || "Verification failed");
+            }
+
+            console.log("✅ Verification successful!", data);
+            toast.dismiss(toastId);
+            toast.success("¡Identidad Verificada! Governance desbloqueada 🎉");
+
+            // Trigger auth refresh
+            await login();
+
+            // Redirect to wallet
+            router.push("/wallet");
         } catch (error: any) {
-            console.error("Login Error:", error); toast.dismiss(toastId); toast.error(error.message || "Failed to verify");
-        } finally { setIsLoading(false); }
+            console.error("❌ Login Error:", error);
+            toast.dismiss(toastId);
+            toast.error(error.message || "No se pudo verificar tu identidad");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -98,7 +123,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                             action={action}
                             onSuccess={handleVerify}
                             handleVerify={async (proof: ISuccessResult) => { return; }}
-                            verification_level={VerificationLevel.Orb}
+                            verification_level={VerificationLevel.Device}
                         >
                             {({ open }: { open: () => void }) => (
                                 <button

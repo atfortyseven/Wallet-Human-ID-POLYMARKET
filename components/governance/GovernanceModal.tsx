@@ -75,7 +75,7 @@ export function GovernanceModal({ isOpen, onClose }: GovernanceModalProps) {
                                         </p>
                                     </div>
                                 ) : (
-                                    <ProposeMarket />
+                                    <ProposeMarket onClose={onClose} />
                                 )}
                             </div>
                         </div>
