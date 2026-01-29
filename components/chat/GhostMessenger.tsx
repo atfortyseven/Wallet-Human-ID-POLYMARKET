@@ -55,8 +55,17 @@ function GhostMessengerInner() {
             const provider = new ethers.BrowserProvider(transport, network);
             const signer = new ethers.JsonRpcSigner(provider, account.address);
 
+            // Create a signer wrapper for XMTP
+            const xmtpSigner = {
+                getAddress: async () => account.address,
+                signMessage: async (message: string | Uint8Array) => {
+                    const signature = await signer.signMessage(message);
+                    return signature;
+                },
+            };
+
             // Create XMTP V3 client using browser-sdk
-            const xmtpClient = await Client.create(account.address, {
+            const xmtpClient = await Client.create(xmtpSigner, {
                 env: 'production', // Use production environment for V3
                 dbEncryptionKey: await generateEncryptionKey(account.address),
             });
