@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, Globe, Vote, Lock, AlertTriangle, TrendingUp, TrendingDown, Target, Wallet, Cpu, Fish, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,13 +15,17 @@ import { ZapButton } from '@/components/defi/ZapButton'; // [NEW] Phase 3
 type FeedMode = 'LIVE' | 'WHALES' | 'GOV' | 'YIELD';
 
 export function IntelFeed() {
+    const searchParams = useSearchParams();
+
+    // Get mode from URL params, default to LIVE
+    const mode = (searchParams?.get('mode')?.toUpperCase() as FeedMode) || 'LIVE';
+
     // --- Hook Integration ---
     const sentiment = useAiSentiment();
     const gov = useGovSniper();
     const yieldData = useYieldHunter();
 
-    // --- Local State ---
-    const [mode, setMode] = useState<FeedMode>('LIVE');
+
 
 
 
@@ -50,25 +54,9 @@ export function IntelFeed() {
             {/* --- CONTENIDO PRINCIPAL (Z-20) --- */}
             <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
 
-                {/* Espacio vacío arriba para ver el 3D */}
+                {/* Space to see 3D background */}
                 <div className="flex-1 min-h-[150px] flex items-center justify-center pointer-events-none">
-                    {/* El 3D vive aquí visualmente */}
-                </div>
-
-                {/* --- SELECTOR DE PESTAÑAS --- */}
-                <div className="flex justify-center gap-4 py-2 overflow-x-auto px-4 custom-scrollbar">
-                    {['LIVE', 'WHALES', 'GOV', 'YIELD'].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setMode(tab as any)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap z-20 ${mode === tab
-                                ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105'
-                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
-                                }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
+                    {/* The 3D lives here visually */}
                 </div>
 
                 {/* --- CONTENIDO DE DATOS (SCROLLABLE) --- */}
