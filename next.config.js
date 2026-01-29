@@ -68,8 +68,29 @@ const nextConfig = {
             })
         );
 
+        // 3. Robust Fix: Manually copy WASM file to server chunks
+        // This solves the "ENOENT... user_preferences_bindings_wasm_bg.wasm" error on Docker/Railway
+        const CopyPlugin = require('copy-webpack-plugin');
+        config.plugins.push(
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: './node_modules/@xmtp/user-preferences-bindings-wasm/dist/web/user_preferences_bindings_wasm_bg.wasm',
+                        to: 'static/chunks/app', // Try multiple locations to be safe
+                        noErrorOnMissing: true
+                    },
+                    {
+                        from: './node_modules/@xmtp/user-preferences-bindings-wasm/dist/web/user_preferences_bindings_wasm_bg.wasm',
+                        to: 'server/chunks', // The likely required location based on error log
+                        noErrorOnMissing: true
+                    }
+                ]
+            })
+        );
+
         return config;
     },
+},
 };
 
 module.exports = nextConfig;

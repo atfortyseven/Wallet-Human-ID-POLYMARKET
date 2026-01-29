@@ -3,6 +3,8 @@
 import { useFavorites } from "@/hooks/useFavorites";
 import { NewsCard } from "@/components/crystalline/NewsCard";
 
+export const dynamic = 'force-dynamic';
+
 export default function FavoritesPage() {
     const { favorites, isLoading } = useFavorites();
 
