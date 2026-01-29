@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon } from "lucide-react";
+import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon, Vote } from "lucide-react";
 import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
@@ -95,6 +95,13 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                         <div className="flex items-center gap-4 text-sm font-medium text-[var(--text-secondary)]">
                             <a href="/" className="hover:text-[var(--text-primary)] transition-colors">Feed</a>
                             <a href="/wallet" className="hover:text-[var(--text-primary)] transition-colors">Wallet</a>
+                            <button
+                                onClick={() => router.push('/')}
+                                className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
+                            >
+                                <Vote size={14} />
+                                <span>Governance</span>
+                            </button>
                             <button
                                 onClick={() => setIsSettingsOpen(true)}
                                 className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
