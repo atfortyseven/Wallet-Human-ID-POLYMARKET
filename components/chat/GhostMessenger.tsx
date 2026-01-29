@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Lock, Send, X, Terminal, Copy, Shield, Wifi, Minimize2, Loader2, User } from 'lucide-react';
-import { useClient, useCanMessage, useStartConversation, useStreamMessages, useMessages } from '@xmtp/react-sdk';
+import { MessageSquare, Lock, Send, X, Terminal, Shield, Wifi, Loader2, User } from 'lucide-react';
 import { useWalletClient } from 'wagmi';
-import { walletClientToSigner } from './XMTPProviderWrapper';
 import { toast } from 'sonner';
+import { useXMTP } from './XMTPProviderWrapper';
+import { Client } from '@xmtp/browser-sdk';
+import { ethers } from 'ethers';
 
 export function GhostMessenger() {
     const [mounted, setMounted] = useState(false);
@@ -29,11 +30,7 @@ function GhostMessengerInner() {
     const [conversation, setConversation] = useState<any>(null);
     const [isConnected, setIsConnected] = useState(false);
 
-    // XMTP Hooks (without conversation-dependent hooks)
-    const { client, initialize } = useClient();
-    const { canMessage } = useCanMessage();
-    const { startConversation } = useStartConversation();
-
+    const { client, setClient } = useXMTP();
     const { data: walletClient } = useWalletClient();
 
     // Initialize XMTP Client (V3)
@@ -45,25 +42,31 @@ function GhostMessengerInner() {
 
         try {
             setIsInitializing(true);
-            console.log('[XMTP] Initializing V3 client...');
-            console.log('[XMTP] Wallet address:', walletClient.account.address);
+            console.log('[XMTP V3] Initializing client...');
+            console.log('[XMTP V3] Wallet address:', walletClient.account.address);
 
-            const signer = walletClientToSigner(walletClient);
-            console.log('[XMTP] Signer created successfully');
+            // Convert to ethers signer
+            const { account, chain, transport } = walletClient;
+            const network = {
+                chainId: chain.id,
+                name: chain.name,
+                ensAddress: chain.contracts?.ensRegistry?.address,
+            };
+            const provider = new ethers.BrowserProvider(transport, network);
+            const signer = new ethers.JsonRpcSigner(provider, account.address);
 
-            // V3 initialization with production environment
-            const xmtp = await initialize({
-                signer,
-                options: {
-                    env: 'production' // Use XMTP V3 production network
-                }
+            // Create XMTP V3 client using browser-sdk
+            const xmtpClient = await Client.create(account.address, {
+                env: 'production', // Use production environment for V3
+                dbEncryptionKey: await generateEncryptionKey(account.address),
             });
 
-            console.log('[XMTP] V3 client initialized:', xmtp?.address);
+            console.log('[XMTP V3] Client initialized:', xmtpClient.accountAddress);
+            setClient(xmtpClient);
             setIsConnected(true);
             toast.success("🔐 Secure Uplink Established (V3)");
         } catch (e: any) {
-            console.error('[XMTP] Initialization failed:', e);
+            console.error('[XMTP V3] Initialization failed:', e);
             const errorMsg = e?.message || e?.toString() || 'Unknown error';
 
             // Provide helpful error messages
@@ -85,18 +88,20 @@ function GhostMessengerInner() {
 
         // Validate address format
         if (!peerAddress.startsWith('0x') || peerAddress.length !== 42) {
-            toast.error("Invalid Etherum address");
+            toast.error("Invalid Ethereum address");
             return;
         }
 
         try {
-            const canMsg = await canMessage(peerAddress);
-            if (!canMsg) {
+            // Check if user can message
+            const canMessage = await client.canMessage([peerAddress]);
+            if (!canMessage[peerAddress]) {
                 toast.error("Recipient has not activated XMTP yet");
-                // We could let them try anyway, but warning is good
+                return;
             }
 
-            const conv = await startConversation(peerAddress, "Attempting secure connection...");
+            // Create a DM conversation (V3 uses conversations.newConversation)
+            const conv = await client.conversations.newDm(peerAddress);
             setConversation(conv);
             toast.success(`Connected to ${peerAddress.slice(0, 6)}...`);
         } catch (e) {
@@ -158,12 +163,12 @@ function GhostMessengerInner() {
                                     </div>
                                     <h3 className="text-white font-bold text-lg">Encrypted Uplink</h3>
                                     <p className="text-xs text-zinc-500">
-                                        Connect your wallet to establish an end-to-end encrypted messaging channel via XMTP.
+                                        Connect your wallet to establish an end-to-end encrypted messaging channel via XMTP V3.
                                     </p>
                                     <button
                                         onClick={handleConnect}
                                         disabled={isInitializing}
-                                        className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2"
+                                        className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isInitializing && <Loader2 size={12} className="animate-spin" />}
                                         {isInitializing ? 'INITIALIZING...' : 'INITIALIZE UPLINK'}
@@ -221,7 +226,7 @@ function GhostMessengerInner() {
                         {/* FOOTER DECORATION */}
                         <div className="h-6 bg-black/60 border-t border-white/10 flex items-center px-4 justify-between text-[10px] text-zinc-600">
                             <span className="flex items-center gap-1"><Shield size={8} /> E2EE ACTIVE</span>
-                            <span className="flex items-center gap-1"><Wifi size={8} /> XMTP NET</span>
+                            <span className="flex items-center gap-1"><Wifi size={8} /> XMTP V3</span>
                         </div>
 
                     </motion.div>
@@ -231,13 +236,43 @@ function GhostMessengerInner() {
     );
 }
 
-// Separate component for active chat to avoid hook dependency issues
+// Separate component for active chat
 function ChatView({ conversation, client, onClose }: { conversation: any; client: any; onClose: () => void }) {
     const [messageInput, setMessageInput] = useState('');
-    const { messages, isLoading: isLoadingMessages } = useMessages(conversation);
-    useStreamMessages(conversation);
-
+    const [messages, setMessages] = useState<any[]>([]);
+    const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Load messages when conversation changes
+    useEffect(() => {
+        const loadMessages = async () => {
+            try {
+                setIsLoadingMessages(true);
+                await conversation.sync();
+                const msgs = await conversation.messages();
+                setMessages(msgs);
+            } catch (e) {
+                console.error('Error loading messages:', e);
+            } finally {
+                setIsLoadingMessages(false);
+            }
+        };
+
+        loadMessages();
+
+        // Stream new messages
+        const stream = conversation.streamMessages();
+        (async () => {
+            for await (const message of stream) {
+                setMessages(prev => [...prev, message]);
+            }
+        })();
+
+        return () => {
+            // Cleanup stream if needed
+        };
+    }, [conversation]);
+
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
@@ -259,7 +294,7 @@ function ChatView({ conversation, client, onClose }: { conversation: any; client
             <div className="bg-white/5 p-2 flex items-center justify-between text-xs border-b border-white/5">
                 <div className="flex items-center gap-2 text-zinc-300">
                     <User size={12} />
-                    <span>{conversation.peerAddress.substring(0, 6)}...</span>
+                    <span>{conversation.peerAddress?.substring(0, 6) || 'DM'}...</span>
                 </div>
                 <button onClick={onClose} className="text-zinc-500 hover:text-white">
                     <X size={12} />
@@ -271,17 +306,17 @@ function ChatView({ conversation, client, onClose }: { conversation: any; client
                 {isLoadingMessages && (
                     <div className="flex justify-center"><Loader2 size={16} className="animate-spin text-zinc-600" /></div>
                 )}
-                {messages?.map((msg: any) => {
-                    const isMe = msg.senderAddress === client.address;
+                {messages?.map((msg: any, idx: number) => {
+                    const isMe = msg.senderInboxId === client.inboxId;
                     return (
-                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                        <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[80%] rounded-xl p-3 text-xs ${isMe
                                 ? 'bg-indigo-600 text-white rounded-br-none'
                                 : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
                                 }`}>
                                 {msg.content}
                                 <div className={`text-[9px] mt-1 ${isMe ? 'text-indigo-200' : 'text-zinc-500'} text-right`}>
-                                    {msg.sent.toLocaleTimeString()}
+                                    {new Date(msg.sentAtNs / 1000000).toLocaleTimeString()}
                                 </div>
                             </div>
                         </div>
@@ -311,4 +346,12 @@ function ChatView({ conversation, client, onClose }: { conversation: any; client
             </div>
         </div>
     );
+}
+
+// Helper to generate encryption key for local database
+async function generateEncryptionKey(address: string): Promise<Uint8Array> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(address);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return new Uint8Array(hash);
 }

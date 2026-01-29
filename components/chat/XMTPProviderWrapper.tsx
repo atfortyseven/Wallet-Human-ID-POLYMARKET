@@ -1,46 +1,36 @@
 'use client';
 
-import { XMTPProvider } from '@xmtp/react-sdk';
-import { useEffect, useState, useCallback } from 'react';
-import { useWalletClient } from 'wagmi';
-import { ethers } from 'ethers';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { Client } from '@xmtp/browser-sdk';
 
-// Helper to convert Viem WalletClient to Ethers Signer
-// XMTP SDK currently works best with Ethers v5/v6 Signers
-export function walletClientToSigner(walletClient: any) {
-    const { account, chain, transport } = walletClient;
-    const network = {
-        chainId: chain.id,
-        name: chain.name,
-        ensAddress: chain.contracts?.ensRegistry?.address,
-    };
-    const provider = new ethers.BrowserProvider(transport, network);
-    const signer = new ethers.JsonRpcSigner(provider, account.address);
-    return signer;
+// Context to share XMTP client across components
+interface XMTPContextType {
+    client: Client<'group'> | null;
+    setClient: (client: Client<'group'> | null) => void;
+    isReady: boolean;
 }
 
-export default function XMTPProviderWrapper({ children }: { children: React.ReactNode }) {
-    const { data: walletClient } = useWalletClient();
-    const [signer, setSigner] = useState<any>(null);
-    const [mounted, setMounted] = useState(false);
+const XMTPContext = createContext<XMTPContextType | undefined>(undefined);
+
+export function useXMTP() {
+    const context = useContext(XMTPContext);
+    if (!context) {
+        throw new Error('useXMTP must be used within XMTPProviderWrapper');
+    }
+    return context;
+}
+
+export default function XMTPProviderWrapper({ children }: { children: ReactNode }) {
+    const [client, setClient] = useState<Client<'group'> | null>(null);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        setIsReady(true);
     }, []);
 
-    useEffect(() => {
-        if (walletClient) {
-            const ethersSigner = walletClientToSigner(walletClient);
-            setSigner(ethersSigner);
-        }
-    }, [walletClient]);
-
-    // Loop Fix: Use mounted check to avoid hydration mismatch or generic provider errors on server
-    if (!mounted) return <>{children}</>;
-
     return (
-        <XMTPProvider>
+        <XMTPContext.Provider value={{ client, setClient, isReady }}>
             {children}
-        </XMTPProvider>
+        </XMTPContext.Provider>
     );
 }

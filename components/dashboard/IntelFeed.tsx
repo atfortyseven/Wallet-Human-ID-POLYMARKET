@@ -7,34 +7,23 @@ import { toast } from 'sonner';
 
 // Import Custom Hooks
 import { useAiSentiment } from '@/hooks/useAiSentiment';
-import { useGasMatrix } from '@/hooks/useGasMatrix';
 import { useGovSniper } from '@/hooks/useGovSniper';
 import { useYieldHunter } from '@/hooks/useYieldHunter';
 
-// Import 3D Core
-// IdentityCore moved to VoidShell for global background
-import { Constellation } from '../history/Constellation';
 import { ZapButton } from '@/components/defi/ZapButton'; // [NEW] Phase 3
-import { RefuelStation } from '@/components/defi/RefuelStation'; // [NEW] Phase 3
 
-type FeedMode = 'LIVE' | 'HISTORY' | 'WHALES' | 'GAS' | 'GOV' | 'YIELD';
+type FeedMode = 'LIVE' | 'WHALES' | 'GOV' | 'YIELD';
 
 export function IntelFeed() {
     // --- Hook Integration ---
     const sentiment = useAiSentiment();
-    const gas = useGasMatrix();
     const gov = useGovSniper();
     const yieldData = useYieldHunter();
 
     // --- Local State ---
     const [mode, setMode] = useState<FeedMode>('LIVE');
 
-    // --- Helper for Gas Color ---
-    const getGasColor = (fee: number) => {
-        if (fee < 15) return 'text-emerald-400';
-        if (fee < 30) return 'text-amber-400';
-        return 'text-red-400';
-    };
+
 
     return (
         <div className="flex flex-col h-full w-full relative overflow-hidden rounded-3xl bg-black/40 border border-white/10 backdrop-blur-xl shadow-2xl">
@@ -68,7 +57,7 @@ export function IntelFeed() {
 
                 {/* --- SELECTOR DE PESTAÑAS --- */}
                 <div className="flex justify-center gap-4 py-2 overflow-x-auto px-4 custom-scrollbar">
-                    {['LIVE', 'HISTORY', 'WHALES', 'GAS', 'GOV', 'YIELD'].map((tab) => (
+                    {['LIVE', 'WHALES', 'GOV', 'YIELD'].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setMode(tab as any)}
@@ -124,18 +113,7 @@ export function IntelFeed() {
                             </motion.div>
                         )}
 
-                        {/* --- TAB: HISTORY (Constellation) --- */}
-                        {mode === 'HISTORY' && (
-                            <motion.div
-                                key="history"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="h-full w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-sm"
-                            >
-                                <Constellation />
-                            </motion.div>
-                        )}
+
 
                         {/* --- TAB: WHALES (Placeholder/Future) --- */}
                         {mode === 'WHALES' && (
@@ -152,54 +130,7 @@ export function IntelFeed() {
                             </motion.div>
                         )}
 
-                        {/* --- TAB: GAS (Gas Matrix) --- */}
-                        {mode === 'GAS' && (
-                            <motion.div
-                                key="gas"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="space-y-4"
-                            >
-                                <div className="bg-white/5 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h4 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
-                                            <Zap size={14} /> GAS MATRIX
-                                        </h4>
-                                        <div className="flex items-center gap-2">
-                                            <RefuelStation gasLevel={0.5} /> {/* [NEW] Phase 3: Simulated Low Gas */}
-                                            <span className="text-[10px] font-mono text-zinc-600">EIP-1559 REALTIME</span>
-                                        </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-3 gap-2 text-center mb-4">
-                                        <div className="p-2 bg-black/40 rounded-lg border border-white/5">
-                                            <div className="text-[10px] text-zinc-500 mb-1">ECO</div>
-                                            <div className={`text-sm font-mono font-bold ${getGasColor(gas.eco)}`}>
-                                                {gas.eco}
-                                            </div>
-                                        </div>
-                                        <div className="p-2 bg-black/40 rounded-lg border border-white/5 ring-1 ring-indigo-500/30">
-                                            <div className="text-[10px] text-indigo-400 mb-1 font-bold">STD</div>
-                                            <div className={`text-lg font-mono font-bold ${getGasColor(gas.std)}`}>
-                                                {gas.std}
-                                            </div>
-                                        </div>
-                                        <div className="p-2 bg-black/40 rounded-lg border border-white/5">
-                                            <div className="text-[10px] text-zinc-500 mb-1">TURBO</div>
-                                            <div className={`text-sm font-mono font-bold ${getGasColor(gas.turbo)}`}>
-                                                {gas.turbo}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="text-center">
-                                        <span className={`text-[10px] px-2 py-1 rounded border ${gas.congestion === 'CLOGGED' || gas.congestion === 'HIGH' ? 'bg-red-500/10 text-red-400 border-red-500/20 animate-pulse' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
-                                            NETWORK STATUS: {gas.congestion}
-                                        </span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
 
                         {/* --- TAB: GOV (Governance) --- */}
                         {mode === 'GOV' && (

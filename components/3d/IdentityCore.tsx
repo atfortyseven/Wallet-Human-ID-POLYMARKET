@@ -46,8 +46,8 @@ function CoreMesh({ mode }: CoreProps) {
 
     return (
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-            {/* CÁSCARA EXTERIOR (CRISTAL) - SCALED UP FOR WALLPAPER */}
-            <mesh ref={mesh} scale={[2.5, 2.5, 2.5]}>
+            {/* CÁSCARA EXTERIOR (CRISTAL) - SCALED DOWN 30% */}
+            <mesh ref={mesh} scale={[1.75, 1.75, 1.75]}>
                 {/* Un octaedro se ve más sci-fi que un cubo simple */}
                 <octahedronGeometry args={[1.5, 0]} />
                 <MeshTransmissionMaterial
@@ -75,12 +75,12 @@ function CoreMesh({ mode }: CoreProps) {
             </mesh>
 
             {/* PARTÍCULAS DE ENERGÍA (ADAPTATIVAS) */}
-            <Sparkles count={80} scale={8} size={4} speed={0.4} opacity={0.6} color={targetColor} />
+            <Sparkles count={80} scale={5.6} size={4} speed={0.4} opacity={0.6} color={targetColor} />
 
             {/* CHISPAS VERDES EXTRA (SOLICITUD USER) */}
             <Sparkles
                 count={150}
-                scale={10}
+                scale={7}
                 size={3}
                 speed={0.8}
                 opacity={0.8}
