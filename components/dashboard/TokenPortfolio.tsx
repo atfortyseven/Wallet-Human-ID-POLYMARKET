@@ -10,8 +10,11 @@ import { getUsdcAddress, WLD_TOKEN_ADDRESS } from '@/config/tokens';
 import { toast } from 'sonner';
 import { QRCodeCanvas } from 'qrcode.react';
 
+import { useSettings } from '@/src/context/SettingsContext';
+
 export function TokenPortfolio() {
     const { address, chainId } = useAccount();
+    const { strictMode, contacts } = useSettings();
     const [selectedToken, setSelectedToken] = useState<any>(null);
     const [view, setView] = useState<'details' | 'send' | 'receive'>('details');
 
@@ -57,6 +60,15 @@ export function TokenPortfolio() {
     const handleSend = async () => {
         if (!selectedToken || !amount || !recipient) return;
         if (!isAddress(recipient)) { toast.error("Invalid Address"); return; }
+
+        // Strict Mode Check
+        if (strictMode) {
+            const isContact = contacts.find(c => c.address.toLowerCase() === recipient.toLowerCase());
+            if (!isContact) {
+                toast.error("Strict Mode Active", { description: "Address not in saved contacts." });
+                return;
+            }
+        }
 
         setIsSending(true);
         try {

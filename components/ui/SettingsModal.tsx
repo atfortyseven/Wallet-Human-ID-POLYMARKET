@@ -5,16 +5,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '@/src/context/SettingsContext';
 import {
     X, Settings, Shield, Zap, Database, Bell, Users,
-    CreditCard, Beaker, Link, Info, MessageCircle, Lock
+    CreditCard, Beaker, Link, Info, MessageCircle, Lock,
+    Loader2
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { verifyBiometricOwnership } from '@/src/services/security/BiometricService';
+import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
 
 export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { activeTab: contextActiveTab, t, currency, setCurrency, language, setLanguage, searchEngine, setSearchEngine, lockApp } = useSettings();
-    const [localActiveTab, setLocalActiveTab] = useState('general');
+    const {
+        t, currency, setCurrency,
+        language, setLanguage, searchEngine, setSearchEngine, lockApp,
+        strictMode, toggleStrictMode, hideBalances, toggleHideBalances,
+        privacyMode, togglePrivacyMode, humanMetrics, toggleHumanMetrics
+    } = useSettings();
 
-    // Use local state for activeTab since it's not in the context interface provided in the instructions
+    // Manage local tab state
+    const [localActiveTab, setLocalActiveTab] = useState('general');
     const activeTab = localActiveTab;
     const setActiveTab = setLocalActiveTab;
+
+    // Security Tab State
+    const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+    const [revokeToken, setRevokeToken] = useState('');
+    const [revokeSpender, setRevokeSpender] = useState('');
+    const [isRevoking, setIsRevoking] = useState(false);
 
     // HELPER: Sidebar Items with Translation
     const SECTIONS = [
@@ -30,6 +45,35 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         { id: 'about', label: t('nav_about'), icon: Info },
         { id: 'support', label: t('nav_support'), icon: MessageCircle },
     ];
+
+    const toggleBiometrics = async () => {
+        if (!biometricsEnabled) {
+            const verified = await verifyBiometricOwnership();
+            if (verified) {
+                setBiometricsEnabled(true);
+                toast.success("Biometrics Enabled");
+            } else {
+                toast.error("Biometric verification failed");
+            }
+        } else {
+            setBiometricsEnabled(false);
+        }
+    };
+
+    const handleRevoke = async () => {
+        if (!revokeToken || !revokeSpender) return;
+        setIsRevoking(true);
+        try {
+            const hash = await revokeTokenAllowance(revokeToken, revokeSpender);
+            toast.success("Revocation TX Sent", { description: hash });
+            setRevokeToken('');
+            setRevokeSpender('');
+        } catch (e: any) {
+            toast.error("Revocation Failed", { description: e.message });
+        } finally {
+            setIsRevoking(false);
+        }
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -83,7 +127,73 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 );
 
             case 'security':
-                return <div className="p-4 text-center text-gray-500 bg-white/5 rounded-xl">{t('btn_reveal')} (Secure Enclave Active)</div>;
+                return (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                        {/* Toggles */}
+                        <div className="space-y-1">
+                            <ToggleItem
+                                title="Biometric Authentication"
+                                description="Require TouchID/FaceID to unlock wallet."
+                                active={biometricsEnabled}
+                                onClick={toggleBiometrics}
+                            />
+                            <ToggleItem
+                                title="Strict Mode (Whitelist Only)"
+                                description="Only allow transactions to saved contacts."
+                                active={strictMode}
+                                onClick={toggleStrictMode}
+                            />
+                            <ToggleItem
+                                title="Hide Balances"
+                                description="Mask all balance values with **** for privacy."
+                                active={hideBalances}
+                                onClick={toggleHideBalances}
+                            />
+                            <ToggleItem
+                                title="Strict Privacy Mode"
+                                description="Block third-party trackers and anonymize requests."
+                                active={privacyMode}
+                                onClick={togglePrivacyMode}
+                            />
+                            <ToggleItem
+                                title="Participate in MetaMetrics"
+                                description="Send anonymous usage data to help us improve."
+                                active={humanMetrics}
+                                onClick={toggleHumanMetrics}
+                            />
+                        </div>
+
+                        {/* Revoke Allowance Section */}
+                        <div className="p-5 bg-red-500/5 border border-red-500/20 rounded-2xl space-y-3">
+                            <h4 className="text-red-400 font-bold text-sm flex items-center gap-2">
+                                <Shield className="w-4 h-4" /> Revoke Token Allowances
+                            </h4>
+                            <p className="text-xs text-gray-500">Emergency trigger to reset approval to 0.</p>
+
+                            <input
+                                placeholder="Token Address (0x...)"
+                                value={revokeToken}
+                                onChange={e => setRevokeToken(e.target.value)}
+                                className="w-full bg-black/40 border border-red-500/20 rounded-lg p-2 text-xs text-white outline-none font-mono"
+                            />
+                            <input
+                                placeholder="Spender Address (0x...)"
+                                value={revokeSpender}
+                                onChange={e => setRevokeSpender(e.target.value)}
+                                className="w-full bg-black/40 border border-red-500/20 rounded-lg p-2 text-xs text-white outline-none font-mono"
+                            />
+
+                            <button
+                                onClick={handleRevoke}
+                                disabled={isRevoking || !revokeToken || !revokeSpender}
+                                className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
+                            >
+                                {isRevoking ? <Loader2 className="animate-spin w-3 h-3" /> : <Shield className="w-3 h-3" />}
+                                {isRevoking ? "REVOKING..." : "REVOKE ALLOWANCE"}
+                            </button>
+                        </div>
+                    </div>
+                );
 
             case 'advanced':
                 return <div className="space-y-4"><h3 className="text-white">RPC Configuration</h3><input disabled placeholder="https://mainnet.infura.io/v3..." className="w-full bg-black/20 p-3 rounded border border-white/10" /></div>;
@@ -205,5 +315,20 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 </>
             )}
         </AnimatePresence>
+    );
+}
+
+// Utility Component for Toggles
+function ToggleItem({ title, description, active, onClick }: { title: string, description: string, active: boolean, onClick: () => void }) {
+    return (
+        <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group" onClick={onClick}>
+            <div>
+                <h4 className="text-white text-sm font-medium mb-1 group-hover:text-[#00f2ea] transition-colors">{title}</h4>
+                <p className="text-xs text-gray-500 max-w-[80%]">{description}</p>
+            </div>
+            <div className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${active ? 'bg-[#00f2ea]' : 'bg-white/10'}`}>
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all duration-300 ${active ? 'left-7' : 'left-1'}`} />
+            </div>
+        </div>
     );
 }

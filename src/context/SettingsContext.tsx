@@ -31,6 +31,8 @@ export interface SettingsContextType {
     togglePrivacyMode: () => void;
     humanMetrics: boolean; // "MetaMetrics"
     toggleHumanMetrics: () => void;
+    strictMode: boolean; // Whitelist Only
+    toggleStrictMode: () => void;
     revealSecretPhrase: () => string; // Mock
 
     // Advanced
@@ -71,6 +73,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     // Security
     const [hideBalances, setHideBalances] = useState(false);
     const [privacyMode, setPrivacyMode] = useState(true);
+    const [strictMode, setStrictMode] = useState(false);
     const [humanMetrics, setHumanMetrics] = useState(false);
 
     // Advanced
@@ -129,6 +132,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     // --- FUNCTIONS ---
     const toggleHideBalances = () => setHideBalances(prev => !prev);
     const togglePrivacyMode = () => setPrivacyMode(prev => !prev);
+    const toggleStrictMode = () => setStrictMode(prev => !prev);
     const toggleHumanMetrics = () => setHumanMetrics(prev => !prev);
 
     const toggleTestNets = () => setTestNetsEnabled(prev => !prev);
@@ -180,7 +184,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return (
         <SettingsContext.Provider value={{
             currency, setCurrency, language, setLanguage, searchEngine, setSearchEngine,
-            hideBalances, toggleHideBalances, privacyMode, togglePrivacyMode, humanMetrics, toggleHumanMetrics, revealSecretPhrase,
+            hideBalances, toggleHideBalances, privacyMode, togglePrivacyMode, strictMode, toggleStrictMode, humanMetrics, toggleHumanMetrics, revealSecretPhrase,
             testNetsEnabled, toggleTestNets, ipfsGateway, setIpfsGateway, customRPC, setCustomRPC, stateLogsEnabled, toggleStateLogs, resetAccount,
             contacts, addContact, removeContact,
             notifications, toggleNotification,
