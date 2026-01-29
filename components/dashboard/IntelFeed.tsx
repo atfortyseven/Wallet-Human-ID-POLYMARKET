@@ -61,32 +61,7 @@ export function IntelFeed() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-4"
                             >
-                                {/* Sentiment Card */}
-                                <div className="bg-white/5 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h4 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
-                                            <Globe size={14} /> GLOBAL SENTIMENT
-                                        </h4>
-                                        <div className={`px-2 py-1 rounded text-xs font-bold border ${sentiment.score >= 50 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                                            {sentiment.score}/100
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className={`text-sm font-bold ${sentiment.score >= 50 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                            {sentiment.state}
-                                        </span>
-                                        <span className="text-[10px] text-zinc-500">
-                                            {sentiment.isLoading ? 'Analyzing...' : `${sentiment.analysisCount} Headlines Scanned`}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {sentiment.keywords.map((word, i) => (
-                                            <span key={i} className="text-[10px] px-2 py-1 bg-white/5 rounded border border-white/10 text-zinc-300 flex items-center gap-1">
-                                                #{word.tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
+                                {/* GLOBAL SENTIMENT section removed */}
                             </motion.div>
                         )}
 
