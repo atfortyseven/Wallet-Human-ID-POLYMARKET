@@ -8,7 +8,7 @@ import { parseEther, parseUnits, formatEther, formatUnits, erc20Abi, isAddress }
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { getUsdcAddress, WLD_TOKEN_ADDRESS } from '@/config/tokens';
 import { toast } from 'sonner';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 export function TokenPortfolio() {
     const { address, chainId } = useAccount();
