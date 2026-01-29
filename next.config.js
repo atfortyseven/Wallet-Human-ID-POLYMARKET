@@ -57,6 +57,7 @@ const nextConfig = {
             '@react-native-async-storage/async-storage': false,
             'sharp$': false,
             'onnxruntime-node$': false,
+            'porto/internal': false, // Fix for Wagmi build error
         };
         config.externals.push('pino-pretty', 'lokijs', 'encoding');
 
