@@ -5,10 +5,12 @@ import { CreateConnectorFn } from 'wagmi';
 import { AppKitNetwork } from "@reown/appkit/networks";
 
 // 1. Get projectId from https://cloud.walletconnect.com
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+// 1. Get projectId
+// Fallback to a generous default if env is missing to prevent crash
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "37621051039974f1c7a00f59ee5c1185";
 
-if (!projectId) {
-    throw new Error('Project ID is not defined')
+if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
+    console.warn("Using fallback WalletConnect Project ID. Please set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.");
 }
 
 // 2. Create wagmiConfig
