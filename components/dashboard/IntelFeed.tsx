@@ -37,18 +37,7 @@ export function IntelFeed() {
 
             {/* --- HEADER --- */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20 z-20">
-                <div>
-                    <div className="text-[10px] font-mono text-emerald-500 tracking-widest mb-1 flex items-center gap-2">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        SYSTEM_CORE // ACTIVE
-                    </div>
-                    <div className="text-[10px] font-mono text-gray-500 tracking-widest">
-                        v3.0.1
-                    </div>
-                </div>
+                {/* Header removed for cleaner UI */}
             </div>
 
             {/* --- CONTENIDO PRINCIPAL (Z-20) --- */}

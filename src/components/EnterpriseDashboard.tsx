@@ -31,16 +31,6 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
 
                 </div>
 
-                {/* FOOTER DISCRETO */}
-                <footer className="mt-16 border-t border-white/5 pt-8 flex justify-between items-center text-xs text-neutral-600 font-mono">
-                    <div>HUMANID.FI © 2026 // SYSTEM V1.0.4</div>
-                    <div className="flex gap-6">
-                        <span className="hover:text-neutral-400 cursor-pointer">Manifesto</span>
-                        <span className="hover:text-neutral-400 cursor-pointer">Contracts</span>
-                        <span className="hover:text-neutral-400 cursor-pointer">Privacy</span>
-                    </div>
-                </footer>
-
             </div>
         </div>
     );
