@@ -6,7 +6,7 @@ import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { SystemCoreDropdown } from "./nav/SystemCoreDropdown";
+
 import { SettingsModal } from "@/components/ui/SettingsModal";
 import { useAuth } from "@/hooks/useAuth";
 import dynamic from 'next/dynamic';
@@ -70,7 +70,6 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                         <div className="flex items-center gap-4 text-sm font-medium text-[var(--text-secondary)]">
                             <a href="/" className="hover:text-[var(--text-primary)] transition-colors">Feed</a>
                             <a href="/wallet" className="hover:text-[var(--text-primary)] transition-colors">Wallet</a>
-                            <SystemCoreDropdown />
                             <a href="/voting" className="hover:text-[#00f2ea] transition-colors">Voting Hub</a>
                             <button
                                 onClick={() => setIsSettingsOpen(true)}

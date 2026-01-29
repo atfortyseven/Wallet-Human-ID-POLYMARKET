@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { MeshTransmissionMaterial, Float, Environment, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
@@ -12,6 +12,17 @@ const MODE_COLORS = {
     GOV: '#f59e0b',    // Dorado (Poder)
     YIELD: '#10b981'   // Verde (Dinero)
 };
+
+// WebGL Detection Function
+function isWebGLAvailable(): boolean {
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('webgl2') || canvas.getContext('experimental-webgl');
+        return !!gl;
+    } catch (e) {
+        return false;
+    }
+}
 
 interface CoreProps {
     mode: string;
@@ -91,14 +102,61 @@ function CoreMesh({ mode }: CoreProps) {
     );
 }
 
+// CSS-Only Fallback Component
+function FallbackBackground() {
+    return (
+        <div className="w-full h-full relative overflow-hidden">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/10 to-emerald-900/20 animate-pulse"
+                style={{ animationDuration: '4s' }} />
+
+            {/* Glowing orbs */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"
+                style={{ animationDuration: '3s' }} />
+            <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+                style={{ animationDuration: '5s', animationDelay: '1s' }} />
+            <div className="absolute bottom-1/3 left-1/4 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"
+                style={{ animationDuration: '4s', animationDelay: '2s' }} />
+        </div>
+    );
+}
+
 interface IdentityCoreProps {
     mode?: string;
 }
 
 export default function IdentityCore({ mode = 'LIVE' }: IdentityCoreProps) {
+    const [webGLSupported, setWebGLSupported] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        // Check WebGL support on mount
+        setWebGLSupported(isWebGLAvailable());
+    }, []);
+
+    // Loading state
+    if (webGLSupported === null) {
+        return <FallbackBackground />;
+    }
+
+    // WebGL not supported - use CSS fallback
+    if (!webGLSupported) {
+        console.warn('WebGL not supported, using CSS fallback');
+        return <FallbackBackground />;
+    }
+
+    // WebGL supported - render Three.js scene
     return (
-        <div className="w-full h-full pointer-events-none"> {/* Allow clicks to pass through usually, but canvas catches events */}
-            <Canvas camera={{ position: [0, 0, 8], fov: 45 }} gl={{ alpha: true }}>
+        <div className="w-full h-full pointer-events-none">
+            <Canvas
+                camera={{ position: [0, 0, 8], fov: 45 }}
+                gl={{ alpha: true }}
+                onCreated={(state) => {
+                    // Additional safety check
+                    if (!state.gl) {
+                        console.error('WebGL context creation failed');
+                    }
+                }}
+            >
                 <ambientLight intensity={0.5} />
                 <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
                 <Environment preset="city" />

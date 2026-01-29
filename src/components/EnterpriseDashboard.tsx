@@ -19,40 +19,10 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
 
 
                 {/* BENTO GRID LAYOUT */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6">
 
-                    {/* BLOQUE 1: TREASURY (Removed) */}
-
-                    {/* BLOQUE 2: SUPPLY METRICS */}
-                    <div className="bg-[#111] border border-white/5 rounded-2xl p-8 flex flex-col justify-between hover:border-white/10 transition-colors">
-                        <div>
-                            <p className="text-neutral-500 text-sm font-medium mb-4">Circulating Supply</p>
-                            <div className="text-3xl font-medium text-white mb-1">
-                                {typeof treasury.supply === 'number' ? (treasury.supply / 1000000).toFixed(1) + 'M' : treasury.supply} <span className="text-lg text-neutral-600">HMND</span>
-                            </div>
-                            <div className="w-full bg-neutral-800 h-1 rounded-full mt-4 overflow-hidden">
-                                <div className="bg-white h-full w-[15%]"></div>
-                            </div>
-                            <div className="flex justify-between mt-2 text-[10px] text-neutral-500 font-mono uppercase">
-                                <span>Unlocked (15%)</span>
-                                <span>Cap 100M</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* BLOQUE 3: GOVERNANCE POWER */}
-                    <div className="bg-[#111] border border-white/5 rounded-2xl p-8 flex flex-col justify-between hover:border-white/10 transition-colors">
-                        <div>
-                            <p className="text-neutral-500 text-sm font-medium mb-4">Governance Weight</p>
-                            <div className="text-3xl font-medium text-white mb-1">0.00 <span className="text-lg text-neutral-600">vHMND</span></div>
-                        </div>
-                        <button className="w-full py-3 mt-4 border border-white/10 rounded-lg text-sm font-medium text-neutral-300 hover:bg-white/5 transition-colors">
-                            Delegate Votes
-                        </button>
-                    </div>
-
-                    {/* BLOQUE 4: RECENT INTEL (God-Tier Terminal) */}
-                    <div className="md:col-span-2 lg:col-span-3">
+                    {/* INTEL FEED - Full Width */}
+                    <div className="w-full">
                         <IntelFeed />
                     </div>
 
