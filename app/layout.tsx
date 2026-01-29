@@ -1,3 +1,6 @@
+// CRITICAL: Polyfills MUST load first to fix production black screen
+import '@/components/polyfills';
+
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
@@ -13,8 +16,8 @@ import { GeoBlocker } from '@/components/logic/GeoBlocker';
 import { TermsGate } from '@/components/compliance/TermsGate';
 import { BaseGasWidget } from '@/components/compliance/BaseGasWidget';
 import RegisterSW from '@/components/pwa/RegisterSW';
-import '@/components/polyfills'; // <-- Import early to fix WalletConnect Buffer issue
 import { GlobalErrorBoundary } from '@/components/GlobalErrorBoundary';
+import { ErrorLogger } from '@/components/ErrorLogger';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -78,6 +81,7 @@ export default function RootLayout({
             <body className="relative min-h-screen">
                 <Providers>
                     <GlobalErrorBoundary>
+                        <ErrorLogger />
                         <RegisterSW />
                         <TermsGate />
                         <GeoBlocker />

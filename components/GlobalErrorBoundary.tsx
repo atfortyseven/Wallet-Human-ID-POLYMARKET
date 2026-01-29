@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, Copy } from "lucide-react";
 
 interface Props {
     children?: ReactNode;
@@ -25,9 +25,27 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error("Uncaught error:", error, errorInfo);
+        console.error("[GlobalErrorBoundary] Uncaught error:", error, errorInfo);
         this.setState({ errorInfo });
+
+        // Also log to a potential error tracking service
+        if (typeof window !== 'undefined') {
+            console.error('[GlobalErrorBoundary] Error details:', {
+                message: error.message,
+                stack: error.stack,
+                componentStack: errorInfo.componentStack,
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            });
+        }
     }
+
+    private copyErrorToClipboard = () => {
+        const errorText = `Error: ${this.state.error?.message}\n\nStack:\n${this.state.error?.stack}\n\nComponent Stack:\n${this.state.errorInfo?.componentStack}`;
+        navigator.clipboard.writeText(errorText).then(() => {
+            alert('Error details copied to clipboard');
+        });
+    };
 
     public render() {
         if (this.state.hasError) {
@@ -46,13 +64,22 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                             </pre>
                         </div>
 
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
-                        >
-                            <RefreshCw size={18} />
-                            REBOOT SYSTEM
-                        </button>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={this.copyErrorToClipboard}
+                                className="px-6 py-3 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
+                            >
+                                <Copy size={18} />
+                                COPY ERROR
+                            </button>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
+                            >
+                                <RefreshCw size={18} />
+                                REBOOT SYSTEM
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
