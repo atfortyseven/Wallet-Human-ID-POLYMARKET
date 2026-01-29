@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/components/AppContext";
 import { MainVault } from "@/components/MainVault";
+import { TokenPortfolio } from "@/components/dashboard/TokenPortfolio";
 import {
     Wallet,
     ArrowRightLeft,
@@ -266,13 +267,15 @@ export default function WalletSection() {
                 < div className="lg:col-span-8 space-y-6" >
 
                     {/* 1. Portfolio Card (World ID Connected) */}
-                    < motion.div
-                        initial={{ opacity: 0, y: 20 }
-                        }
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
                         <MainVault onConnect={handleStandardConnect} />
-                    </motion.div >
+                    </motion.div>
+
+                    {/* [NEW] Token Portfolio Section */}
+                    <TokenPortfolio />
 
                     {/* 2. Action Center (Tabs + Content) */}
                     <div className="bg-[var(--bg-card)] border border-[var(--border-main)] rounded-3xl overflow-hidden flex flex-col min-h-[500px]">

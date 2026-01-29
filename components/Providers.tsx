@@ -9,7 +9,7 @@ import { SettingsProvider } from "@/src/context/SettingsContext";
 export default function Providers({ children, initialState }: { children: React.ReactNode, initialState?: State }) {
     return (
         <Web3ModalProvider cookies={null}>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
                 <SettingsProvider>
                     <LanguageProvider>
                         {children}
