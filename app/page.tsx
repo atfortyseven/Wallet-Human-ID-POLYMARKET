@@ -5,7 +5,7 @@ import EnterpriseDashboard from "@/components/EnterpriseDashboard";
 import { toast } from 'sonner';
 
 // Production Backend URL
-const API_URL = "https://wallet-human-polymarket-id-production.up.railway.app";
+// Production Backend URL (Removed: Using relative path)
 
 export default function Page() {
     const [data, setData] = useState<any>(null);
@@ -14,8 +14,8 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                // Fetch from the live backend
-                const res = await fetch(`${API_URL}/api/dashboard`);
+                // Fetch from the local API
+                const res = await fetch('/api/dashboard');
                 if (!res.ok) throw new Error('Failed to fetch data');
                 const jsonData = await res.json();
                 setData(jsonData);
