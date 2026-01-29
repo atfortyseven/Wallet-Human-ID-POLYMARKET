@@ -26,24 +26,15 @@ function GhostMessengerInner() {
     const [isOpen, setIsOpen] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
     const [peerAddress, setPeerAddress] = useState('');
-    const [messageInput, setMessageInput] = useState('');
     const [conversation, setConversation] = useState<any>(null);
     const [isConnected, setIsConnected] = useState(false);
 
-    // XMTP Hooks
+    // XMTP Hooks (without conversation-dependent hooks)
     const { client, initialize } = useClient();
     const { canMessage } = useCanMessage();
     const { startConversation } = useStartConversation();
-    const { messages, isLoading: isLoadingMessages } = useMessages(conversation);
-    useStreamMessages(conversation); // Stream new messages
 
     const { data: walletClient } = useWalletClient();
-
-    // Scroll to bottom
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
 
     // Initialize Client
     const handleConnect = async () => {
@@ -89,18 +80,6 @@ function GhostMessengerInner() {
         } catch (e) {
             console.error(e);
             toast.error("Failed to start conversation");
-        }
-    };
-
-    // Send Message
-    const handleSend = async () => {
-        if (!messageInput || !conversation) return;
-        try {
-            await conversation.send(messageInput);
-            setMessageInput('');
-        } catch (e) {
-            console.error(e);
-            toast.error("Transmission failed");
         }
     };
 
@@ -212,62 +191,7 @@ function GhostMessengerInner() {
 
                             {/* STATE 3: ACTIVE CHAT */}
                             {client && conversation && (
-                                <div className="flex-1 flex flex-col h-full">
-                                    {/* Chat Header */}
-                                    <div className="bg-white/5 p-2 flex items-center justify-between text-xs border-b border-white/5">
-                                        <div className="flex items-center gap-2 text-zinc-300">
-                                            <User size={12} />
-                                            <span>{conversation.peerAddress.substring(0, 6)}...</span>
-                                        </div>
-                                        <button onClick={() => setConversation(null)} className="text-zinc-500 hover:text-white">
-                                            <X size={12} />
-                                        </button>
-                                    </div>
-
-                                    {/* Messages */}
-                                    <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                                        {isLoadingMessages && (
-                                            <div className="flex justify-center"><Loader2 size={16} className="animate-spin text-zinc-600" /></div>
-                                        )}
-                                        {messages?.map((msg: any) => {
-                                            const isMe = msg.senderAddress === client.address;
-                                            return (
-                                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                    <div className={`max-w-[80%] rounded-xl p-3 text-xs ${isMe
-                                                        ? 'bg-indigo-600 text-white rounded-br-none'
-                                                        : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
-                                                        }`}>
-                                                        {msg.content}
-                                                        <div className={`text-[9px] mt-1 ${isMe ? 'text-indigo-200' : 'text-zinc-500'} text-right`}>
-                                                            {msg.sent.toLocaleTimeString()}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })}
-                                        <div ref={messagesEndRef} />
-                                    </div>
-
-                                    {/* Input Area */}
-                                    <div className="p-3 border-t border-white/10 bg-black/20">
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="Encrypting message..."
-                                                value={messageInput}
-                                                onChange={(e) => setMessageInput(e.target.value)}
-                                                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                                            />
-                                            <button
-                                                onClick={handleSend}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white transition-colors"
-                                            >
-                                                <Send size={12} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <ChatView conversation={conversation} client={client} onClose={() => setConversation(null)} />
                             )}
 
                         </div>
@@ -282,5 +206,87 @@ function GhostMessengerInner() {
                 )}
             </AnimatePresence>
         </>
+    );
+}
+
+// Separate component for active chat to avoid hook dependency issues
+function ChatView({ conversation, client, onClose }: { conversation: any; client: any; onClose: () => void }) {
+    const [messageInput, setMessageInput] = useState('');
+    const { messages, isLoading: isLoadingMessages } = useMessages(conversation);
+    useStreamMessages(conversation);
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    const handleSend = async () => {
+        if (!messageInput || !conversation) return;
+        try {
+            await conversation.send(messageInput);
+            setMessageInput('');
+        } catch (e) {
+            console.error(e);
+            toast.error("Transmission failed");
+        }
+    };
+
+    return (
+        <div className="flex-1 flex flex-col h-full">
+            {/* Chat Header */}
+            <div className="bg-white/5 p-2 flex items-center justify-between text-xs border-b border-white/5">
+                <div className="flex items-center gap-2 text-zinc-300">
+                    <User size={12} />
+                    <span>{conversation.peerAddress.substring(0, 6)}...</span>
+                </div>
+                <button onClick={onClose} className="text-zinc-500 hover:text-white">
+                    <X size={12} />
+                </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                {isLoadingMessages && (
+                    <div className="flex justify-center"><Loader2 size={16} className="animate-spin text-zinc-600" /></div>
+                )}
+                {messages?.map((msg: any) => {
+                    const isMe = msg.senderAddress === client.address;
+                    return (
+                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[80%] rounded-xl p-3 text-xs ${isMe
+                                ? 'bg-indigo-600 text-white rounded-br-none'
+                                : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
+                                }`}>
+                                {msg.content}
+                                <div className={`text-[9px] mt-1 ${isMe ? 'text-indigo-200' : 'text-zinc-500'} text-right`}>
+                                    {msg.sent.toLocaleTimeString()}
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <div className="p-3 border-t border-white/10 bg-black/20">
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Encrypting message..."
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                    <button
+                        onClick={handleSend}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white transition-colors"
+                    >
+                        <Send size={12} />
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }
