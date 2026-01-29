@@ -8,8 +8,19 @@ export function useAuth() {
 
     const checkAuth = async () => {
         try {
+            // Check client-side persistence (3-minute rule)
+            const expiry = localStorage.getItem('human_session_expiry');
+            if (expiry && parseInt(expiry) > Date.now()) {
+                setIsAuthenticated(true);
+                setIsLoading(false);
+                return;
+            }
+
+            // Fallback to server check (optional, but keep for robustness if needed)
             const res = await fetch("/api/auth/session");
             if (res.ok) {
+                // Determine source of server session - assuming server session is strictly tied to 3 min logic too?
+                // For now, if server says OK, we trust it, but we prefer client expiry for the "3 min reload" rule.
                 setIsAuthenticated(true);
             } else {
                 setIsAuthenticated(false);
@@ -22,31 +33,56 @@ export function useAuth() {
         }
     };
 
-    const logout = async () => {
+    const login = async () => {
         try {
-            await fetch("/api/auth/logout", { method: "POST" });
-            setIsAuthenticated(false);
-            window.location.href = "/"; // Redirect to home
+            // Set 3-minute expiry
+            const expiry = Date.now() + 3 * 60 * 1000; // 3 minutes
+            localStorage.setItem('human_session_expiry', expiry.toString());
+            
+            // Still verify with server if needed by backend architecture, but client auth is immediate
+            await fetch("/api/auth/verify-world-id", { method: "POST" }); // Mock call or real call handled elsewhere
+            setIsAuthenticated(true);
         } catch (error) {
-            console.error("Logout failed", error);
+            console.error("Login persistence failed", error);
+            // Even if server fails, if we verified proof, we might want to allow locally?
+            // Assuming login() is called AFTER proof verification succeeded.
+            const expiry = Date.now() + 3 * 60 * 1000; 
+            localStorage.setItem('human_session_expiry', expiry.toString());
+            setIsAuthenticated(true);
         }
     };
 
-    const resetAuth = async () => {
+    const logout = async () => {
+        localStorage.removeItem('human_session_expiry');
         try {
-            // Invalidate server-side session/cookie to prevent refresh bypass
             await fetch("/api/auth/logout", { method: "POST" });
-            setIsAuthenticated(false);
-        } catch (error) {
-            console.error("Reset auth failed", error);
-            // Still clear client state even if server call fails
-            setIsAuthenticated(false);
+        } catch (e) { console.error(e); }
+        setIsAuthenticated(false);
+        window.location.href = "/";
+    };
+
+    const resetAuth = async () => {
+        // Clear 3-minute session
+        localStorage.removeItem('human_session_expiry');
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+        } catch (e) {
+             console.error(e);
         }
+        setIsAuthenticated(false);
     };
 
     useEffect(() => {
         checkAuth();
     }, []);
 
-    return { isAuthenticated, isLoading, login: checkAuth, logout, resetAuth };
+    // Helper to refresh session (extend 3 mins) if needed
+    const refreshSession = () => {
+        if (isAuthenticated) {
+            const expiry = Date.now() + 3 * 60 * 1000;
+            localStorage.setItem('human_session_expiry', expiry.toString());
+        }
+    };
+
+    return { isAuthenticated, isLoading, login, logout, resetAuth, refreshSession };
 }

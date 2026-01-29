@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon, Vote } from "lucide-react";
+import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon } from "lucide-react";
 import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { SettingsModal } from "@/components/ui/SettingsModal";
-import { GovernanceModal } from "@/components/governance/GovernanceModal";
 import { useAuth } from "@/hooks/useAuth";
 import dynamic from 'next/dynamic';
 const GhostMessenger = dynamic(() => import('./chat/GhostMessenger').then(mod => mod.GhostMessenger), { ssr: false });
@@ -21,7 +20,6 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(false);
     const { isAuthenticated, login } = useAuth();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isGovernanceOpen, setIsGovernanceOpen] = useState(false);
 
     // ... world id config ...
     const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}` || "app_affe7470221b57a8edee20b3ac30c484";
@@ -98,13 +96,6 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                             <a href="/" className="hover:text-[var(--text-primary)] transition-colors">Feed</a>
                             <a href="/wallet" className="hover:text-[var(--text-primary)] transition-colors">Wallet</a>
                             <button
-                                onClick={() => setIsGovernanceOpen(true)}
-                                className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
-                            >
-                                <Vote size={14} />
-                                <span>Governance</span>
-                            </button>
-                            <button
                                 onClick={() => setIsSettingsOpen(true)}
                                 className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
                             >
@@ -163,12 +154,6 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                 <SettingsModal
                     isOpen={isSettingsOpen}
                     onClose={() => setIsSettingsOpen(false)}
-                />
-
-                {/* Governance Modal */}
-                <GovernanceModal
-                    isOpen={isGovernanceOpen}
-                    onClose={() => setIsGovernanceOpen(false)}
                 />
             </div>
         </XMTPProviderWrapper>
