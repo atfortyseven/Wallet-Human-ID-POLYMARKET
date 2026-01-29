@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HumanID.fi - Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            border: 2px solid #0f0;
+            border-radius: 8px;
+            padding: 30px;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0ff;
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #0f0;
+        }
+        .status.error {
+            border-left-color: #f00;
+            color: #f00;
+            background: rgba(255, 0, 0, 0.1);
+        }
+        .status.success {
+            border-left-color: #0f0;
+            color: #0f0;
+        }
+        .test-btn {
+            margin: 10px 0;
+            padding: 12px 24px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            width: 100%;
+        }
+        .test-btn:hover {
+            background: #0ff;
+        }
+        pre {
+            background: #111;
+            padding: 10px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .info { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 HUMANID.FI DIAGNOSTIC</h1>
+        
+        <div class="status success" id="server-status">
+            ✅ SERVER ONLINE - HTML Loaded Successfully
+        </div>
+
+        <div class="status success" id="js-status">
+            ✅ JAVASCRIPT ENABLED - Script Executing
+        </div>
+
+        <div class="status" id="env-status">
+            ⏳ Checking environment...
+        </div>
+
+        <div class="status" id="api-status">
+            ⏳ Testing API connection...
+        </div>
+
+        <button class="test-btn" onclick="testMainApp()">
+            🚀 TEST MAIN APPLICATION
+        </button>
+
+        <button class="test-btn" onclick="runFullDiagnostic()">
+            🔬 RUN FULL DIAGNOSTIC
+        </button>
+
+        <div id="diagnostic-output"></div>
+
+        <div class="info" style="margin-top: 20px;">
+            <strong>Browser:</strong> <span id="browser-info"></span><br>
+            <strong>Time:</strong> <span id="time-info"></span><br>
+            <strong>URL:</strong> <span id="url-info"></span>
+        </div>
+    </div>
+
+    <script>
+        // Display browser info
+        document.getElementById('browser-info').textContent = navigator.userAgent;
+        document.getElementById('time-info').textContent = new Date().toISOString();
+        document.getElementById('url-info').textContent = window.location.href;
+
+        // Test environment
+        setTimeout(() => {
+            const envStatus = document.getElementById('env-status');
+            envStatus.className = 'status success';
+            envStatus.textContent = '✅ CLIENT ENVIRONMENT OK';
+        }, 500);
+
+        // Test API
+        setTimeout(async () => {
+            const apiStatus = document.getElementById('api-status');
+            try {
+                const response = await fetch('/api/debug/env');
+                if (response.ok) {
+                    const data = await response.json();
+                    apiStatus.className = 'status success';
+                    apiStatus.textContent = '✅ API RESPONDING - Environment variables loaded';
+                } else {
+                    apiStatus.className = 'status error';
+                    apiStatus.textContent = `❌ API ERROR - Status: ${response.status}`;
+                }
+            } catch (e) {
+                apiStatus.className = 'status error';
+                apiStatus.textContent = `❌ API UNREACHABLE - ${e.message}`;
+            }
+        }, 1000);
+
+        function testMainApp() {
+            window.location.href = '/';
+        }
+
+        async function runFullDiagnostic() {
+            const output = document.getElementById('diagnostic-output');
+            output.innerHTML = '<h3 style="color: #0ff; margin-top: 20px;">🔬 DIAGNOSTIC REPORT</h3>';
+            
+            const tests = [
+                { name: 'Window Object', test: () => typeof window !== 'undefined' },
+                { name: 'Document Ready', test: () => document.readyState === 'complete' },
+                { name: 'Local Storage', test: () => { localStorage.setItem('test', '1'); return true; } },
+                { name: 'Buffer Polyfill', test: () => typeof window.Buffer !== 'undefined' },
+                { name: 'Crypto API', test: () => typeof crypto !== 'undefined' },
+                { name: 'Fetch API', test: () => typeof fetch !== 'undefined' },
+            ];
+
+            for (const { name, test } of tests) {
+                try {
+                    const result = test();
+                    output.innerHTML += `<div class="status success">✅ ${name}: ${result}</div>`;
+                } catch (e) {
+                    output.innerHTML += `<div class="status error">❌ ${name}: ${e.message}</div>`;
+                }
+            }
+
+            // Test API endpoints
+            const endpoints = ['/api/debug/env', '/api/dashboard'];
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint);
+                    const statusClass = response.ok ? 'success' : 'error';
+                    const icon = response.ok ? '✅' : '❌';
+                    output.innerHTML += `<div class="status ${statusClass}">${icon} ${endpoint}: ${response.status}</div>`;
+                } catch (e) {
+                    output.innerHTML += `<div class="status error">❌ ${endpoint}: ${e.message}</div>`;
+                }
+            }
+        }
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('[DIAGNOSTIC] Error caught:', e);
+            const output = document.getElementById('diagnostic-output');
+            output.innerHTML += `<div class="status error">❌ RUNTIME ERROR: ${e.message}<br><pre>${e.error?.stack || 'No stack'}</pre></div>`;
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('[DIAGNOSTIC] Unhandled rejection:', e);
+            const output = document.getElementById('diagnostic-output');
+            output.innerHTML += `<div class="status error">❌ PROMISE REJECTION: ${e.reason}</div>`;
+        });
+    </script>
+</body>
+</html>
