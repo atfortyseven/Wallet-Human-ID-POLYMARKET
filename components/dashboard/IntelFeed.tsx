@@ -12,9 +12,12 @@ import { useGovSniper } from '@/hooks/useGovSniper';
 import { useYieldHunter } from '@/hooks/useYieldHunter';
 
 // Import 3D Core
-import IdentityCore from '../3d/IdentityCore';
+// IdentityCore moved to VoidShell for global background
+import { Constellation } from '../history/Constellation';
+import { ZapButton } from '@/components/defi/ZapButton'; // [NEW] Phase 3
+import { RefuelStation } from '@/components/defi/RefuelStation'; // [NEW] Phase 3
 
-type FeedMode = 'LIVE' | 'WHALES' | 'GAS' | 'GOV' | 'YIELD';
+type FeedMode = 'LIVE' | 'HISTORY' | 'WHALES' | 'GAS' | 'GOV' | 'YIELD';
 
 export function IntelFeed() {
     // --- Hook Integration ---
@@ -34,23 +37,13 @@ export function IntelFeed() {
     };
 
     return (
-        <div className="w-full bg-[#0D0D12] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] relative group">
+        <div className="flex flex-col h-full w-full relative overflow-hidden rounded-3xl bg-black/40 border border-white/10 backdrop-blur-xl shadow-2xl">
 
-            {/* --- WALLPAPER 3D (Z-0) --- */}
-            <div className="absolute inset-0 z-0">
-                {/* 3D CORE - Interactive but stays behind content */}
-                <IdentityCore mode={mode} />
-            </div>
+            {/* --- GRID BACKGROUND (Static) --- */}
+            <div className="absolute inset-0 z-0 opacity-20 bg-[url('/assets/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black,transparent)]"></div>
 
-            {/* --- FONDO DE RED (Z-1) --- */}
-            <div className="absolute inset-0 bg-[url('/assets/grid.svg')] opacity-10 pointer-events-none z-0 mix-blend-overlay" />
-
-            {/* --- GRADIENTE DE LEGIBILIDAD (Z-1) --- */}
-            {/* Oscurece la parte inferior para que el texto se lea bien sobre el 3D */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D12] via-[#0D0D12]/60 to-transparent pointer-events-none z-0" />
-
-            {/* --- HEADER FLOTANTE (Z-20) --- */}
-            <div className="relative z-20 p-4 flex justify-between items-start shrink-0">
+            {/* --- HEADER --- */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20 z-20">
                 <div>
                     <div className="text-[10px] font-mono text-emerald-500 tracking-widest mb-1 flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
@@ -75,13 +68,13 @@ export function IntelFeed() {
 
                 {/* --- SELECTOR DE PESTAÑAS --- */}
                 <div className="flex justify-center gap-4 py-2 overflow-x-auto px-4 custom-scrollbar">
-                    {['LIVE', 'WHALES', 'GAS', 'GOV', 'YIELD'].map((tab) => (
+                    {['LIVE', 'HISTORY', 'WHALES', 'GAS', 'GOV', 'YIELD'].map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => setMode(tab as FeedMode)}
-                            className={`px-4 py-1 rounded-full text-xs font-bold transition-all border shrink-0 ${mode === tab
-                                ? 'bg-white/10 border-[#00f2ea] text-[#00f2ea] shadow-[0_0_10px_rgba(0,242,234,0.3)]'
-                                : 'border-transparent text-gray-500 hover:text-white'
+                            onClick={() => setMode(tab as any)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap z-20 ${mode === tab
+                                ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105'
+                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
                                 }`}
                         >
                             {tab}
@@ -103,7 +96,7 @@ export function IntelFeed() {
                                 className="space-y-4"
                             >
                                 {/* Sentiment Card */}
-                                <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                <div className="bg-white/5 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
                                     <div className="flex justify-between items-start mb-4">
                                         <h4 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
                                             <Globe size={14} /> GLOBAL SENTIMENT
@@ -131,6 +124,19 @@ export function IntelFeed() {
                             </motion.div>
                         )}
 
+                        {/* --- TAB: HISTORY (Constellation) --- */}
+                        {mode === 'HISTORY' && (
+                            <motion.div
+                                key="history"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="h-full w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-sm"
+                            >
+                                <Constellation />
+                            </motion.div>
+                        )}
+
                         {/* --- TAB: WHALES (Placeholder/Future) --- */}
                         {mode === 'WHALES' && (
                             <motion.div
@@ -155,12 +161,15 @@ export function IntelFeed() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-4"
                             >
-                                <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                <div className="bg-white/5 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
                                     <div className="flex justify-between items-center mb-4">
                                         <h4 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
                                             <Zap size={14} /> GAS MATRIX
                                         </h4>
-                                        <span className="text-[10px] font-mono text-zinc-600">EIP-1559 REALTIME</span>
+                                        <div className="flex items-center gap-2">
+                                            <RefuelStation gasLevel={0.5} /> {/* [NEW] Phase 3: Simulated Low Gas */}
+                                            <span className="text-[10px] font-mono text-zinc-600">EIP-1559 REALTIME</span>
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-3 gap-2 text-center mb-4">
@@ -260,9 +269,10 @@ export function IntelFeed() {
                                                 <h4 className="text-sm font-bold text-white">{pool.pool}</h4>
                                                 <p className="text-xs text-zinc-400">{pool.protocol}</p>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-right flex flex-col items-end gap-1">
                                                 <div className="text-lg font-bold text-emerald-400 font-mono">{pool.apy}% APY</div>
                                                 <div className="text-[10px] text-zinc-500">TVL: {pool.tvl}</div>
+                                                <ZapButton poolName={pool.pool} apy={`${pool.apy}%`} /> {/* [NEW] Phase 3 */}
                                             </div>
                                         </div>
 

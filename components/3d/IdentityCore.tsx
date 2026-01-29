@@ -91,7 +91,11 @@ function CoreMesh({ mode }: CoreProps) {
     );
 }
 
-export default function IdentityCore({ mode = 'LIVE' }: { mode: string }) {
+interface IdentityCoreProps {
+    mode?: string;
+}
+
+export default function IdentityCore({ mode = 'LIVE' }: IdentityCoreProps) {
     return (
         <div className="w-full h-full pointer-events-none"> {/* Allow clicks to pass through usually, but canvas catches events */}
             <Canvas camera={{ position: [0, 0, 8], fov: 45 }} gl={{ alpha: true }}>

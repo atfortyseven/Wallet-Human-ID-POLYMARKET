@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAccount, useBalance, useEnsName } from 'wagmi';
+import { useAccount, useBalance, useEnsName, usePublicClient } from 'wagmi';
 
 export interface HumanScore {
     totalScore: number;
@@ -18,6 +18,7 @@ export function useHumanScore() {
     const { address } = useAccount();
     const { data: ensName } = useEnsName({ address });
     const { data: balance } = useBalance({ address });
+    const publicClient = usePublicClient();
 
     const [scoreData, setScoreData] = useState<HumanScore>({
         totalScore: 0,
@@ -27,50 +28,45 @@ export function useHumanScore() {
     });
 
     useEffect(() => {
-        if (!address) {
+        if (!address || !publicClient) {
             setScoreData(prev => ({ ...prev, isLoading: false }));
             return;
         }
 
         const calculateScore = async () => {
-            // 1. Simulate Fetching History (Mock for now, replace with Covalent/Etherscan later)
-            // In a real app, we would fetch tx count and first tx date here.
-            const mockTxCount = 45; // Simulated
-            const mockFirstTxDate = new Date('2022-05-20'); // Simulated ~2.5 years ago
+            // 1. Fetch Real Activity Data
+            const txCount = await publicClient.getTransactionCount({ address });
+
+            // Age is hard to get without indexer (e.g. Etherscan), preserving simulation for demo
+            // But we can infer "some" age if nonce is high
+            const estimatedYears = txCount > 50 ? 1.5 : 0.5;
 
             // 2. Scoring Logic
 
-            // Age: +10 pts per year (Max 30)
-            const now = new Date();
-            const yearsActive = (now.getTime() - mockFirstTxDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-            const ageScore = Math.min(Math.floor(yearsActive * 10), 30);
+            // Age: +10 pts per estimated year
+            const ageScore = Math.floor(estimatedYears * 10);
 
-            // Activity: +1 pt per 10 txs (Max 20)
-            const activityScore = Math.min(Math.floor(mockTxCount / 10), 20);
+            // Activity: +1 pt per 5 txs (Real Nonce) - Max 30
+            const activityScore = Math.min(Math.floor(txCount / 5), 30);
 
-            // Blue Chip: Hold ETH > $100 (Simulated check using balance)
-            // Assuming 1 ETH ~ $3000, 0.033 ETH > $100
+            // Blue Chip: Hold ETH > 0.05 (Real Balance)
             const ethBalance = balance ? parseFloat(balance.formatted) : 0;
-            const blueChipScore = ethBalance > 0.03 ? 20 : 0;
+            const blueChipScore = ethBalance > 0.05 ? 20 : 0;
 
-            // ENS Owner
+            // ENS Owner (Real)
             const ensScore = ensName ? 15 : 0;
 
-            // Identity (Gitcoin/WorldID - Mock)
-            // We assume if they are using this app they might have WorldID verified soon
+            // Identity (Simulated until WorldID flow used)
             const identityScore = 15;
 
             const total = ageScore + activityScore + blueChipScore + ensScore + identityScore;
 
             // Rank Determination
             let rank: HumanScore['rank'] = 'Novice';
-            if (total > 80) rank = 'Titan'; // Legendary
+            if (total > 80) rank = 'Titan';
             else if (total > 60) rank = 'Whale';
             else if (total > 40) rank = 'Veteran';
             else if (total > 20) rank = 'Citizen';
-
-            // Simulator Delay for Effect
-            await new Promise(r => setTimeout(r, 1500));
 
             setScoreData({
                 totalScore: total,
@@ -87,7 +83,7 @@ export function useHumanScore() {
         };
 
         calculateScore();
-    }, [address, balance, ensName]);
+    }, [address, balance, ensName, publicClient]);
 
     return scoreData;
 }
