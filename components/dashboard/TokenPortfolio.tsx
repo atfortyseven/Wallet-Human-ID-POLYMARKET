@@ -244,7 +244,7 @@ export function TokenPortfolio() {
                             {view === 'receive' && (
                                 <div className="flex flex-col items-center text-center space-y-6">
                                     <div className="p-4 bg-white rounded-xl shadow-lg shadow-white/5">
-                                        <QRCode
+                                        <QRCodeCanvas
                                             value={address}
                                             size={160}
                                             bgColor="#ffffff"
