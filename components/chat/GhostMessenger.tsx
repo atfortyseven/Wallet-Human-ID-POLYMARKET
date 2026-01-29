@@ -55,12 +55,18 @@ function GhostMessengerInner() {
             const provider = new ethers.BrowserProvider(transport, network);
             const signer = new ethers.JsonRpcSigner(provider, account.address);
 
-            // Create a signer wrapper for XMTP
+            // Create a signer wrapper for XMTP with correct interface
             const xmtpSigner = {
-                getAddress: async () => account.address,
+                type: 'EOA' as const,
+                getIdentifier: () => ({
+                    identifier: account.address.toLowerCase(),
+                    identifierKind: 'Ethereum' as const,
+                }),
                 signMessage: async (message: string | Uint8Array) => {
                     const signature = await signer.signMessage(message);
-                    return signature;
+                    // Convert hex signature to Uint8Array
+                    const bytes = signature.startsWith('0x') ? signature.slice(2) : signature;
+                    return new Uint8Array(bytes.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
                 },
             };
 
