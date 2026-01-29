@@ -52,7 +52,7 @@ export function IntelFeed() {
                 <div className="flex-1 p-4 overflow-y-auto relative z-20 custom-scrollbar">
                     <AnimatePresence mode='wait'>
 
-                        {/* --- TAB: LIVE (Sentiment & General) --- */}
+                        {/* --- TAB: LIVE (Empty - Sentiment removed) --- */}
                         {mode === 'LIVE' && (
                             <motion.div
                                 key="live"
@@ -61,7 +61,7 @@ export function IntelFeed() {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="space-y-4"
                             >
-                                {/* GLOBAL SENTIMENT section removed */}
+                                {/* Feed vacío - GLOBAL SENTIMENT eliminado */}
                             </motion.div>
                         )}
 
