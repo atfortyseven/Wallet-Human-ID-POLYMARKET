@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useAccount } from 'wagmi';
 import useSWR from 'swr';
+import { ChronosLens } from '@/components/oracle/ChronosLens';
+import { useFactCheck } from '@/hooks/useFactCheck';
 
 interface Proposal {
     id: string;
@@ -121,37 +123,53 @@ export function GovernanceProposals() {
                 <span className="text-indigo-400">{proposals.length} Encontradas</span>
             </div>
 
-            {proposals.map((proposal) => (
-                <div
-                    key={proposal.id}
-                    className="bg-gradient-to-br from-indigo-900/10 to-purple-900/10 border border-indigo-500/20 p-5 rounded-2xl hover:border-indigo-500/40 transition-all"
-                >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-bold uppercase">
-                                {proposal.category}
-                            </span>
-                            <h3 className="text-base font-bold text-white mt-2 mb-1">
-                                {proposal.question}
-                            </h3>
-                            {proposal.description && (
-                                <p className="text-xs text-zinc-400 line-clamp-2">
-                                    {proposal.description}
-                                </p>
-                            )}
+            {proposals.map((proposal) => {
+                // Fact-check each proposal
+                const { result } = useFactCheck({ claim: proposal.question });
+                
+                return (
+                    <div
+                        key={proposal.id}
+                        className="bg-gradient-to-br from-indigo-900/10 to-purple-900/10 border border-indigo-500/20 p-5 rounded-2xl hover:border-indigo-500/40 transition-all"
+                    >
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-bold uppercase">
+                                    {proposal.category}
+                                </span>
+                                <h3 className="text-base font-bold text-white mt-2 mb-1">
+                                    {proposal.question}
+                                </h3>
+                                {proposal.description && (
+                                    <p className="text-xs text-zinc-400 line-clamp-2">
+                                        {proposal.description}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Voting Options */}
-                    {proposal.outcomes && proposal.outcomes.length === 2 && (
-                        <div className="grid grid-cols-2 gap-3 mt-4">
-                            {proposal.outcomes.map((outcome, idx) => (
-                                <IDKitWidget
-                                    key={idx}
-                                    app_id={process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`}
-                                    action={`vote_${proposal.id}_${outcome}`}
-                                    signal={proposal.id}
+                        {/* Chronos Lens - Credibility Indicator */}
+                        {result && (
+                            <div className="flex justify-center my-4 border-y border-white/5 py-4">
+                                <ChronosLens
+                                    status={result.status}
+                                    truthScore={result.truthScore}
+                                    sources={result.sources.length}
+                                    provenanceStamp={result.provenanceStamp}
+                                />
+                            </div>
+                        )}
+
+                        {/* Voting Options */}
+                        {proposal.outcomes && proposal.outcomes.length === 2 && (
+                            <div className="grid grid-cols-2 gap-3 mt-4">
+                                {proposal.outcomes.map((outcome, idx) => (
+                                    <IDKitWidget
+                                        key={idx}
+                                        app_id={process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`}
+                                        action={`vote_${proposal.id}_${outcome}`}
+                                        signal={proposal.id}
                                     onSuccess={(proof: ISuccessResult) => handleVote(proposal.id, idx, proof)}
                                     verification_level={VerificationLevel.Orb}
                                 >
@@ -195,7 +213,8 @@ export function GovernanceProposals() {
                         )}
                     </div>
                 </div>
-            ))}
+            );
+        }))}
         </div>
     );
 }
