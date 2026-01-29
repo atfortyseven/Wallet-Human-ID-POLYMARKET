@@ -98,36 +98,7 @@ export function GovernanceProposals() {
 
     return (
         <div className="space-y-4">
-            <div className="text-center mb-6">
-                <div className="flex justify-center mb-4">
-                    <img 
-                        src="/fingerprint-inverted.png" 
-                        alt="Human Verification" 
-                        className="w-16 h-16 md:w-20 md:h-20 opacity-80 invert brightness-0 contrast-200"
-                        style={{ filter: 'invert(1) brightness(2)' }}
-                    />
-                </div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif' }}>
-                    ENCUESTAS CREADAS POR HUMANOS VERIFICADOS
-                </h1>
-            </div>
-
-            <div className="flex items-center justify-between text-zinc-400 text-xs mb-2 border-t border-white/10 pt-4">
-                <span className="flex items-center gap-1">
-                    <Vote className="w-3 h-3" />
-                    Encuestas Activas
-                </span>
-                <span className="text-indigo-400">{proposals.length} Encontradas</span>
-            </div>
-
-            {proposals.map((proposal) => (
-                <ProposalCard 
-                    key={proposal.id} 
-                    proposal={proposal} 
-                    onVote={handleVote} 
-                    votingProposal={votingProposal} 
-                />
-            ))}
+            {/* Content removed as per user request to show only background */}
         </div>
     );
 }
