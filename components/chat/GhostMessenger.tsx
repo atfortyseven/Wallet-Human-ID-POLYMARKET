@@ -111,9 +111,17 @@ function GhostMessengerInner() {
         try {
             setIsValidating(true);
 
+            // XMTP V3 requires Identifier objects, not raw strings
+            const targetIdentifier = {
+                identifier: peerAddress.toLowerCase(),
+                identifierKind: 'Ethereum' as const
+            };
+
             // Check if user can message
-            const canMessage = await client.canMessage([peerAddress]);
-            if (!canMessage[peerAddress]) {
+            const canMessage = await client.canMessage([targetIdentifier]);
+
+            // The result is keyed by the identifier string
+            if (!canMessage[peerAddress.toLowerCase()]) {
                 toast.error(
                     "This address has not activated XMTP chat yet.",
                     {
@@ -124,8 +132,8 @@ function GhostMessengerInner() {
                 return;
             }
 
-            // Create a DM conversation (V3 uses conversations.newConversation)
-            const conv = await client.conversations.newDm(peerAddress);
+            // Create a DM conversation - newDm expects a string address
+            const conv = await client.conversations.newDm(peerAddress.toLowerCase());
             setConversation(conv);
             toast.success(`🔗 Connected to ${peerAddress.slice(0, 6)}...${peerAddress.slice(-4)}`);
         } catch (e: any) {
