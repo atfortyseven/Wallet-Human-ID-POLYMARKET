@@ -16,7 +16,7 @@
     "db:seed": "prisma db seed"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=20.x"
   },
   "dependencies": {
     "@gnosis.pm/conditional-tokens-contracts": "^1.0.3",
