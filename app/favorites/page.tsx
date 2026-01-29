@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useWatchlist } from "@/lib/watchlist-store";
 import { NewsCard } from "@/components/crystalline/NewsCard";
 import { useEffect, useState } from "react";

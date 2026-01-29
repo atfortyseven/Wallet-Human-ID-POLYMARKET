@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+
+export const dynamic = 'force-dynamic';
+
 import EnterpriseDashboard from "@/components/EnterpriseDashboard";
 import { toast } from 'sonner';
 

@@ -1,6 +1,9 @@
 "use client";
 
 import React, { Suspense } from 'react';
+
+export const dynamic = 'force-dynamic';
+
 import WalletSection from "@/components/WalletSection";
 
 export default function WalletPage() {
