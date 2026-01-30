@@ -7,19 +7,36 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 export function WalletPreview() {
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Aggressive scroll fade: disappears quickly as you scroll past it
-    // We map scroll 0 to 300px -> Opacity 1 to 0
-    const { scrollY } = useScroll();
-    const opacity = useTransform(scrollY, [0, 400], [1, 0]);
-    const scale = useTransform(scrollY, [0, 400], [1, 0.9]);
-    const y = useTransform(scrollY, [0, 400], [0, 100]);
+    // Scroll Animation Logic
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start end", "end start"]
+    });
+
+    // 1. Initial State: Fully visible
+    // 2. "Cover like glass": Curtain slides down [0.2 - 0.5 progress]
+    // 3. "Fade away": Opacity goes to 0 [0.5 - 0.8 progress]
+    
+    // Glass Curtain Height (0% to 100%)
+    const curtainHeight = useTransform(scrollYProgress, [0.1, 0.4], ["0%", "100%"]);
+    
+    // Opacity (Stays 1 until curtain is down, then fades)
+    const opacity = useTransform(scrollYProgress, [0.45, 0.6], [1, 0]);
+    
+    // Scale (Slight shrink for effect)
+    const scale = useTransform(scrollYProgress, [0.45, 0.6], [1, 0.95]);
 
     return (
         <motion.div 
             ref={containerRef}
-            style={{ opacity, scale, y }}
+            style={{ opacity, scale }}
             className="w-full max-w-lg mx-auto bg-[#8B8B83] border border-white/5 rounded-[3rem] p-8 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden relative z-20"
         >
+            {/* GLASS CURTAIN OVERLAY ("Tape por partes como cristal") */}
+            <motion.div 
+                style={{ height: curtainHeight }}
+                className="absolute top-0 left-0 w-full bg-white/10 backdrop-blur-md z-50 pointer-events-none border-b border-white/20 transition-all duration-300 ease-out"
+            />
             {/* Header Area - CENTERED */}
             <div className="flex items-center justify-between mb-8 relative">
                 <div className="flex items-center gap-2 text-white/50 bg-black/10 px-3 py-1 rounded-full text-[10px] font-mono">
