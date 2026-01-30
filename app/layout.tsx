@@ -99,10 +99,9 @@ export default function RootLayout({
                     {/* <IdentityCore mode="LIVE" /> */}
                 </div>
 
-                 {/* Official Header Layer */}
-                <SiteHeader />
-
                 <Providers>
+                    {/* Official Header Layer */}
+                    <SiteHeader />
                     {children}
                 </Providers>
 
