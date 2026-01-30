@@ -422,3 +422,35 @@ model SupportTicket {
   @@index([userId])
   @@index([createdAt])
 }
+
+// ----------------------------------------------------------------------------
+// AUTH SYSTEM (Real Email Verification & Sessions)
+// ----------------------------------------------------------------------------
+
+model AuthUser {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  passwordHash    String
+  name            String?
+  verified        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  verificationCodes VerificationCode[]
+  
+  @@index([email])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  code      String
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, code])
+  @@index([expiresAt])
+}

@@ -5,7 +5,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { HumanDefiFooter } from '@/components/landing/HumanDefiFooter';
-import { LottieCarousel } from '@/components/ui/LottieCarousel';
 import { Shield, Zap, Globe, Lock, Coins, Vote } from 'lucide-react';
 
 export default function FuncionesPage() {
@@ -62,7 +61,6 @@ export default function FuncionesPage() {
                     </p>
                 </section>
 
-                {/* Interactive Carousel */}
                 <section className="py-12 bg-[#1F1F1F] text-white my-12 relative overflow-hidden">
                      {/* Decorative Elements */}
                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -71,9 +69,8 @@ export default function FuncionesPage() {
                     <div className="mb-8 px-12">
                         <h2 className="text-xs font-mono uppercase tracking-widest opacity-50 mb-2">Visual Intelligence</h2>
                         <p className="text-2xl font-bold">System Visualizations</p>
+                        <p className="text-sm text-neutral-400 mt-4 max-w-2xl">Interactive components coming soon. Explore the features below for a detailed system breakdown.</p>
                     </div>
-
-                    <LottieCarousel />
                 </section>
 
                 {/* Feature Grid */}

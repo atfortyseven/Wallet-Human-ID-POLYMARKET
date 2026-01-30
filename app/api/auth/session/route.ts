@@ -1,65 +1,66 @@
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { verifyJWT } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-prod";
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-    const cookieStore = cookies();
-    const token = cookieStore.get("auth_token");
+  try {
+    // Try to get token from cookie or Authorization header
+    const cookieStore = await cookies();
+    let token = cookieStore.get('auth_token')?.value;
+    
+    if (!token) {
+      const authHeader = request.headers.get('authorization');
+      token = authHeader?.replace('Bearer ', '');
+    }
 
     if (!token) {
-        return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({
+        authenticated: false,
+        user: null
+      });
     }
 
-    try {
-        // 1. Verify JWT signature
-        const verified = await jwtVerify(token.value, new TextEncoder().encode(JWT_SECRET));
-        const payload = verified.payload;
-
-        // 2. Extract session ID from JWT
-        const sessionId = payload.sessionId as string;
-
-        if (!sessionId) {
-            return NextResponse.json({ authenticated: false, reason: 'No session ID' }, { status: 401 });
-        }
-
-        // 3. Verify session exists in database
-        const session = await prisma.session.findUnique({
-            where: { id: sessionId },
-            include: { user: true }
-        });
-
-        if (!session) {
-            return NextResponse.json({ authenticated: false, reason: 'Session not found' }, { status: 401 });
-        }
-
-        // 4. Check if session has expired
-        if (session.expiresAt < new Date()) {
-            // Cleanup expired session
-            await prisma.session.delete({ where: { id: sessionId } });
-            return NextResponse.json({ authenticated: false, reason: 'Session expired' }, { status: 401 });
-        }
-
-        // 5. Update last activity timestamp
-        await prisma.session.update({
-            where: { id: sessionId },
-            data: { lastActivity: new Date() }
-        });
-
-        // 6. Return authenticated status with user data
-        return NextResponse.json({
-            authenticated: true,
-            user: {
-                address: session.user.walletAddress,
-                tier: session.user.tier,
-            }
-        });
-
-    } catch (error) {
-        console.error("Session validation error:", error);
-        return NextResponse.json({ authenticated: false, reason: 'Invalid token' }, { status: 401 });
+    // Verify JWT
+    const decoded = verifyJWT(token);
+    if (!decoded) {
+      return NextResponse.json({
+        authenticated: false,
+        user: null
+      });
     }
+
+    // Get user from database
+    const user = await prisma.authUser.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        verified: true,
+        createdAt: true
+      }
+    });
+
+    if (!user) {
+      return NextResponse.json({
+        authenticated: false,
+        user: null
+      });
+    }
+
+    return NextResponse.json({
+      authenticated: true,
+      user
+    });
+
+  } catch (error) {
+    console.error('Session error:', error);
+    return NextResponse.json({
+      authenticated: false,
+      user: null
+    });
+  }
 }

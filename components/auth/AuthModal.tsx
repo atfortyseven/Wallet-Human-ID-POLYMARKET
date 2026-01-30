@@ -16,34 +16,74 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [code, setCode] = useState('');
+    const [userId, setUserId] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         
-        // Simulating Backend Latency
-        await new Promise(r => setTimeout(r, 2000));
-        
-        setIsLoading(false);
-        setStep('verify');
-        toast.success(`Verification code sent to ${email}`);
+        try {
+            const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email, 
+                    password,
+                    ...(mode === 'signup' && { name })
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setIsLoading(false);
+                toast.error(data.error || 'Authentication failed');
+                return;
+            }
+
+            setUserId(data.userId);
+            setIsLoading(false);
+            setStep('verify');
+            toast.success(data.message || 'Verification code sent to your email');
+
+        } catch (error) {
+            setIsLoading(false);
+            toast.error('Network error. Please try again.');
+        }
     };
 
     const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulating Verification Check
-        await new Promise(r => setTimeout(r, 1500));
-        
-        if (code === '123456' || code.length === 6) {
+        try {
+            const response = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, code })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setIsLoading(false);
+                toast.error(data.error || 'Verification failed');
+                return;
+            }
+
+            // Store token in localStorage
+            localStorage.setItem('auth_token', data.token);
+            
             setIsLoading(false);
-            toast.success("Identity Verified");
+            toast.success('Successfully authenticated!');
             onAuthenticated();
-        } else {
+
+        } catch (error) {
             setIsLoading(false);
-            toast.error("Invalid code. Please try again.");
+            toast.error('Network error. Please try again.');
         }
     };
 
@@ -90,6 +130,8 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                             <input 
                                                 type="text" 
                                                 required
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
                                                 className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
                                                 placeholder="John Doe"
                                             />
