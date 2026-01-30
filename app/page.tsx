@@ -11,6 +11,7 @@ import { useAppKitAccount, useAppKit } from '@reown/appkit/react';
 import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';
 import { LandingHero } from '@/components/landing/LandingHero';
 import FluidBeigeBackground from '@/components/layout/FluidBeigeBackground';
+import { TitaniumGate } from '@/components/layout/TitaniumGate';
 
 // ============================================
 // 2. LAZY IMPORTS (Below the Fold - Load on Demand)
@@ -64,90 +65,73 @@ export default function Home() {
   const showLobby = isMounted && (isConnected || isAuthenticated);
 
   return (
-    <main className="relative min-h-screen w-full bg-[#F5F5DC] text-neutral-900 selection:bg-orange-200 selection:text-orange-900 overflow-x-hidden">
-        
-        {/* ============================================
-            LAYER 0: GPU-ISOLATED BACKGROUND
-            Fixed positioning removes from document flow
-            pointer-events-none ensures scroll isn't blocked
-            transform-gpu forces GPU compositor layer
-            ============================================ */}
-        <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
-             <FluidBeigeBackground />
-        </div>
-
-        {/* ============================================
-            LAYER 1: CONTENT
-            Relative positioning with z-10 ensures it's above canvas
-            ============================================ */}
-        <div className="relative z-10 flex flex-col">
+    <TitaniumGate>
+        <main className="relative min-h-screen w-full bg-[#F5F5DC] text-neutral-900 selection:bg-orange-200 selection:text-orange-900 overflow-x-hidden">
             
-            {/* Header (Always Visible) */}
-            <HumanDefiHeader />
+            {/* ============================================
+                LAYER 0: GPU-ISOLATED BACKGROUND
+            ============================================ */}
+            <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
+                 <FluidBeigeBackground />
+            </div>
 
-            {/* Loading Overlay */}
-            {isLoadingLobby && (
-               <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xl flex items-center justify-center">
-                   <div className="text-white animate-pulse text-2xl font-bold font-mono">
-                       CONNECTING...
+            {/* ============================================
+                LAYER 1: CONTENT
+            ============================================ */}
+            <div className="relative z-10 flex flex-col">
+                
+                {/* Header (Always Visible) */}
+                <HumanDefiHeader />
+
+                {/* Loading Overlay */}
+                {isLoadingLobby && (
+                   <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xl flex items-center justify-center">
+                       <div className="text-white animate-pulse text-2xl font-bold font-mono">
+                           CONNECTING...
+                       </div>
                    </div>
-               </div>
-            )}
+                )}
 
-            {showLobby ? (
-                // ============================================
-                // AUTHENTICATED LOBBY (Wallet Interface) - Clean Dark BG
-                // ============================================
-                <div key="lobby" className="pt-24 px-4 pb-20 min-h-screen animate-in fade-in duration-500">
-                    <WalletSection />
-                </div>
-            ) : (
-                // ============================================
-                // LANDING PAGE (Marketing Site)
-                // Each section uses 'optimize-visibility' for viewport virtualization
-                // ============================================
-                <div key="landing" className="flex flex-col w-full">
-                    
-                    {/* SECTION 1: HERO (Critical for LCP - Largest Contentful Paint) */}
-                    <section className="relative w-full h-[100dvh]">
-                        <LandingHero onStart={handleStart} />
-                    </section>
+                {showLobby ? (
+                    <div key="lobby" className="pt-24 px-4 pb-20 min-h-screen animate-in fade-in duration-500">
+                        <WalletSection />
+                    </div>
+                ) : (
+                    <div key="landing" className="flex flex-col w-full">
+                        <section className="relative w-full h-[100dvh]">
+                            <LandingHero onStart={handleStart} />
+                        </section>
 
-                    {/* COMMUNITY INFO (Vibrant Cards) */}
-                    <section className="relative w-full optimize-visibility bg-neutral-100/50 backdrop-blur-sm">
-                         <CommunityInfo />
-                    </section>
+                        <section className="relative w-full optimize-visibility bg-neutral-100/50 backdrop-blur-sm">
+                             <CommunityInfo />
+                        </section>
 
-                    {/* SECTION 2: WALLET PREVIEW (Viewport Virtualized) */}
-                    <section className="relative w-full py-20 min-h-[80vh] flex items-center justify-center optimize-visibility">
-                        <WalletPreview />
-                    </section>
+                        <section className="relative w-full py-20 min-h-[80vh] flex items-center justify-center optimize-visibility">
+                            <WalletPreview />
+                        </section>
 
-                    {/* SECTION 3: FEATURES (Viewport Virtualized) */}
-                    <section className="relative w-full py-20 optimize-visibility">
-                        <FeatureCardsSection />
-                    </section>
+                        <section className="relative w-full py-20 optimize-visibility">
+                            <FeatureCardsSection />
+                        </section>
 
-                    {/* SECTION 4: SECURITY (Viewport Virtualized) */}
-                    <section className="relative w-full py-20 optimize-visibility">
-                        <SecurityGrowthSection />
-                    </section>
+                        <section className="relative w-full py-20 optimize-visibility">
+                            <SecurityGrowthSection />
+                        </section>
 
-                    {/* SECTION 5: WEB3 ACCESS & FOOTER (Fluid Background Area) */}
-                    <section className="relative w-full overflow-hidden">
-                        {/* Background Layer */}
-                        <div className="absolute inset-0 z-0 transform-gpu translate-3d-0">
-                             <FluidBeigeBackground />
-                        </div>
-                        
-                        <div className="relative z-10 w-full pt-32 pb-10 optimize-visibility">
-                            <Web3AccessSection />
-                            <HumanDefiFooter />
-                        </div>
-                    </section>
-                </div>
-            )}
-        </div>
-    </main>
+                        <section className="relative w-full overflow-hidden">
+                            <div className="absolute inset-0 z-0 transform-gpu translate-3d-0">
+                                 <FluidBeigeBackground />
+                            </div>
+                            
+                            <div className="relative z-10 w-full pt-32 pb-10 optimize-visibility">
+                                <Web3AccessSection />
+                                <HumanDefiFooter />
+                            </div>
+                        </section>
+                    </div>
+                )}
+            </div>
+        </main>
+    </TitaniumGate>
   );
 }
