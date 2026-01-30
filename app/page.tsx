@@ -92,7 +92,7 @@ export default function Home() {
         >
           <color attach="background" args={['#000']} /> 
           
-          <ScrollControls pages={10} damping={0.2} style={{ scrollBehavior: 'smooth' }}> {/* 0.2 damping for "weighty" smooth feel */}
+          <ScrollControls pages={10} damping={0.1} style={{ scrollBehavior: 'smooth' }}> {/* 0.1 damping for sharper control */}
             
             {/* 1. The Video Engine */}
             <Suspense fallback={null}>
