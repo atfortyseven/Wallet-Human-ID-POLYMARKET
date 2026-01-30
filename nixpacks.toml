@@ -1,6 +1,6 @@
 [phases.setup]
 # Nixpacks automatically detects Node version from package.json engines
-nixPkgs = ["nodejs", "openssl"]
+nixPkgs = ["openssl"]
 
 [phases.install]
 cmds = ["npm install --prefer-offline --no-audit"]
