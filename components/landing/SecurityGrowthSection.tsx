@@ -8,13 +8,26 @@ export function SecurityGrowthSection() {
         <div className="w-full max-w-7xl mx-auto px-4 pb-32">
             
             {/* Center Text Interlude */}
-            <div className="py-32 flex flex-col items-center justify-center text-center">
-                <h2 className="text-6xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-ty from-white/80 to-transparent tracking-tighter opacity-50">
-                    MÁXIMA
-                </h2>
-                <h2 className="text-6xl md:text-9xl font-black text-white tracking-widest mt-[-20px] md:mt-[-40px] z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
-                    SEGURIDAD
-                </h2>
+            {/* Center Text Interlude with Background */}
+            <div className="py-32 flex flex-col items-center justify-center text-center relative rounded-3xl overflow-hidden my-20">
+                {/* Background Image: 'fondoparaseguridad' */}
+                <div className="absolute inset-0 z-0">
+                    <img 
+                        src="/models/fondoparaseguridad.jpg" 
+                        alt="Security Background" 
+                        className="w-full h-full object-cover opacity-60 mix-blend-overlay"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#F5F5DC] via-transparent to-[#F5F5DC]" />
+                </div>
+
+                <div className="relative z-10">
+                    <h2 className="text-6xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-ty from-black/20 to-transparent tracking-tighter opacity-50">
+                        MÁXIMA
+                    </h2>
+                    <h2 className="text-6xl md:text-9xl font-black text-indigo-900 tracking-widest mt-[-20px] md:mt-[-40px] drop-shadow-2xl">
+                        SEGURIDAD
+                    </h2>
+                </div>
             </div>
 
             {/* 4 Cards: Security */}
