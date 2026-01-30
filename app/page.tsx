@@ -95,7 +95,7 @@ export default function Home() {
 
             {showLobby ? (
                 // ============================================
-                // AUTHENTICATED LOBBY (Wallet Interface)
+                // AUTHENTICATED LOBBY (Wallet Interface) - Clean Dark BG
                 // ============================================
                 <div key="lobby" className="pt-24 px-4 pb-20 min-h-screen animate-in fade-in duration-500">
                     <WalletSection />

@@ -5,6 +5,7 @@ import { useAppKitAccount, useAppKit } from '@reown/appkit/react';
 import { AccountSwitcher } from './wallet/AccountSwitcher';
 import { WalletActions } from './wallet/WalletActions';
 import { NetworkSelector } from './wallet/NetworkSelector';
+import { CommunityInfo } from './CommunityInfo';
 import { Search, Info } from 'lucide-react';
 
 export default function WalletSection() {
@@ -64,6 +65,9 @@ export default function WalletSection() {
 
                 {/* ACTION GRID (Buy, Send, etc.) & TABS */}
                 <div className="w-full">
+                    {/* Community Info Cards - 20 Lottie Animations */}
+                    <CommunityInfo />
+                    
                     <WalletActions />
                 </div>
 
