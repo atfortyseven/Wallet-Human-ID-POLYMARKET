@@ -1,13 +1,6 @@
 "use client";
 
-import React from 'react';
-import LottieCard from '../ui/LottieCard';
-import { TrendingUp } from 'lucide-react';
-
-export function FeatureCardsSection() {
-"use client";
-
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import LottieCard from '../ui/LottieCard';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
@@ -29,7 +22,7 @@ export function FeatureCardsSection() {
                 className="flex gap-6 overflow-x-auto pb-10 snap-x snap-mandatory no-scrollbar"
                 style={{ scrollBehavior: 'smooth' }}
             >
-                {/* 1. Buy & Redeem */}
+                {/* 1. Compra y canjea */}
                 <div className="min-w-[300px] md:min-w-[400px] snap-center">
                     <LottieCard 
                         lottieSrc="https://lottie.host/0f8c4e3d-9b7a-4f6c-8d2e-1a3b4c5d6e7f/9KJh8G7F6D.lottie"
@@ -40,7 +33,7 @@ export function FeatureCardsSection() {
                     />
                 </div>
 
-                {/* 2. Secure Accounts */}
+                {/* 2. Human Defi */}
                  <div className="min-w-[300px] md:min-w-[400px] snap-center">
                     <LottieCard 
                         lottieSrc="https://lottie.host/57803657-6105-4752-921c-308101452631/ShieldSecure.lottie"
