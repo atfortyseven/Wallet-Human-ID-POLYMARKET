@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { ScrollLottie } from '@/components/ui/ScrollLottie';
 
 interface Props {
     onStart: () => void;
@@ -33,6 +34,20 @@ export function LandingHero({ onStart }: Props) {
                 </video>
                 {/* Gradient Overlay for Text Readability during Video */}
                 <div className="absolute inset-0 bg-black/40" />
+            </div>
+
+            {/* PREMIUM SCROLL LOTTIE BACKGROUND (Appears after video ends) */}
+            <div 
+                className={`
+                    absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out pointer-events-none
+                    ${isVideoEnded ? 'opacity-60' : 'opacity-0'}
+                `}
+            >
+                <ScrollLottie
+                     src="https://lottie.host/98c5806c-843e-4363-8a9d-59d4c153724c/Example3DNetwork.lottie"
+                     className="w-full h-full"
+                     speed={1.2}
+                />
             </div>
 
             {/* CONTENT LAYER (Title always visible, Button appears after) */}

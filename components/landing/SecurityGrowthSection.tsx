@@ -2,6 +2,7 @@
 
 import React from 'react';
 import LottieCard from '../ui/LottieCard';
+import dynamic from 'next/dynamic';
 
 export function SecurityGrowthSection() {
     return (

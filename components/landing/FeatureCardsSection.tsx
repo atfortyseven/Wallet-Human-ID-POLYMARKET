@@ -5,67 +5,97 @@ import LottieCard from '../ui/LottieCard';
 import { TrendingUp } from 'lucide-react';
 
 export function FeatureCardsSection() {
-    return (
-        <div className="w-full max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-20">
-            
-            {/* 1. Buy & Redeem - Payment Animation */}
-            <LottieCard 
-                lottieSrc="https://lottie.host/0f8c4e3d-9b7a-4f6c-8d2e-1a3b4c5d6e7f/9KJh8G7F6D.lottie"
-                title="Compra y canjea" 
-                subtitle="Soporte nativo para USD y ETH"
-                lottieSize="lg"
-            >
-                <div className="flex gap-4 justify-center mt-4">
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-xs text-white backdrop-blur-sm border border-white/20">USD</div>
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-xs text-white backdrop-blur-sm border border-white/20">ETH</div>
-                </div>
-            </LottieCard>
+"use client";
 
-            {/* 2. Secure Accounts (Spans 2 cols on large) - Shield Animation */}
-            <div className="lg:col-span-2">
-                <LottieCard 
-                    lottieSrc="https://lottie.host/c23a350f-3be4-44e2-89b6-7cf4c5f92945/H25gv2upyV.lottie"
-                    title="Human Defi" 
-                    subtitle="Rompiendo límites 2027"
-                    lottieSize="lg"
-                    className="h-full"
-                >
-                    <div className="mt-2 text-center">
-                        <div className="text-3xl font-bold text-white">$124,592.21</div>
-                        <div className="text-green-300 text-sm flex items-center justify-center gap-1 mt-2">
-                             <TrendingUp size={14} /> Portfolio Seguro On-Chain
-                        </div>
-                    </div>
-                </LottieCard>
+import React, { useRef, useState, useEffect } from 'react';
+import LottieCard from '../ui/LottieCard';
+import { motion, useScroll, useSpring } from 'framer-motion';
+
+export function FeatureCardsSection() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollXProgress } = useScroll({ container: containerRef });
+    const scaleX = useSpring(scrollXProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
+    return (
+        <div className="w-full max-w-[1440px] mx-auto px-4 py-20 relative">
+            
+            {/* Horizontal Scroll Container */}
+            <div 
+                ref={containerRef}
+                className="flex gap-6 overflow-x-auto pb-10 snap-x snap-mandatory no-scrollbar"
+                style={{ scrollBehavior: 'smooth' }}
+            >
+                {/* 1. Buy & Redeem */}
+                <div className="min-w-[300px] md:min-w-[400px] snap-center">
+                    <LottieCard 
+                        lottieSrc="https://lottie.host/0f8c4e3d-9b7a-4f6c-8d2e-1a3b4c5d6e7f/9KJh8G7F6D.lottie"
+                        title="Compra y canjea" 
+                        subtitle="Soporte nativo para USD y ETH"
+                        lottieSize="lg"
+                        className="h-full bg-white/5 border-white/10 hover:bg-white/10"
+                    />
+                </div>
+
+                {/* 2. Secure Accounts */}
+                 <div className="min-w-[300px] md:min-w-[400px] snap-center">
+                    <LottieCard 
+                        lottieSrc="https://lottie.host/57803657-6105-4752-921c-308101452631/ShieldSecure.lottie"
+                        title="Human Defi" 
+                        subtitle="Rompiendo límites 2027"
+                        lottieSize="lg"
+                        className="h-full bg-white/5 border-white/10 hover:bg-white/10"
+                    />
+                </div>
+
+                {/* 3. Swap / Exchange */}
+                 <div className="min-w-[300px] md:min-w-[400px] snap-center">
+                    <LottieCard 
+                        lottieSrc="https://lottie.host/0a1b2c3d-4e5f-6g7h-8i9j-0k1l2m3n4o5p/CoinSwap3D.lottie"
+                        title="Intercambio Rápido" 
+                        subtitle="Swaps instantáneos entre cadenas"
+                        lottieSize="lg"
+                        className="h-full bg-white/5 border-white/10 hover:bg-white/10"
+                    />
+                </div>
+
+                {/* 4. Rewards */}
+                 <div className="min-w-[300px] md:min-w-[400px] snap-center">
+                    <LottieCard 
+                        lottieSrc="https://lottie.host/8e4d2f1c-9bfa-4b77-8db5-3c5f1b2e6a9d/RainCoins.lottie"
+                        title="Recompensas" 
+                        subtitle="Gana royalties automáticamente"
+                        lottieSize="lg"
+                        className="h-full bg-white/5 border-white/10 hover:bg-white/10"
+                    />
+                </div>
+
+                 {/* 5. Speed/Bonus */}
+                 <div className="min-w-[300px] md:min-w-[400px] snap-center">
+                    <LottieCard 
+                        lottieSrc="https://lottie.host/1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p/FastLightning.lottie"
+                        title="Ultra Rápido" 
+                        subtitle="Ejecución instantánea en L2"
+                        lottieSize="lg"
+                        className="h-full bg-white/5 border-white/10 hover:bg-white/10"
+                    />
+                </div>
             </div>
 
-            {/* 3. Rewards - Coins Animation */}
-            <LottieCard 
-                lottieSrc="https://lottie.host/8e4d2f1c-9bfa-4b77-8db5-3c5f1b2e6a9d/RainCoins.lottie"
-                title="Recompensas" 
-                subtitle="Gana royalties automáticamente"
-                lottieSize="lg"
-            >
-               <div className="mt-4 text-center text-xs text-white/50">
-                   Stake y gana pasivamente con Human ID
-               </div>
-            </LottieCard>
-
-            {/* 4. Earn with Crypto - Chart Growth Animation */}
-            <LottieCard 
-                lottieSrc="https://lottie.host/7a3b1c8d-4e5f-6a7b-8c9d-0e1f2a3b4c5d/ChartUp.lottie"
-                title="Haz crecer tu cripto" 
-                subtitle="Yield farming simplificado"
-                lottieSize="lg"
-            />
-
-             {/* 5. Speed/Bonus - Lightning Animation */}
-             <LottieCard 
-                lottieSrc="https://lottie.host/9f6e4d2c-1a8b-7c5d-3e9f-0a1b2c3d4e5f/Lightning.lottie"
-                title="Ultra Rápido" 
-                subtitle="Ejecución instantánea en L2"
-                lottieSize="lg"
-            />
+            {/* Scroll Progress Bar */}
+            <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden max-w-md mx-auto">
+                <motion.div 
+                    className="h-full bg-indigo-500 rounded-full"
+                    style={{ scaleX, transformOrigin: "0%" }}
+                />
+            </div>
+            
+            <p className="text-center text-white/30 text-xs mt-2 font-mono uppercase tracking-widest">
+                Desliza para explorar funciones &rarr;
+            </p>
         </div>
     );
 }
