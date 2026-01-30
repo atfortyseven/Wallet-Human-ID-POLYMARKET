@@ -13,11 +13,11 @@ export const GeoBlocker = () => {
     useEffect(() => {
         const checkJurisdiction = async () => {
             try {
-                // Using public IP-API (Rate limited, use specialized service in prod)
-                const res = await fetch('https://ipapi.co/json/');
+                // Using local proxy to avoid CORS issues
+                const res = await fetch('/api/geo');
                 const data = await res.json();
 
-                if (data && BLOCKED_COUNTRIES.includes(data.country_code)) {
+                if (data && data.country_code && BLOCKED_COUNTRIES.includes(data.country_code)) {
                     setIsBlocked(true);
                     console.warn(`Access Restricted: Jurisdiction ${data.country_code} detected.`);
                 }

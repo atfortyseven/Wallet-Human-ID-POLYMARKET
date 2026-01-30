@@ -83,19 +83,22 @@ export async function middleware(request: NextRequest) {
     // Content Security Policy - More restrictive
     // Note: Keeping unsafe-inline/unsafe-eval for Next.js dev mode compatibility
     // In strict production, these should be replaced with nonces
-    const csp = [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://worldcoin.org",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https: blob:",
-        "font-src 'self' data:",
-        "connect-src 'self' https://worldcoin.org https://developer.worldcoin.org wss: https:",
-        "frame-src 'self' https://worldcoin.org",
-        "frame-ancestors 'none'",
-        "base-uri 'self'",
-        "form-action 'self'"
-    ].join('; ');
-    response.headers.set('Content-Security-Policy', csp);
+    const cspHeader = `
+            default-src 'self' https: wss:;
+            img-src 'self' https: data: blob:;
+            connect-src 'self' https://worldcoin.org https://developer.worldcoin.org wss: https: blob:;
+            script-src 'self' 'unsafe-eval' 'unsafe-inline' https://worldcoin.org https://www.gstatic.com;
+            worker-src 'self' blob:;
+            style-src 'self' 'unsafe-inline' https:;
+            font-src 'self' https: data:;
+            object-src 'none';
+            base-uri 'self';
+            form-action 'self';
+            frame-ancestors 'none';
+            block-all-mixed-content;
+            upgrade-insecure-requests;
+        `.replace(/\s{2,}/g, ' ').trim();
+    response.headers.set('Content-Security-Policy', cspHeader);
 
     // HSTS - Force HTTPS for 1 year (only in production)
     if (process.env.NODE_ENV === 'production') {

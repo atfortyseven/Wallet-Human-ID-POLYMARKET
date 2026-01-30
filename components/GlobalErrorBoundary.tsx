@@ -50,8 +50,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6 font-mono">
-                    <div className="max-w-2xl w-full bg-red-950/20 border border-red-500/30 rounded-xl p-8 shadow-2xl">
+                <div className="flex flex-col items-center justify-center min-h-screen bg-black/80 backdrop-blur-sm text-white p-6 font-mono relative z-50">
+                    <div className="max-w-2xl w-full bg-red-950/40 border border-red-500/30 rounded-xl p-8 shadow-2xl backdrop-blur-md">
                         <div className="flex items-center gap-4 mb-6 text-red-500">
                             <AlertCircle size={48} />
                             <h1 className="text-3xl font-bold tracking-tight">SYSTEM FAILURE</h1>

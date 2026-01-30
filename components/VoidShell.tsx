@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import dynamic from 'next/dynamic';
 const GhostMessenger = dynamic(() => import('./chat/GhostMessenger').then(mod => mod.GhostMessenger), { ssr: false });
 import XMTPProviderWrapper from './chat/XMTPProviderWrapper'; // [NEW] Phase 4
-import IdentityCore from './3d/IdentityCore'; // [NEW] Global 3D Background
+
 
 export default function VoidShell({ children }: { children: React.ReactNode }) {
     const { address } = useAccount();
@@ -71,11 +71,6 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     return (
         <XMTPProviderWrapper>
             <div className="min-h-screen bg-[#0D0D12] text-[var(--text-primary)] selection:bg-midgard/30 overflow-x-hidden relative transition-colors duration-300">
-
-                {/* --- GLOBAL 3D WALLPAPER --- */}
-                <div className="fixed inset-0 z-0">
-                    <IdentityCore />
-                </div>
 
                 {/* Overlay Gradient for Text Readability */}
                 <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#0D0D12] via-transparent to-transparent pointer-events-none" />

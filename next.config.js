@@ -19,6 +19,21 @@ const nextConfig = {
         ]
     },
 
+    // 4. Security Headers (Fix for CSP Blob/Data issues)
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    {
+                        key: 'Content-Security-Policy',
+                        value: "default-src 'self' https: wss:; img-src 'self' https: data: blob:; connect-src 'self' https: wss: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https: https://www.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;",
+                    },
+                ],
+            },
+        ];
+    },
+
     reactStrictMode: true,
     swcMinify: true,
 

@@ -42,7 +42,7 @@ const queryClient = new QueryClient()
 const metadata = {
     name: 'HumanID.fi',
     description: 'The Void Wallet',
-    url: 'https://www.humanidfi.com', // origin must match your domain & subdomain
+    url: typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com', // origin must match your domain & subdomain
     icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 

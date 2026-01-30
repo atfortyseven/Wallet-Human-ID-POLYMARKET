@@ -1,7 +1,8 @@
 'use client';
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { MeshTransmissionMaterial, Float, Environment, Sparkles } from '@react-three/drei';
+import { MeshTransmissionMaterial, Float, Environment, Sparkles, ScrollControls } from '@react-three/drei';
+import { KanagawaEngine } from './KanagawaEngine';
 import * as THREE from 'three';
 
 // Colores según el modo del Feed
@@ -107,12 +108,13 @@ export default function IdentityCore({ mode = 'LIVE' }: IdentityCoreProps) {
         return <FallbackBackground />;
     }
 
+
     // WebGL supported - render Three.js scene
     return (
-        <div className="w-full h-full pointer-events-none">
+        <div className="w-full h-full pointer-events-auto">
             <Canvas
-                camera={{ position: [0, 0, 8], fov: 45 }}
-                gl={{ alpha: true }}
+                camera={{ position: [0, 0, 5], fov: 45 }}
+                gl={{ alpha: true, antialias: true }}
                 onCreated={(state) => {
                     // Additional safety check
                     if (!state.gl) {
@@ -120,10 +122,17 @@ export default function IdentityCore({ mode = 'LIVE' }: IdentityCoreProps) {
                     }
                 }}
             >
-                <ambientLight intensity={0.5} />
-                <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
-                <Environment preset="city" />
-                {/* <CoreMesh mode={mode} /> Prism removed as per user request */}
+                <ambientLight intensity={1.5} />
+                <pointLight position={[10, 10, 10]} intensity={2} />
+                
+                <spotLight position={[-10, -10, -10]} angle={0.15} penumbra={1} intensity={1} />
+                
+                {/* Scroll Controls for the Defragmentation Effect - Pages=3 means scrollable area is 300vh */}
+                <ScrollControls pages={3} damping={0.2}>
+                    <React.Suspense fallback={<group><mesh><boxGeometry /><meshStandardMaterial color="hotpink" /></mesh></group>}>
+                        <KanagawaEngine />
+                    </React.Suspense>
+                </ScrollControls>
             </Canvas>
         </div>
     );
