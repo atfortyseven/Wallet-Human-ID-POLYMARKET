@@ -25,14 +25,18 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             )}
 
             {/* 2. AUTHENTICATION GATE */}
-            {(state === 'AUTH' || (state === 'INTRO' && false)) && ( 
-                 // Note: We might want Auth to fade in while Intro fades out. 
-                 // For now, simple state switch, Intro handles its own exit anim via AnimatePresence if managed internally,
-                 // but here we unmount Intro. 
-                 // To make it smoother, IntroSequence has an 'exit' prop or handles it. 
-                 // Let's rely on IntroSequence's internal exit animation if we keep it mounted, 
-                 // BUT since we unmount it, we need a wrapper or just let the next component fade in.
-                <AuthModal onAuthenticated={() => setState('APP')} />
+            {state === 'AUTH' && (
+                <>
+                    <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
+                        {/* Renamed check to ensure import validity (it's imported as FluidBeigeBackground in page.tsx, likely need to move or import here if not passed). 
+                            Actually, TitaniumGate wraps page content. Page.tsx has the background inside APP state.
+                            TitaniumGate needs its own background for the AUTH state if page.tsx one is hidden.
+                            Let's assume FluidBeigeBackground is available or we use a simple beige div.
+                        */}
+                        <div className="absolute inset-0 bg-[#F5F5DC]" /> 
+                    </div>
+                    <AuthModal onAuthenticated={() => setState('APP')} />
+                </>
             )}
 
             {/* 3. THE APPLICATION */}

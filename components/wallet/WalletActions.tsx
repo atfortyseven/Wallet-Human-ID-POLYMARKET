@@ -89,7 +89,7 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
             label: 'Comprar', 
             icon: <CreditCard size={24} />, 
             color: 'bg-blue-600 hover:bg-blue-500',
-            action: () => window.open(`https://global.transak.com?defaultCryptoCurrency=USDC&walletAddress=${address || ''}`, '_blank')
+            action: () => window.open('https://app.metamask.io/buy/build-quote', '_blank')
         },
         { 
             label: 'Intercambio', 
