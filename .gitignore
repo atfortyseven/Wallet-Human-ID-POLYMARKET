@@ -26,6 +26,9 @@ ts-debug.log*
 # local env files
 .env*.local
 .env
+.env.railway
+.env.production.template
+.env.example
 
 # vercel
 .vercel

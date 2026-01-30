@@ -36,12 +36,25 @@ export async function middleware(request: NextRequest) {
     // CORS and security logic for all routes
     const origin = request.headers.get('origin');
     const allowedOrigins = [
+        'https://www.humanidfi.com',
+        'https://humanidfi.com',
         'https://www.polymarketwallet.com',
         'https://polymarketwallet.com',
         'https://polymarketwallet.up.railway.app',
         'http://localhost:3000',
         'http://localhost:8080'
     ];
+
+    // Block unknown origins for sensitive API routes
+    if (pathname.startsWith('/api/auth/')) {
+        if (!origin || !allowedOrigins.includes(origin)) {
+            console.warn(`[Security] Blocked request to ${pathname} from ${origin || 'unknown origin'}`);
+            return new NextResponse(JSON.stringify({ error: 'Unauthorized origin' }), {
+                status: 403,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+    }
 
     if (origin && !allowedOrigins.includes(origin)) {
         return new NextResponse(null, {
@@ -123,12 +136,12 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
+         * Match all request paths except for:
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
+         * - assets/ (public assets)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        '/((?!_next/static|_next/image|favicon.ico|assets).*)',
     ],
 }
