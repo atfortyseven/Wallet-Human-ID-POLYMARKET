@@ -4,7 +4,13 @@ import React, { Suspense, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, Scroll, useScroll } from '@react-three/drei';
 import { VideoScrubEngine } from '@/components/3d/VideoScrubEngine';
-import { MetaMaskInterface } from '@/components/site/MetaMaskInterface';
+import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';
+import { LandingHero } from '@/components/landing/LandingHero';
+import { WalletPreview } from '@/components/landing/WalletPreview';
+import { FeatureCardsSection } from '@/components/landing/FeatureCardsSection';
+import { SecurityGrowthSection } from '@/components/landing/SecurityGrowthSection';
+import { Web3AccessSection } from '@/components/landing/Web3AccessSection';
+import { HumanDefiFooter } from '@/components/landing/HumanDefiFooter';
 import { FeaturesSection } from '@/components/site/FeaturesSection';
 import { ZKVault } from '@/components/ZKVault';
 import { BarrelDistortion } from '@/components/3d/effects/BarrelDistortion';
@@ -77,8 +83,69 @@ function DashboardContent() {
 }
 
 export default function Home() {
+  const { isConnected } = useAppKitAccount();
+  const { isAuthenticated } = useAuth();
+  const { open } = useAppKit();
+  
+  // State for the "Loading" transition to registration/lobby
+  const [isLoadingLobby, setIsLoadingLobby] = useState(false);
+
+  const handleStart = () => {
+      setIsLoadingLobby(true);
+      // Simulate fast loading, then open connection logic or direct to lobby if connected
+      setTimeout(() => {
+          if (!isConnected && !isAuthenticated) {
+              open(); 
+          }
+          setIsLoadingLobby(false);
+      }, 1500);
+  };
+
+  // If fully authenticated, show the Real Wallet Lobby (No Scroll Story needed? Or maybe still accessible?)
+  // For now, let's assume if authenticated, we go straight to wallet.
+  if (isConnected || isAuthenticated) {
+      return (
+        <main className="fixed inset-0 bg-black overflow-hidden">
+             {/* 3D Background persists delicately? Or maybe strict black for "Lobby" efficiency? 
+                 User asked for "our scroll and background", so we keep it even in Dashboard?
+                 Let's keep it for visual consistency but maybe reduced.
+             */}
+             <div className="absolute inset-0 z-0">
+                <Canvas 
+                    dpr={[1, 2]} 
+                    gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, depth: false }}
+                >
+                    <color attach="background" args={['#000']} />
+                    <Suspense fallback={null}><VideoScrubEngine /></Suspense>
+                    <EffectComposer><BarrelDistortion distortion={0} /></EffectComposer>
+                 </Canvas>
+             </div>
+
+             {/* The Real Wallet Lobby */}
+             <div className="relative z-10 w-full h-full overflow-y-auto">
+                <HumanDefiHeader /> 
+                <div className="pt-24 px-4">
+                    <WalletSection />
+                </div>
+             </div>
+        </main>
+      );
+  }
+
+  // LANDING PAGE MODE (Scroll Story)
   return (
     <main className="main-container">
+       <HumanDefiHeader />
+
+       {/* Loading Overlay */}
+       {isLoadingLobby && (
+           <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+               <div className="text-blue-500 animate-pulse text-2xl font-bold font-mono">
+                   CONNECTING TO ON-CHAIN REGISTRY...
+               </div>
+           </div>
+       )}
+
       <div className="canvas-layer">
         <Canvas 
             dpr={[1, 2]} 
@@ -92,28 +159,50 @@ export default function Home() {
         >
           <color attach="background" args={['#000']} /> 
           
-          <ScrollControls pages={10} damping={0.2} style={{ scrollBehavior: 'smooth' }}> {/* 0.2 damping for "weighty" smooth feel */}
+          <ScrollControls pages={12} damping={0.2} style={{ scrollBehavior: 'smooth' }}>
             
-            {/* 1. The Video Engine */}
+            {/* 1. The Video Engine (Background) */}
             <Suspense fallback={null}>
                 <VideoScrubEngine />
             </Suspense>
 
-            {/* 2. Post-Processing Effects - Conditionally lighter on mobile conceptually, but here we assume modern phone */}
+            {/* 2. Effects */}
             <EffectComposer>
                  <AnimatedDistortion />
             </EffectComposer>
 
-            {/* 3. The UI Overlay & Transitions */}
-            <Scroll html style={{ width: '100%', height: '100dvh' }}> {/* Use dvh for mobile address bar handling */}
-               {/* Quantum Leap Effect - Inside Canvas for useScroll access */}
-               <QuantumLeapEffectInternal />
-               
-                <DashboardTransition>
-                    <div className="flex flex-col items-center justify-start w-full min-h-[100dvh] pb-20">
-                        <DashboardContent />
-                    </div>
-                </DashboardTransition>
+            {/* 3. The Scroll Story Content */}
+            <Scroll html style={{ width: '100vw' }}>
+                
+                {/* PAGE 1: HERO */}
+                <LandingHero onStart={handleStart} />
+
+                {/* PAGE 2: WALLET VISUALIZATION */}
+                <div className="w-full h-[150vh] flex items-center justify-center opacity-0 animate-fade-in-scroll">
+                     {/* We will fade this in via CSS in logic later or rely on scroll position */}
+                     <WalletPreview />
+                </div>
+
+                {/* PAGE 3: FEATURE CARDS (5 Cards) */}
+                <div className="w-full min-h-screen flex items-center justify-center py-20">
+                    <FeatureCardsSection />
+                </div>
+
+                {/* PAGE 4: SECURITY & GROWTH (8 Cards + Text) */}
+                <div className="w-full min-h-screen py-20">
+                    <SecurityGrowthSection />
+                </div>
+
+                {/* PAGE 5: BENEFITS & ACCESS (Cartoon + News) */}
+                <div className="w-full min-h-screen py-20">
+                    <Web3AccessSection />
+                </div>
+
+                {/* PAGE 6: FOOTER */}
+                <div className="w-full">
+                    <HumanDefiFooter />
+                </div>
+                
             </Scroll>
             
           </ScrollControls>
@@ -123,11 +212,11 @@ export default function Home() {
 
       <style jsx>{`
         .main-container {
-          height: 100dvh; /* Mobile viewport fix */
+          height: 100dvh;
           width: 100vw;
           background: #000;
           overflow: hidden;
-          position: fixed; /* Prevent bouncy scroll on iOS */
+          position: fixed;
           top: 0;
           left: 0;
         }
