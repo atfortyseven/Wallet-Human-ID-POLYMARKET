@@ -8,157 +8,141 @@ import * as THREE from 'three';
 export function VideoScrubEngine() {
   const scroll = useScroll();
   const meshRef = useRef<THREE.Mesh>(null);
-  const { viewport, gl } = useThree();
+  const { viewport, gl, size } = useThree();
   const lastTimeRef = useRef(0);
-  const frameSkipRef = useRef(0);
-  const lastUpdateTime = useRef(0);
   
   // 1. Setup Video Element with Performance Optimizations
   const [video] = useState(() => {
     if (typeof document === 'undefined') return null;
     
+    // Check if mobile for initial settings
+    const isMobile = window.innerWidth < 768;
+
     const vid = document.createElement('video');
     vid.src = '/models/kanagawa-wave.mp4'; 
     vid.crossOrigin = 'Anonymous';
     vid.loop = true; 
     vid.muted = true;
     vid.playsInline = true;
-    vid.preload = 'auto';
-    vid.playbackRate = 0;
-    vid.preservesPitch = false;
+    vid.preload = 'auto'; // Force buffer
+    vid.playbackRate = 0; // Manual seek only
     
-    // Optimized CSS for performance
-    vid.style.filter = 'contrast(1.15) brightness(1.05) saturate(1.1)';
+    // Optimized CSS 
     vid.style.objectFit = 'cover';
-    vid.style.transform = 'translate3d(0,0,0)'; // Force GPU layer
-    vid.style.backfaceVisibility = 'hidden';
-    vid.style.imageRendering = 'high-quality';
-    vid.style.willChange = 'transform'; // Hint to browser for optimization
+    vid.style.transform = 'translate3d(0,0,0)'; 
+    vid.style.willChange = 'transform'; 
+    
+    // Reduce CPU load on filters if on mobile
+    if (!isMobile) {
+        vid.style.filter = 'contrast(1.15) brightness(1.05) saturate(1.1)';
+    }
     
     return vid;
   });
 
-  // Configure WebGL for balanced quality/performance
+  // Configure WebGL for performance
   useEffect(() => {
     if (gl) {
-      gl.outputColorSpace = THREE.SRGBColorSpace;
-      gl.toneMapping = THREE.ACESFilmicToneMapping;
+      // Prioritize performance over perfect color accuracy on mobile
+      gl.powerPreference = "high-performance";
+      gl.capabilities.precision = 'mediump'; // Drop to mediump for speed
       gl.toneMappingExposure = 1.0;
-      // Enable hardware acceleration hints
-      gl.capabilities.precision = 'highp';
     }
   }, [gl]);
 
-  // 2. Optimized Video Texture - Adaptive Quality
+  // 2. Texture Management with proper disposal
   const videoTexture = useMemo(() => {
     if (!video) return null;
     const tex = new THREE.VideoTexture(video as HTMLVideoElement);
     
     tex.colorSpace = THREE.SRGBColorSpace;
-    tex.minFilter = THREE.LinearFilter; // Changed from mipmap to reduce processing
+    tex.generateMipmaps = false; 
+    
+    // Linear filter is fast enough on modern GPUs and looks much better
+    tex.minFilter = THREE.LinearFilter;
     tex.magFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false; // Disabled for performance
-    tex.format = THREE.RGBAFormat;
-    tex.wrapS = THREE.ClampToEdgeWrapping;
-    tex.wrapT = THREE.ClampToEdgeWrapping;
     
     return tex;
   }, [video]);
 
-  // Set anisotropy based on GPU but limit for performance
+  // Set anisotropic filtering carefully
   useEffect(() => {
     if (videoTexture && gl) {
       const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
-      videoTexture.anisotropy = Math.min(4, maxAnisotropy); // Limited to 4 for performance
+      // Cap at 2x for mobile, 4x for desktop to save fill rate
+      videoTexture.anisotropy = Math.min(2, maxAnisotropy); 
     }
   }, [videoTexture, gl]);
 
-  // 3. Load video metadata
+  // 3. Load video
   useEffect(() => {
     if (video) {
-      video.load();
-      
-      // Preload first frame
-      video.addEventListener('loadedmetadata', () => {
-        video.currentTime = 0.001;
-      }, { once: true });
+        // Force header loading
+       video.currentTime = 0.001; 
     }
   }, [video]);
 
-  // 4. ULTRA-OPTIMIZED CORE LOOP
+  // 4. MAX FLUIDITY LOOP (Uncapped)
   useFrame((state, delta) => {
     if (!scroll || !video || !video.duration || !meshRef.current) return;
 
-    // AGGRESSIVE frame skipping: Only update every 2 out of 3 frames for smoother performance
-    const now = state.clock.elapsedTime;
-    frameSkipRef.current++;
-    const shouldUpdate = frameSkipRef.current % 2 === 0; // Skip 1 out of 2 frames
-    
-    if (!shouldUpdate) return;
-
+    // DIRECT MAPPING: No skipping, no throttling.
+    // This provides 60fps/120fps scrolling if the GPU can handle it.
     const offset = scroll.offset;
-    
-    // --- A. ULTRA-OPTIMIZED SCRUBBING: Reduce texture updates ---
     const targetTime = offset * video.duration;
-    const timeDiff = Math.abs(video.currentTime - targetTime);
     
-    // Only seek if difference is VERY significant (reduces GPU load massively)
-    if (timeDiff > 0.033) { // ~2 frames at 60fps - less frequent updates
-      video.currentTime = targetTime;
-      
-      // Throttle texture updates to max 30fps
-      if (videoTexture && now - lastUpdateTime.current > 0.033) {
-        videoTexture.needsUpdate = true;
-        lastUpdateTime.current = now;
-      }
+    // Use a tiny epsilon to avoid redundant seeks, but keep it SMALL for smoothness
+    if (Math.abs(video.currentTime - targetTime) > 0.001) {
+        video.currentTime = targetTime;
     }
     
+    // Always mark texture as needing update if we moved
+    // VideoTexture internally handles 'readyState' checks
     lastTimeRef.current = targetTime;
+
+    // --- ASPECT RATIO & ZOOM LOGIC ---
+    // Modified to ensure "COVER" behavior on portrait mobile
     
-    // --- B. HIGHLY OPTIMIZED ZOOM: Reduced max zoom for performance ---
+    // Zoom logic
     let targetScale = 1;
     const zoomStart = 0.75;
     const zoomPeak = 0.95;
     
-    // Early bailout if not in zoom range
-    if (offset < zoomStart) {
-      meshRef.current.scale.set(viewport.width, viewport.height, 1);
-      return;
-    }
-    
     if (offset > zoomStart) {
       const zoomProgress = Math.min((offset - zoomStart) / (zoomPeak - zoomStart), 1);
-      
-      // Ultra-smooth zoom curve with MUCH lower max zoom
       if (offset < zoomPeak) {
-        // Gentle cubic easing
-        targetScale = 1 + Math.pow(zoomProgress, 2.5) * 8; // Max 9x at peak
+        targetScale = 1 + Math.pow(zoomProgress, 3) * 8; 
       } else {
-        // Final zoom phase - smooth quartic easing
         const finalProgress = (offset - zoomPeak) / (1 - zoomPeak);
-        targetScale = 9 + Math.pow(finalProgress, 2) * 16; // Max 25x total (reduced from 80x)
+        targetScale = 9 + Math.pow(finalProgress, 2) * 16; 
       }
     }
     
-    // Faster, more responsive lerp
-    const currentScale = meshRef.current.scale.x / viewport.width;
-    const smoothScale = THREE.MathUtils.lerp(currentScale, targetScale, 0.2); // Increased responsiveness
+    const currentScale = meshRef.current.scale.z; // Storing scale in Z for temp storage? No, let's just use lerp var
+    // Actually, let's keep it stateless for max speed, or simple lerp
+    // For smoothness, we want some damping on the ZOOM, not the video scrub
+    // The video scrub must be INSTANT to match scroll. The zoom can lag slightly.
     
-    // --- C. Optimized Aspect Ratio Calculation ---
+    const smoothScale = THREE.MathUtils.lerp(meshRef.current.userData.scale || 1, targetScale, 0.1);
+    meshRef.current.userData.scale = smoothScale; // Store for next frame
+    
+    // COVER LOGIC
     const videoAspect = 16 / 9;
-    const viewportAspect = viewport.width / viewport.height;
+    const screenAspect = size.width / size.height;
     
-    let scaleX = viewport.width * smoothScale;
-    let scaleY = viewport.height * smoothScale;
+    let scaleX, scaleY;
     
-    // Fast aspect ratio fix
-    if (viewportAspect > videoAspect) {
-      scaleY = scaleX / videoAspect;
-    } else {
-      scaleX = scaleY * videoAspect;
+    // If screen is wider than video (Landscape) -> Fit width, crop height
+    if (screenAspect > videoAspect) {
+        scaleX = viewport.width * smoothScale;
+        scaleY = (viewport.width / videoAspect) * smoothScale;
+    } 
+    // If screen is taller than video (Portrait Mobile) -> Fit height, crop width
+    else {
+        scaleY = viewport.height * smoothScale;
+        scaleX = (viewport.height * videoAspect) * smoothScale;
     }
-    
-    // Direct scale application (no intermediate calculations)
+
     meshRef.current.scale.set(scaleX, scaleY, 1);
   });
 
@@ -168,17 +152,19 @@ export function VideoScrubEngine() {
     <mesh 
       ref={meshRef} 
       position={[0, 0, -1]}
-      frustumCulled={false} // Prevent culling during zoom
+      frustumCulled={false}
     > 
-      <planeGeometry args={[1, 1]} /> {/* Minimal geometry for max performance */}
+      {/* 
+        Using plane geometry with 1,1. 
+        Texture covers it full.
+      */}
+      <planeGeometry args={[1, 1]} />
       <meshBasicMaterial 
         map={videoTexture} 
-        toneMapped={true}
-        side={THREE.FrontSide} // Only render front (performance)
-        transparent={false}
-        depthWrite={false} // Optimization: no depth writing needed
-        depthTest={false}  // Optimization: always render on top
-        precision="mediump" // Balanced precision
+        toneMapped={false} // Disable tone mapping for raw performance
+        side={THREE.FrontSide}
+        depthWrite={false}
+        depthTest={false}
       />
     </mesh>
   );

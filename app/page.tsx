@@ -83,25 +83,25 @@ export default function Home() {
         <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 1], fov: 75 }}>
           <color attach="background" args={['#000']} /> 
           
-          <ScrollControls pages={10} damping={0.1}> {/* Slight damping for smoother scroll */}
+          <ScrollControls pages={10} damping={0.2} style={{ scrollBehavior: 'smooth' }}> {/* 0.2 damping for "weighty" smooth feel */}
             
             {/* 1. The Video Engine */}
             <Suspense fallback={null}>
                 <VideoScrubEngine />
             </Suspense>
 
-            {/* 2. Post-Processing Effects */}
+            {/* 2. Post-Processing Effects - Conditionally lighter on mobile conceptually, but here we assume modern phone */}
             <EffectComposer>
                  <AnimatedDistortion />
             </EffectComposer>
 
             {/* 3. The UI Overlay & Transitions */}
-            <Scroll html style={{ width: '100%', height: '100%' }}>
+            <Scroll html style={{ width: '100%', height: '100dvh' }}> {/* Use dvh for mobile address bar handling */}
                {/* Quantum Leap Effect - Inside Canvas for useScroll access */}
                <QuantumLeapEffectInternal />
                
                 <DashboardTransition>
-                    <div className="flex flex-col items-center justify-start w-full min-h-screen pb-20">
+                    <div className="flex flex-col items-center justify-start w-full min-h-[100dvh] pb-20">
                         <DashboardContent />
                     </div>
                 </DashboardTransition>
@@ -114,10 +114,13 @@ export default function Home() {
 
       <style jsx>{`
         .main-container {
-          height: 100vh;
+          height: 100dvh; /* Mobile viewport fix */
           width: 100vw;
           background: #000;
           overflow: hidden;
+          position: fixed; /* Prevent bouncy scroll on iOS */
+          top: 0;
+          left: 0;
         }
         .canvas-layer {
           height: 100%;
