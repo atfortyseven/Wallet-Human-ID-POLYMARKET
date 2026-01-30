@@ -89,12 +89,13 @@ export function VideoScrubEngine() {
     // DIRECT MAPPING: No skipping, no throttling.
     // This provides 60fps/120fps scrolling if the GPU can handle it.
     const offset = scroll.offset;
-    const targetTime = offset * video.duration;
+    // Clamp to ensure we never exceed duration (prevents loop glitches during scrub)
+    const targetTime = Math.max(0, Math.min(video.duration, offset * video.duration));
     
-    // Use a tiny epsilon to avoid redundant seeks, but keep it SMALL for smoothness
-    if (Math.abs(video.currentTime - targetTime) > 0.001) {
-        video.currentTime = targetTime;
-    }
+    // DIRECT UPDATE: No epsilon check. 
+    // This ensures even the smallest scroll micro-movement updates the video frame.
+    // Essential for "Perfect" sensitivity feeling.
+    video.currentTime = targetTime;
     
     // Always mark texture as needing update if we moved
     // VideoTexture internally handles 'readyState' checks
