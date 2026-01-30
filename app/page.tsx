@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import FluidBeigeBackground from '@/components/layout/FluidBeigeBackground';
 import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';

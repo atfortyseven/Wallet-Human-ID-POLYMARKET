@@ -27,7 +27,6 @@ export function NetworkSelector() {
     const [selected, setSelected] = useState(NETWORKS.popular[0]);
 
     return (
-    return (
         <div className="w-full max-w-md mx-auto relative z-40 my-6">
             <button
                 onClick={() => setIsOpen(!isOpen)}
