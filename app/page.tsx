@@ -12,6 +12,8 @@ import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';
 import { LandingHero } from '@/components/landing/LandingHero';
 import FluidBeigeBackground from '@/components/layout/FluidBeigeBackground';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
+import { LenisProvider } from '@/components/creative/LenisProvider';
+import { LottieStack } from '@/components/creative/LottieStack';
 
 // ============================================
 // 2. LAZY IMPORTS (Below the Fold - Load on Demand)
@@ -97,38 +99,53 @@ export default function Home() {
                         <WalletSection />
                     </div>
                 ) : (
-                    <div key="landing" className="flex flex-col w-full">
-                        <section className="relative w-full h-[100dvh]">
-                            <LandingHero onStart={handleStart} />
-                        </section>
+                    <> {/* Added Fragment to wrap multiple top-level elements */}
+                    {/* SECTION 1: HERO (Critical for LCP - Largest Contentful Paint) */}
+                    <section className="relative w-full h-[100dvh]">
+                        <LandingHero onStart={handleStart} />
+                    </section>
 
-                        <section className="relative w-full optimize-visibility bg-neutral-100/50 backdrop-blur-sm">
-                             <CommunityInfo />
-                        </section>
-
-                        <section className="relative w-full py-20 min-h-[80vh] flex items-center justify-center optimize-visibility">
-                            <WalletPreview />
-                        </section>
-
-                        <section className="relative w-full py-20 optimize-visibility">
-                            <FeatureCardsSection />
-                        </section>
-
-                        <section className="relative w-full py-20 optimize-visibility">
-                            <SecurityGrowthSection />
-                        </section>
-
-                        <section className="relative w-full overflow-hidden">
-                            <div className="absolute inset-0 z-0 transform-gpu translate-3d-0">
-                                 <FluidBeigeBackground />
-                            </div>
-                            
-                            <div className="relative z-10 w-full pt-32 pb-10 optimize-visibility">
-                                <Web3AccessSection />
-                                <HumanDefiFooter />
-                            </div>
-                        </section>
+                    {/* HIGH PERFORMANCE STACK (Replaces standard grid) */}
+                    <div className="relative z-20">
+                        <LenisProvider>
+                             <LottieStack items={[
+                                 {
+                                     title: "Human Wallet",
+                                     description: "Non-custodial, biometric-secured vault for your digital assets.",
+                                     lottieSrc: "https://lottie.host/8d48bb95-7124-4224-bcae-2144799011af/lHDi1Xo9qO.lottie"
+                                 },
+                                 {
+                                     title: "Prediction Markets",
+                                     description: "Trade on future outcomes with zero-knowledge privacy.",
+                                     lottieSrc: "https://lottie.host/8d48bb95-7124-4224-bcae-2144799011af/lHDi1Xo9qO.lottie"
+                                 },
+                                 {
+                                     title: "Yield Governance",
+                                     description: "Earn rewards by participating in protocol decisions.",
+                                     lottieSrc: "https://lottie.host/8d48bb95-7124-4224-bcae-2144799011af/lHDi1Xo9qO.lottie"
+                                 },
+                                 {
+                                      title: "Global Settlements",
+                                      description: "Instant cross-border transfers with stablecoin liquidity.",
+                                      lottieSrc: "https://lottie.host/8d48bb95-7124-4224-bcae-2144799011af/lHDi1Xo9qO.lottie"
+                                 }
+                             ]} />
+                        </LenisProvider>
                     </div>
+
+                    {/* SECTION 5: WEB3 ACCESS & FOOTER (Fluid Background Area) */}
+                    <section className="relative w-full overflow-hidden">
+                        {/* Background Layer */}
+                        <div className="absolute inset-0 z-0 transform-gpu translate-3d-0">
+                             <FluidBeigeBackground />
+                        </div>
+                        
+                        <div className="relative z-10 w-full pt-32 pb-10 optimize-visibility">
+                            <Web3AccessSection />
+                            <HumanDefiFooter />
+                        </div>
+                    </section>
+                    </> // Added Fragment closing tag
                 )}
             </div>
         </main>

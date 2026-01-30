@@ -19,7 +19,7 @@ export function LenisProvider({ children }: LenisProviderProps) {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.0, 
+      wheelMultiplier: 3.0, // Maximum Sensitivity requested 
       touchMultiplier: 2.0, // Mobile sensitivity
       infinite: false,
     });
