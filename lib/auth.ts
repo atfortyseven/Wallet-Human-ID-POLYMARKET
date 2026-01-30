@@ -49,10 +49,14 @@ export function verifyJWT(token: string): { userId: string; email: string } | nu
 /**
  * Validate email format
  */
-export function isValidEmail(email: string): boolean {
+export function isValidEmail(email: string): { valid: boolean; error?: string } {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(email)) {
+    return { valid: false, error: 'Invalid email format' };
+  }
+  return { valid: true };
 }
+
 
 /**
  * Validate password strength

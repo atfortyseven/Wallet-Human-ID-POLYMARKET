@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { verifyPassword, createJWT, isValidEmail } from '@/lib/auth';
+import { hashPassword, createJWT, isValidPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 const prisma = new PrismaClient();
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, name } = body;
 
-    // Validation
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -18,35 +19,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emailValidation = isValidEmail(email);
-    if (!emailValidation.valid) {
+    // Validate password
+    const passwordValidation = isValidPassword(password);
+    if (!passwordValidation.valid) {
       return NextResponse.json(
-        { error: emailValidation.error },
+        { error: passwordValidation.error },
         { status: 400 }
       );
     }
 
-    // Find user
-    const user = await prisma.authUser.findUnique({
-      where: { email }
+    // Hash password
+    const passwordHash = await hashPassword(password);
+
+    // Update user with password and mark as verified
+    const user = await prisma.authUser.update({
+      where: { email },
+      data: {
+        passwordHash,
+        name: name || null,
+        verified: true
+      }
     });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
-
-    // Verify password
-    const isPasswordValid = await verifyPassword(password, user.passwordHash);
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
 
     // Generate JWT
     const token = createJWT(user.id, user.email);
@@ -71,9 +64,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Signin error:', error);
+    console.error('Complete signup error:', error);
     return NextResponse.json(
-      { error: 'Authentication failed' },
+      { error: 'Failed to complete signup' },
       { status: 500 }
     );
   }
