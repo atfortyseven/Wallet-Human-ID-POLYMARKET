@@ -36,6 +36,9 @@ const nextConfig = {
 
     reactStrictMode: true,
     swcMinify: true,
+    compress: true, // Enable Gzip compression
+    poweredByHeader: false, // Remove X-Powered-By header
+    productionBrowserSourceMaps: false, // Disable source maps in production for speed
 
     // BUILD ROBUSTNESS
     typescript: {

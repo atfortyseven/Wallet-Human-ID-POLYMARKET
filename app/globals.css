@@ -58,6 +58,11 @@
     --zk-shield-active: #06b6d4;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent; /* Remove blue tap box on mobile */
+  }
+
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
@@ -67,6 +72,7 @@
     min-width: 360px;
     min-height: 600px;
     overflow-x: hidden;
+    touch-action: manipulation; /* Faster tap delay removal */
     @apply antialiased cursor-default selection:bg-indigo-500/30 selection:text-indigo-200 transition-colors duration-300;
   }
 }
