@@ -1,9 +1,4 @@
-'use client';
-
-import React, { Suspense, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, Scroll, useScroll } from '@react-three/drei';
-import { VideoScrubEngine } from '@/components/3d/VideoScrubEngine';
+import FluidBeigeBackground from '@/components/layout/FluidBeigeBackground';
 import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';
 import { LandingHero } from '@/components/landing/LandingHero';
 import { WalletPreview } from '@/components/landing/WalletPreview';
@@ -11,7 +6,9 @@ import { FeatureCardsSection } from '@/components/landing/FeatureCardsSection';
 import { SecurityGrowthSection } from '@/components/landing/SecurityGrowthSection';
 import { Web3AccessSection } from '@/components/landing/Web3AccessSection';
 import { HumanDefiFooter } from '@/components/landing/HumanDefiFooter';
-import { BarrelDistortion } from '@/components/3d/effects/BarrelDistortion';
+import { useAuth } from '@/hooks/useAuth';
+import { useAppKitAccount, useAppKit } from '@reown/appkit/react';
+import dynamic from 'next/dynamic';
 import { QuantumLeapEffectInternal } from '@/components/3d/effects/QuantumLeapEffect';
 import { EffectComposer } from '@react-three/postprocessing';
 import * as THREE from 'three';
@@ -85,44 +82,29 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const { open } = useAppKit();
   
-  // State for the "Loading" transition to registration/lobby
+  // State for the "Loading" transition
   const [isLoadingLobby, setIsLoadingLobby] = useState(false);
 
   const handleStart = () => {
       setIsLoadingLobby(true);
-      // Simulate fast loading, then open connection logic or direct to lobby if connected
       setTimeout(() => {
           if (!isConnected && !isAuthenticated) {
               open(); 
           }
           setIsLoadingLobby(false);
-      }, 1500);
+      }, 1000);
   };
 
-  // If fully authenticated, show the Real Wallet Lobby (No Scroll Story needed? Or maybe still accessible?)
-  // For now, let's assume if authenticated, we go straight to wallet.
+  // 1. AUTHENTICATED LOBBY
   if (isConnected || isAuthenticated) {
       return (
-        <main className="fixed inset-0 bg-black overflow-hidden">
-             {/* 3D Background persists delicately? Or maybe strict black for "Lobby" efficiency? 
-                 User asked for "our scroll and background", so we keep it even in Dashboard?
-                 Let's keep it for visual consistency but maybe reduced.
-             */}
-             <div className="absolute inset-0 z-0">
-                <Canvas 
-                    dpr={[1, 2]} 
-                    gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, depth: false }}
-                >
-                    <color attach="background" args={['#000']} />
-                    <Suspense fallback={null}><VideoScrubEngine /></Suspense>
-                    <EffectComposer><BarrelDistortion distortion={0} /></EffectComposer>
-                 </Canvas>
-             </div>
-
+        <main className="fixed inset-0 overflow-hidden bg-[#F5F5DC]">
+             <FluidBeigeBackground />
+             
              {/* The Real Wallet Lobby */}
-             <div className="relative z-10 w-full h-full overflow-y-auto">
+             <div className="relative z-10 w-full h-full overflow-y-auto custom-scrollbar">
                 <HumanDefiHeader /> 
-                <div className="pt-24 px-4">
+                <div className="pt-24 px-4 pb-20">
                     <WalletSection />
                 </div>
              </div>
@@ -130,96 +112,45 @@ export default function Home() {
       );
   }
 
-  // LANDING PAGE MODE (Scroll Story)
+  // 2. LANDING PAGE (Standard Scroll, High Perf)
   return (
-    <main className="main-container">
-       <HumanDefiHeader />
+    <main className="min-h-screen w-full relative bg-[#F5F5DC] text-neutral-900 selection:bg-orange-200 selection:text-orange-900">
+       <FluidBeigeBackground />
+       
+       <div className="relative z-10">
+           <HumanDefiHeader />
 
-       {/* Loading Overlay */}
-       {isLoadingLobby && (
-           <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-               <div className="text-blue-500 animate-pulse text-2xl font-bold font-mono">
-                   CONNECTING TO ON-CHAIN REGISTRY...
+           {/* Loading Overlay */}
+           {isLoadingLobby && (
+               <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xl flex items-center justify-center">
+                   <div className="text-white animate-pulse text-2xl font-bold font-mono">
+                       CONNECTING...
+                   </div>
                </div>
-           </div>
-       )}
+           )}
 
-      <div className="canvas-layer">
-        <Canvas 
-            dpr={[1, 2]} 
-            camera={{ position: [0, 0, 1], fov: 75 }}
-            gl={{ 
-                powerPreference: 'high-performance',
-                antialias: false,
-                stencil: false,
-                depth: false
-            }}
-        >
-          <color attach="background" args={['#000']} /> 
-          
-          <ScrollControls pages={7} damping={0.2} style={{ scrollBehavior: 'smooth' }}>
-            
-            {/* 1. The Video Engine (Background) */}
-            <Suspense fallback={null}>
-                <VideoScrubEngine />
-            </Suspense>
-
-            {/* 2. Effects */}
-            <EffectComposer>
-                 <AnimatedDistortion />
-            </EffectComposer>
-
-            {/* 3. The Scroll Story Content */}
-            <Scroll html style={{ width: '100vw' }}>
+           <div className="flex flex-col">
                 <LandingHero onStart={handleStart} />
                 
-                <div className="w-full flex flex-col relative z-10 pb-20">
-                    
-                    {/* PAGE 2: WALLET VISUALIZATION (Triggered slightly later) */}
-                    <div className="w-full flex items-center justify-center opacity-0 animate-fade-in-scroll mt-[100vh] mb-20">
-                         <WalletPreview />
-                    </div>
-
-                    {/* PAGE 3: FEATURE CARDS */}
-                    <div className="w-full py-20">
-                        <FeatureCardsSection />
-                    </div>
-
-                    {/* PAGE 4: SECURITY & GROWTH */}
-                    <div className="w-full py-20">
-                        <SecurityGrowthSection />
-                    </div>
-
-                    {/* PAGE 5: BENEFITS & ACCESS (Finale) */}
-                    <div className="w-full py-32 mt-auto">
-                        <Web3AccessSection />
-                    </div>
-
-                    {/* PAGE 6: FOOTER */}
-                    <HumanDefiFooter />
+                <div className="w-full flex items-center justify-center py-20 min-h-[80vh]">
+                     <WalletPreview />
                 </div>
-            </Scroll>
-            
-          </ScrollControls>
-          
-        </Canvas>
-      </div>
 
-      <style jsx>{`
-        .main-container {
-          height: 100dvh;
-          width: 100vw;
-          background: #000;
-          overflow: hidden;
-          position: fixed;
-          top: 0;
-          left: 0;
-        }
-        .canvas-layer {
-          height: 100%;
-          width: 100%;
-        }
-      `}</style>
+                <div className="w-full py-20">
+                    <FeatureCardsSection />
+                </div>
+
+                <div className="w-full py-20">
+                    <SecurityGrowthSection />
+                </div>
+
+                <div className="w-full py-32">
+                    <Web3AccessSection />
+                </div>
+
+                <HumanDefiFooter />
+           </div>
+       </div>
     </main>
   );
 }
