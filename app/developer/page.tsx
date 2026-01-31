@@ -1,7 +1,6 @@
 'use client';
 
 import { HumanDefiFooter } from "@/components/landing/HumanDefiFooter";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import { useLanguage } from '@/src/context/LanguageContext';
 
 export default function DeveloperPage() {
@@ -9,7 +8,6 @@ export default function DeveloperPage() {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white selection:bg-blue-500/30">
-      <SiteHeader />
       
       <main className="pt-32 pb-20 px-8 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center">
         <div className="bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full text-sm font-mono font-medium mb-6 uppercase tracking-wider border border-blue-500/20">
