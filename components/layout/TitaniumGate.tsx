@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IntroSequence } from '@/components/intro/IntroSequence';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 interface TitaniumGateProps {
     children: React.ReactNode;
@@ -13,9 +15,25 @@ interface TitaniumGateProps {
 type GateState = 'INTRO' | 'AUTH' | 'APP';
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
+    const { isAuthenticated, isLoading } = useAuth();
     // In a real app, strictMode checking session cookie would happen here.
     // We start at INTRO for the cinematic effect.
     const [state, setState] = useState<GateState>('INTRO');
+
+    // If already authenticated on mount, skip to APP
+    React.useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            setState('APP');
+        }
+    }, [isAuthenticated, isLoading]);
+
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 bg-[#F5F5DC] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+            </div>
+        );
+    }
 
     return (
         <>
