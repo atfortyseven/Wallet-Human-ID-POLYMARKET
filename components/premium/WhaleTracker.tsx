@@ -172,7 +172,7 @@ export default function WhaleTracker({ isPremium: _propIsPremium, onUpgrade }: W
     setShowBatchImport(false);
   };
 
-  const filteredWallets = watchedWallets.filter(w => {
+  const filteredWallets = (watchedWallets || []).filter(w => {
     if (filter === 'whales' && !w.isWhale) return false;
     if (filter === 'smart' && !w.isSmart) return false;
     if (filter === 'alerts' && !w.alertsEnabled) return false;

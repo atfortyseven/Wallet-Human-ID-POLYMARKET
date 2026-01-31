@@ -46,7 +46,7 @@ export default function SmartAlertsEngine({ isPremium }: { isPremium: boolean })
   const [showCreateRule, setShowCreateRule] = useState(false);
 
   useEffect(() => {
-    // Simulatealerts in real-time
+    // Simulate alerts in real-time
     const mockAlerts: SmartAlert[] = [
       {
         id: '1',
@@ -93,36 +93,7 @@ export default function SmartAlertsEngine({ isPremium }: { isPremium: boolean })
         timestamp: new Date(Date.now() - 900000),
         priority: 'medium',
         read: true,
-      },
-      {
-        id: '4',
-        type: 'copy_signal',
-        walletLabel: 'Smart Trader #12',
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-        title: '📋 Copy Trade Signal',
-        description: 'Bought 10K LDO tokens - 85% historical win rate',
-        action: {
-          type: 'BUY',
-          token: 'LDO',
-          amount: 10000,
-          usdValue: 22500,
-        },
-        timestamp: new Date(Date.now() - 1200000),
-        priority: 'high',
-        read: false,
-        copyable: true,
-      },
-      {
-        id: '5',
-        type: 'risk_alert',
-        walletLabel: 'Your Wallet',
-        walletAddress: '0x...',
-        title: '⚠️ High Risk Detected',
-        description: 'Portfolio concentration > 70% - Diversification recommended',
-        timestamp: new Date(Date.now() - 1800000),
-        priority: 'medium',
-        read: false,
-      },
+      }
     ];
 
     const mockRules: AlertRule[] = [
@@ -140,50 +111,7 @@ export default function SmartAlertsEngine({ isPremium }: { isPremium: boolean })
           email: false,
           sms: false,
         },
-      },
-      {
-        id: '2',
-        name: 'Smart Money Buys',
-        enabled: true,
-        conditions: [
-          { type: 'wallet_label', value: 'smart_money' },
-          { type: 'action_type', value: 'BUY' },
-        ],
-        actions: {
-          telegram: true,
-          push: true,
-          email: true,
-          sms: false,
-        },
-      },
-      {
-        id: '3',
-        name: 'Profit Targets (>50%)',
-        enabled: true,
-        conditions: [
-          { type: 'profit_percentage', value: 50 },
-        ],
-        actions: {
-          telegram: false,
-          push: true,
-          email: true,
-          sms: false,
-        },
-      },
-      {
-        id: '4',
-        name: 'Risk Alerts',
-        enabled: false,
-        conditions: [
-          { type: 'risk_score', value: 70 },
-        ],
-        actions: {
-          telegram: true,
-          push: true,
-          email: true,
-          sms: true,
-        },
-      },
+      }
     ];
 
     if (isPremium) {
