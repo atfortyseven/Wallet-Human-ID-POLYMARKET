@@ -35,10 +35,27 @@ export async function GET(req: NextRequest) {
     }
 
     // Parallel fetch for speed
-    const [ethBalance, tokenBalances] = await Promise.all([
-      alchemy.core.getBalance(address),
-      alchemy.core.getTokenBalances(address, TOKENS)
-    ]);
+    let ethBalance, tokenBalances;
+    try {
+        [ethBalance, tokenBalances] = await Promise.all([
+            alchemy.core.getBalance(address.toLowerCase()), // Lowercase to avoid checksum errors
+            alchemy.core.getTokenBalances(address.toLowerCase(), TOKENS)
+        ]);
+    } catch (apiError: any) {
+        // Handle "Network not enabled" (403) or other Alchemy errors gracefully
+        console.warn("[Alchemy Error] Returning fallback data:", apiError.message);
+        
+        // Return valid fallback structure to keep UI alive
+        return NextResponse.json({
+            address,
+            totalValue: 0,
+            ethBalance: 0,
+            isWhale: false,
+            isSmart: false,
+            fallback: true, // Flag to indicate mock/fallback data
+            error: "Live data unavailable (Network limit)"
+        });
+    }
 
     // Calculate generic total value (Approximate for demo)
     // In production we would need a Price Feed (CoinGecko/Chainlink)
@@ -52,16 +69,18 @@ export async function GET(req: NextRequest) {
 
     // 2. Token Value
     let tokenUsd = 0;
-    for (const token of tokenBalances.tokenBalances) {
-      if (token.tokenBalance) {
-        // Primitive check: USDC/DAI have 6 or 18 decimals usually. 
-        // For this demo we'll assume USDC (6 decimals) for the main stablecoin on Base
-        // This is a simplification.
-        if (token.contractAddress.toLowerCase() === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') { // USDC
-             const val = parseInt(token.tokenBalance, 16) / 1e6;
-             tokenUsd += val;
+    if (tokenBalances && tokenBalances.tokenBalances) {
+        for (const token of tokenBalances.tokenBalances) {
+            if (token.tokenBalance) {
+                // Primitive check: USDC/DAI have 6 or 18 decimals usually. 
+                // For this demo we'll assume USDC (6 decimals) for the main stablecoin on Base
+                // This is a simplification.
+                if (token.contractAddress.toLowerCase() === '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') { // USDC
+                     const val = parseInt(token.tokenBalance, 16) / 1e6;
+                     tokenUsd += val;
+                }
+            }
         }
-      }
     }
 
     const totalValue = ethUsd + tokenUsd;
@@ -75,6 +94,6 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     console.error('Alchemy Stats Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch stats', details: String(error) }, { status: 500 });
   }
 }

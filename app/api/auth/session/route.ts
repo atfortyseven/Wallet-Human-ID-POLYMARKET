@@ -1,31 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { verifyJWT } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    // Try to get token from cookie or Authorization header
-    const cookieStore = await cookies();
-    let token = cookieStore.get('auth_token')?.value;
-    
-    if (!token) {
-      const authHeader = request.headers.get('authorization');
-      token = authHeader?.replace('Bearer ', '');
-    }
+    const session = await getServerSession(authOptions);
 
-    if (!token) {
-      return NextResponse.json({
-        authenticated: false,
-        user: null
-      });
-    }
-
-    // Verify JWT
-    const decoded = await verifyJWT(token);
-    if (!decoded || !decoded.userId) {
+    if (!session || !session.user || !session.user.email) {
       return NextResponse.json({
         authenticated: false,
         user: null
@@ -34,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Get user from database
     const user = await prisma.authUser.findUnique({
-      where: { id: decoded.userId },
+      where: { email: session.user.email },
       select: {
         id: true,
         email: true,
