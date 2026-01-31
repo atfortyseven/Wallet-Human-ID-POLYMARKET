@@ -111,7 +111,7 @@ export const authOptions: NextAuthOptions = {
             include: {
               authUser: {
                 select: {
-                    walletAddress: true,
+                    // walletAddress: true, // TEMPORARILY COMMENTED - column doesn't exist yet in production
                     name: true,
                     email: true
                 }
@@ -126,7 +126,7 @@ export const authOptions: NextAuthOptions = {
           // @ts-ignore
           session.user = {
             ...session.user,
-            walletAddress: (dbSession as any).authUser?.walletAddress,
+            // walletAddress: (dbSession as any).authUser?.walletAddress, // TEMPORARILY COMMENTED
             name: (dbSession as any).authUser?.name,
             email: (dbSession as any).authUser?.email
           } as any;
