@@ -125,7 +125,7 @@ export default function WalletComparison({ wallets, isPremium }: WalletCompariso
                   ? (wallet.totalValue / maxValue) * 100
                   : metric === 'change'
                   ? Math.min(Math.abs(wallet.change24h) * 10, 100)
-                  : 75; // Mock activity
+                  : (wallet.totalValue > 0 ? Math.min((wallet.totalValue / 1e6) * 10, 100) : 0); 
 
                 return (
                   <div key={wallet.id}>

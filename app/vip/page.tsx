@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Waves, BarChart3, Upload, Bell, Star, Sparkles, Brain, GitBranch, TrendingUp, Zap, Activity, Trophy } from 'lucide-react';
+import { Crown, Waves, BarChart3, Bell, Sparkles, TrendingUp, Zap, Activity } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import WhaleTracker from '@/components/premium/WhaleTracker';
 import WalletComparison from '@/components/premium/WalletComparison';
 import PricingModal from '@/components/premium/PricingModal';
@@ -19,6 +20,7 @@ type TabType = 'tracker' | 'analytics' | 'alerts' | 'copytrading' | 'comparison'
 
 export default function VIPPage() {
   const { user, isLoaded } = useUser();
+  const { t } = useLanguage(); // Add translation support
   const [isPremium, setIsPremium] = useState(true); // FORCE UNLOCKED 
   const [loading, setLoading] = useState(true);
   const [showPricing, setShowPricing] = useState(false);
@@ -100,14 +102,13 @@ export default function VIPPage() {
     );
   }
 
+  // Only keep tabs with REAL data
   const tabs = [
-    { id: 'tracker' as const, label: 'Whale Tracker', icon: <Waves size={20} />, color: 'blue' },
-    { id: 'analytics' as const, label: 'Analytics', icon: <BarChart3 size={20} />, color: 'purple' },
-    { id: 'alerts' as const, label: 'Smart Alerts', icon: <Bell size={20} />, color: 'orange' },
-    { id: 'copytrading' as const, label: 'Copy Trading', icon: <GitBranch size={20} />, color: 'green' },
-    { id: 'leaderboard' as const, label: 'Leaderboard', icon: <Trophy size={20} />, color: 'yellow' },
-    { id: 'gamification' as const, label: 'My Progress', icon: <Crown size={20} />, color: 'pink' },
-    { id: 'comparison' as const, label: 'Compare', icon: <TrendingUp size={20} />, color: 'pink' },
+    { id: 'tracker' as const, label: t('vip.tab_tracker'), icon: <Waves size={20} />, color: 'blue' },
+    { id: 'analytics' as const, label: t('vip.tab_analytics'), icon: <BarChart3 size={20} />, color: 'purple' },
+    { id: 'alerts' as const, label: t('vip.tab_alerts'), icon: <Bell size={20} />, color: 'orange' },
+    { id: 'comparison' as const, label: t('vip.tab_compare'), icon: <TrendingUp size={20} />, color: 'pink' },
+    // REMOVED: Copy Trading (fake transactions/traders), Leaderboard (fake rankings), My Progress (fake achievements)
   ];
 
   return (
@@ -124,89 +125,40 @@ export default function VIPPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-12 text-center"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-bold mb-4">
-                <Crown size={20} />
-                PROFESSIONAL WHALE TRACKER
-                {isPremium && <Sparkles size={16} className="animate-pulse" />}
-              </div>
-
-              <h1 className="text-5xl md:text-7xl font-black text-[#1F1F1F] mb-4 leading-tight">
-                Track Whales.
-                <br />
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Copy Profits.
-                </span>
-              </h1>
-
-              <p className="text-xl text-[#1F1F1F]/70 max-w-2xl">
-                Professional-grade whale tracking with AI-powered insights, real-time alerts,
-                and automated copy trading. Join 10,000+ traders making smarter decisions.
-              </p>
+          {/* Centered Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-bold">
+              <Crown size={20} />
+              {t('vip.badge')}
+              {isPremium && <Sparkles size={16} className="animate-pulse" />}
             </div>
-
-            {/* Removed Upgrade Button for Full Access */}
           </div>
 
-          {/* Premium Stats - REAL DATA */}
-          {isPremium && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard 
-                icon={<Activity />} 
-                label="Tracked Whales" 
-                value={stats.trackedWhales.toString()} 
-                change="Live" 
-              />
-              <StatCard 
-                icon={<TrendingUp />} 
-                label="Total Value" 
-                value={stats.totalValue > 0 ? `$${(stats.totalValue / 1e6).toFixed(2)}M` : "Cargando..."} 
-                change="Real-time" 
-              />
-              <StatCard 
-                icon={<Bell />} 
-                label="Activities (24h)" 
-                value={stats.activities.toString()} 
-                change="Live" 
-              />
-              <StatCard 
-                icon={<Zap />} 
-                label="Network" 
-                value="Base" 
-                change="Mainnet" 
-              />
-            </div>
-          )}
+          {/* Centered Title */}
+          <h1 className="text-5xl md:text-7xl font-black text-[#1F1F1F] mb-4 leading-tight">
+            {t('vip.title_track')}.
+            <br />
+            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {t('vip.title_copy')}.
+            </span>
+          </h1>
+
+          {/* Centered Description */}
+          <p className="text-xl text-[#1F1F1F]/70 max-w-2xl mx-auto">
+            {t('vip.desc')}
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+            <StatCard icon={<Activity />} label="Tracked Whales" value={stats.trackedWhales.toString()} change="Live" />
+            <StatCard icon={<TrendingUp />} label="Total Value" value={stats.totalValue > 0 ? `$${(stats.totalValue / 1e6).toFixed(2)}M` : "Cargando..."} change="Real-time" />
+            <StatCard icon={<Bell />} label="Activities (24h)" value={stats.activities.toString()} change="Live" />
+            <StatCard icon={<Zap />} label="Network" value="Base" change="Mainnet" />
+          </div>
         </motion.div>
 
-        {/* Feature Highlights (Non-Premium) */}
-        {!isPremium && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid md:grid-cols-3 gap-6 mb-12"
-          >
-            <HighlightCard
-              icon={<Brain className="text-purple-500" size={32} />}
-              title="AI-Powered Insights"
-              features={['Pattern recognition', 'Profit predictions', 'Risk analysis', 'Auto recommendations']}
-            />
-            <HighlightCard
-              icon={<GitBranch className="text-green-500" size={32} />}
-              title="Copy Trading"
-              features={['1-click copy trades', '85%+ win rate', 'Auto-execute', 'Risk management']}
-            />
-            <HighlightCard
-              icon={<Bell className="text-orange-500" size={32} />}
-              title="Real-Time Alerts"
-              features={['Instant notifications', 'Telegram/Email/SMS', 'Custom rules', 'Smart filtering']}
-            />
-          </motion.div>
-        )}
+
 
         {/* Tab Navigation */}
         <div className="mb-6">
@@ -266,41 +218,11 @@ export default function VIPPage() {
             </motion.div>
           )}
 
-          {activeTab === 'copytrading' && (
-            <motion.div
-              key="copytrading"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-            >
-              <TokenFlowVisualizer isPremium={isPremium} />
-            </motion.div>
-          )}
-
-          {activeTab === 'leaderboard' && (
-            <motion.div
-              key="leaderboard"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-            >
-              <div className="grid md:grid-cols-2 gap-6">
-                <CompetitiveLeaderboard currentUserId={user?.id || 'guest'} />
-                <RealTimeLiveFeed isPremium={isPremium} />
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'gamification' && (
-            <motion.div
-              key="gamification"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-            >
-              <GamificationSystem userId={user?.id || 'guest'} />
-            </motion.div>
-          )}
+          {/* REMOVED FAKE DATA TABS:
+            - Copy Trading (fake transactions, traders, P&L)
+            - Leaderboard (fake rankings, win rates)
+            - Gamification/My Progress (fake achievements, points)
+          */}
 
           {activeTab === 'comparison' && (
             <motion.div
@@ -349,30 +271,6 @@ function StatCard({ icon, label, value, change }: {
       </div>
       <div className="text-2xl font-black text-[#1F1F1F]">{value}</div>
       <div className="text-sm font-bold text-green-600 mt-1">{change}</div>
-    </motion.div>
-  );
-}
-
-function HighlightCard({ icon, title, features }: {
-  icon: React.ReactNode;
-  title: string;
-  features: string[];
-}) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02, y: -5 }}
-      className="p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-[#1F1F1F]/10 hover:shadow-xl transition-all"
-    >
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-lg font-black text-[#1F1F1F] mb-3">{title}</h3>
-      <ul className="space-y-2">
-        {features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-[#1F1F1F]/70">
-            <Star size={16} className="text-yellow-500 fill-current flex-shrink-0 mt-0.5" />
-            {feature}
-          </li>
-        ))}
-      </ul>
     </motion.div>
   );
 }

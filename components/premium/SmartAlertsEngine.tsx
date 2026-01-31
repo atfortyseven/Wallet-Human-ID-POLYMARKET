@@ -46,81 +46,12 @@ export default function SmartAlertsEngine({ isPremium }: { isPremium: boolean })
   const [showCreateRule, setShowCreateRule] = useState(false);
 
   useEffect(() => {
-    // Simulate alerts in real-time
-    const mockAlerts: SmartAlert[] = [
-      {
-        id: '1',
-        type: 'whale_move',
-        walletLabel: 'Binance Hot Wallet',
-        walletAddress: '0x28C6c06298d514Db089934071355E5743bf21d60',
-        title: '🐋 Massive ETH Transfer',
-        description: 'Transferred 5,000 ETH ($12.5M) to unknown wallet',
-        action: {
-          type: 'TRANSFER',
-          token: 'ETH',
-          amount: 5000,
-          usdValue: 12500000,
-        },
-        timestamp: new Date(Date.now() - 300000),
-        priority: 'critical',
-        read: false,
-      },
-      {
-        id: '2',
-        type: 'smart_buy',
-        walletLabel: 'Vitalik Buterin',
-        walletAddress: '0xab5801a7d398351b8be11c439e05c5b3259aec9b',
-        title: '⚡ Smart Money Accumulation',
-        description: 'Accumulated 50K AAVE tokens - Pattern suggests bullish signal',
-        action: {
-          type: 'BUY',
-          token: 'AAVE',
-          amount: 50000,
-          usdValue: 4250000,
-        },
-        timestamp: new Date(Date.now() - 600000),
-        priority: 'high',
-        read: false,
-        copyable: true,
-      },
-      {
-        id: '3',
-        type: 'profit_target',
-        walletLabel: 'DeFi Whale #47',
-        walletAddress: '0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503',
-        title: '🎯 Profit Target Reached',
-        description: 'UNI position up 95% - Consider taking profits',
-        timestamp: new Date(Date.now() - 900000),
-        priority: 'medium',
-        read: true,
-      }
-    ];
+    // FAKE DATA REMOVED - Using empty state until real-time alerts API is connected
+    const realAlerts: SmartAlert[] = [];
+    const realRules: AlertRule[] = [];
 
-    const mockRules: AlertRule[] = [
-      {
-        id: '1',
-        name: 'Whale Movements > $1M',
-        enabled: true,
-        conditions: [
-          { type: 'transaction_value', value: 1000000 },
-          { type: 'wallet_label', value: 'whale' },
-        ],
-        actions: {
-          telegram: true,
-          push: true,
-          email: false,
-          sms: false,
-        },
-      }
-    ];
-
-    if (isPremium) {
-      setAlerts(mockAlerts);
-      setAlertRules(mockRules);
-    } else {
-      setAlerts(mockAlerts.slice(0, 2));
-      setAlertRules(mockRules.slice(0, 1));
-    }
+    setAlerts(realAlerts);
+    setAlertRules(realRules);
   }, [isPremium]);
 
   const filteredAlerts = alerts.filter(alert => {
