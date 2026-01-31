@@ -225,3 +225,24 @@ export function createJWT(userId: string, email: string): string {
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
+
+/**
+ * Verify a legacy JWT token (decodes base64)
+ * @deprecated Use verifySession from lib/session instead
+ */
+export async function verifyJWT(token: string): Promise<any> {
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf-8');
+    const payload = JSON.parse(decoded);
+    
+    // Check expiration
+    if (payload.exp && Date.now() > payload.exp) {
+      return null;
+    }
+    
+    return payload;
+  } catch (error) {
+    console.error("Error verifying JWT:", error);
+    return null;
+  }
+}

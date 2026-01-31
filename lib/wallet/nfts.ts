@@ -37,11 +37,11 @@ export async function getNFTs(address: string, chainId: number = 1): Promise<NFT
       id: `${nft.contract.address}-${nft.tokenId}`,
       contract: nft.contract.address,
       tokenId: nft.tokenId,
-      title: nft.title || `#${nft.tokenId}`,
+      title: nft.name || `#${nft.tokenId}`,
       description: nft.description || '',
-      image: nft.media[0]?.thumbnail || nft.media[0]?.gateway || '',
+      image: nft.image?.thumbnailUrl || nft.image?.cachedUrl || '',
       collectionName: nft.contract.name || 'Unknown Collection',
-      floorPrice: nft.contract.openSea?.floorPrice
+      floorPrice: nft.contract.openSeaMetadata?.floorPrice
     }));
   } catch (error) {
     console.error('Error fetching NFTs:', error);
@@ -57,4 +57,27 @@ export async function getNFTMetadata(contractAddress: string, tokenId: string) {
     console.error('Error fetching NFT metadata:', error);
     return null;
   }
+}
+
+export const getNFTsForOwner = getNFTs;
+
+export async function getNFTCollections(address: string, chainId: number = 1) {
+  const nfts = await getNFTs(address, chainId);
+  
+  // Aggregate unique collections
+  const collectionsMap = new Map();
+  
+  nfts.forEach(nft => {
+    if (!collectionsMap.has(nft.contract)) {
+      collectionsMap.set(nft.contract, {
+        contract: nft.contract,
+        name: nft.collectionName || 'Unknown Collection',
+        image: nft.image,
+        count: 0
+      });
+    }
+    collectionsMap.get(nft.contract).count++;
+  });
+
+  return Array.from(collectionsMap.values());
 }
