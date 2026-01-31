@@ -1,14 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export function useAuth() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const { data: session, status } = useSession();
 
     const checkAuth = async () => {
         try {
-            // Check client-side persistence (3-minute rule)
+            // Check NextAuth session (Google login)
+            if (status === 'authenticated') {
+                setIsAuthenticated(true);
+                setIsLoading(false);
+                return;
+            }
+            
+            // Check client-side persistence (Email login - 3-minute rule)
             const expiry = localStorage.getItem('human_session_expiry');
             if (expiry && parseInt(expiry) > Date.now()) {
                 setIsAuthenticated(true);
@@ -16,15 +25,8 @@ export function useAuth() {
                 return;
             }
 
-            // Fallback to server check (optional, but keep for robustness if needed)
-            const res = await fetch("/api/auth/session");
-            if (res.ok) {
-                // Determine source of server session - assuming server session is strictly tied to 3 min logic too?
-                // For now, if server says OK, we trust it, but we prefer client expiry for the "3 min reload" rule.
-                setIsAuthenticated(true);
-            } else {
-                setIsAuthenticated(false);
-            }
+            // Not authenticated by either method
+            setIsAuthenticated(false);
         } catch (error) {
             console.error("Auth check failed", error);
             setIsAuthenticated(false);
@@ -73,8 +75,11 @@ export function useAuth() {
     };
 
     useEffect(() => {
-        checkAuth();
-    }, []);
+        // Only run checkAuth when session status is determined
+        if (status !== 'loading') {
+            checkAuth();
+        }
+    }, [status, session]);
 
     // Helper to refresh session (extend 3 mins) if needed
     const refreshSession = () => {
