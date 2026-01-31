@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownLeft, Repeat, CreditCard, LayoutGrid, Image as I
 import { useAccount, useChainId, useReadContracts, useBalance } from 'wagmi';
 import { formatUnits, erc20Abi } from 'viem';
 import { FeatureCardsSection } from '@/components/landing/FeatureCardsSection';
+import NFTGallery from '@/components/wallet/NFTGallery';
 import { SecurityGrowthSection } from '@/components/landing/SecurityGrowthSection';
 import SendModal from '@/components/wallet/SendModal';
 import ReceiveModal from '@/components/wallet/ReceiveModal';
@@ -286,11 +287,17 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
                     </div>
                 )}
                  {activeTab === 'NFT' && (
-                    <div className="text-center py-16 text-neutral-400 text-sm">
-                         <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4 text-neutral-300">
-                             <ImageIcon size={24} />
-                        </div>
-                        <p className="font-medium">No NFTs in this wallet.</p>
+                    <div className="px-4">
+                        {isConnected && address ? (
+                            <NFTGallery walletAddress={address} chainId={chainId} />
+                        ) : (
+                             <div className="text-center py-16 text-neutral-400 text-sm">
+                                 <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4 text-neutral-300">
+                                     <ImageIcon size={24} />
+                                </div>
+                                <p className="font-medium">Connect wallet to view NFTs</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
