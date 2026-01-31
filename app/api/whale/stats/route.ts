@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Alchemy, Network, Utils } from 'alchemy-sdk';
 
+// Configure Alchemy
 const config = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID || process.env.ALCHEMY_API_KEY,
   network: Network.BASE_MAINNET,
+};
+
+// HACK: Fix for Alchemy SDK "Referrer 'client' is not a valid URL" in Next.js Server
+const originalFetch = global.fetch;
+global.fetch = (url, init) => {
+    if (init && init.referrer === 'client') {
+        delete init.referrer;
+    }
+    return originalFetch(url, init);
 };
 
 const alchemy = new Alchemy(config);

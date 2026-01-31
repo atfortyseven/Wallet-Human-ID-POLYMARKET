@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify JWT
-    const decoded = verifyJWT(token);
-    if (!decoded) {
+    const decoded = await verifyJWT(token);
+    if (!decoded || !decoded.userId) {
       return NextResponse.json({
         authenticated: false,
         user: null

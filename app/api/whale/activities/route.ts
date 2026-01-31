@@ -8,6 +8,16 @@ const config = {
   network: Network.BASE_MAINNET,
 };
 
+// HACK: Fix for Alchemy SDK "Referrer 'client' is not a valid URL" in Next.js Server
+// The SDK sets 'client' as referrer which native fetch rejects.
+const originalFetch = global.fetch;
+global.fetch = (url, init) => {
+    if (init && init.referrer === 'client') {
+        delete init.referrer;
+    }
+    return originalFetch(url, init);
+};
+
 const alchemy = new Alchemy(config);
 
 const KNOWN_WHALES: Record<string, string> = {
