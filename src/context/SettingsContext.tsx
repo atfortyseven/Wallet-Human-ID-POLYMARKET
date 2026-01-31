@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useSession } from 'next-auth/react';
 import { dictionary } from '@/src/lib/dictionary';
 
 // --- TYPES ---
@@ -94,31 +95,60 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         security: true
     });
 
-    // --- LOAD SETTINGS ---
-    useEffect(() => {
-        const savedSettings = localStorage.getItem('humanid_settings_v2');
-        if (savedSettings) {
-            try {
-                const parsed = JSON.parse(savedSettings);
-                if (parsed.currency) setCurrency(parsed.currency);
-                if (parsed.language) setLanguage(parsed.language);
-                if (parsed.searchEngine) setSearchEngine(parsed.searchEngine);
-                if (parsed.hideBalances !== undefined) setHideBalances(parsed.hideBalances);
-                if (parsed.privacyMode !== undefined) setPrivacyMode(parsed.privacyMode);
-                if (parsed.humanMetrics !== undefined) setHumanMetrics(parsed.humanMetrics);
-                if (parsed.testNetsEnabled !== undefined) setTestNetsEnabled(parsed.testNetsEnabled);
-                if (parsed.ipfsGateway) setIpfsGateway(parsed.ipfsGateway);
-                if (parsed.customRPC) setCustomRPC(parsed.customRPC);
-                if (parsed.stateLogsEnabled !== undefined) setStateLogsEnabled(parsed.stateLogsEnabled);
-                if (parsed.contacts) setContacts(parsed.contacts);
-                if (parsed.notifications) setNotifications(parsed.notifications);
-            } catch (e) {
-                console.error("Failed to parse settings", e);
-            }
-        }
-    }, []);
+    // --- NEXT AUTH ---
+    const { data: session } = useSession();
 
-    // --- AUTO SAVE ---
+    // --- LOAD SETTINGS (Hybrid: Local + Cloud) ---
+    useEffect(() => {
+        const loadSettings = async () => {
+            // 1. Load from LocalStorage first (instant)
+            const savedSettings = localStorage.getItem('humanid_settings_v2');
+            if (savedSettings) {
+                try {
+                    const parsed = JSON.parse(savedSettings);
+                    applySettings(parsed);
+                } catch (e) { console.error("Failed to parse local settings", e); }
+            }
+
+            // 2. If logged in, fetch from Cloud (authoritative)
+            if (session?.user?.email) {
+                try {
+                    const res = await fetch('/api/user/settings');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.settings && Object.keys(data.settings).length > 0) {
+                            applySettings(data.settings);
+                            // Merge with local storage for offline support
+                             localStorage.setItem('humanid_settings_v2', JSON.stringify({
+                                 ...JSON.parse(savedSettings || '{}'),
+                                 ...data.settings
+                             }));
+                        }
+                    }
+                } catch (e) { console.error("Failed to sync cloud settings", e); }
+            }
+        };
+
+        loadSettings();
+    }, [session]);
+
+    // Helper to apply settings object
+    const applySettings = (parsed: any) => {
+        if (parsed.currency) setCurrency(parsed.currency);
+        if (parsed.language) setLanguage(parsed.language);
+        if (parsed.searchEngine) setSearchEngine(parsed.searchEngine);
+        if (parsed.hideBalances !== undefined) setHideBalances(parsed.hideBalances);
+        if (parsed.privacyMode !== undefined) setPrivacyMode(parsed.privacyMode);
+        if (parsed.humanMetrics !== undefined) setHumanMetrics(parsed.humanMetrics);
+        if (parsed.testNetsEnabled !== undefined) setTestNetsEnabled(parsed.testNetsEnabled);
+        if (parsed.ipfsGateway) setIpfsGateway(parsed.ipfsGateway);
+        if (parsed.customRPC) setCustomRPC(parsed.customRPC);
+        if (parsed.stateLogsEnabled !== undefined) setStateLogsEnabled(parsed.stateLogsEnabled);
+        if (parsed.contacts) setContacts(parsed.contacts);
+        if (parsed.notifications) setNotifications(parsed.notifications);
+    };
+
+    // --- AUTO SAVE (Debounced Cloud Sync) ---
     useEffect(() => {
         const settingsToSave = {
             currency, language, searchEngine,
@@ -126,8 +156,26 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled,
             contacts, notifications
         };
+        
+        // Always save to local
         localStorage.setItem('humanid_settings_v2', JSON.stringify(settingsToSave));
-    }, [currency, language, searchEngine, hideBalances, privacyMode, humanMetrics, testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled, contacts, notifications]);
+
+        // Save to cloud if logged in (Debounce 2s)
+        if (session?.user?.email) {
+            const timeoutId = setTimeout(async () => {
+                try {
+                    await fetch('/api/user/settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(settingsToSave)
+                    });
+                } catch (e) {
+                    console.error("Cloud save failed", e);
+                }
+            }, 2000);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [currency, language, searchEngine, hideBalances, privacyMode, humanMetrics, testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled, contacts, notifications, session]);
 
     // --- FUNCTIONS ---
     const toggleHideBalances = () => setHideBalances(prev => !prev);

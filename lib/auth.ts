@@ -1,78 +1,135 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "@/lib/prisma";
+import { getLocationFromIP, parseUserAgent } from "@/lib/geolocation";
+import { headers } from "next/headers";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'development-secret-change-me';
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+    updateAge: 24 * 60 * 60,  // Refresh session every 24 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: 'human.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+      }
+    }
+  },
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      if (!user.email) return false;
 
-/**
- * Hash a password using bcrypt
- */
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
-}
+      // Sync with AuthUser table
+      try {
+        const existingUser = await prisma.authUser.findUnique({
+          where: { email: user.email },
+        });
 
-/**
- * Verify a password against a hash
- */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
-}
+        if (!existingUser) {
+          await prisma.authUser.create({
+            data: {
+              email: user.email,
+              name: user.name || profile?.name,
+              verified: true, // OAuth emails are verified
+              passwordHash: "oauth_google", 
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error syncing AuthUser:", error);
+      }
 
-/**
- * Generate a 6-digit verification code
- */
-export function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+      return true;
+    },
+    async jwt({ token, user, account, trigger }) {
+      // On initial sign in
+      if (trigger === 'signIn' || (user && account)) {
+        try {
+          // Generate a session ID to track this specific login
+          const sessionId = crypto.randomUUID();
+          token.sessionId = sessionId;
 
-/**
- * Create a JWT token for a user
- */
-export function createJWT(userId: string, email: string): string {
-  return jwt.sign(
-    { userId, email },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-}
+          // Gather device info
+          const headersList = headers();
+          const userAgent = headersList.get('user-agent') || 'Unknown';
+          const ip = headersList.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
+          
+          const { deviceType, browser, os } = parseUserAgent(userAgent);
+          const location = await getLocationFromIP(ip);
 
-/**
- * Verify and decode a JWT token
- */
-export function verifyJWT(token: string): { userId: string; email: string } | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-  } catch {
-    return null;
-  }
-}
+          // Find AuthUser to link
+          const authUser = await prisma.authUser.findUnique({
+            where: { email: token.email! }
+          });
 
-/**
- * Validate email format
- */
-export function isValidEmail(email: string): { valid: boolean; error?: string } {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { valid: false, error: 'Invalid email format' };
-  }
-  return { valid: true };
-}
-
-
-/**
- * Validate password strength
- */
-export function isValidPassword(password: string): { valid: boolean; error?: string } {
-  if (password.length < 8) {
-    return { valid: false, error: 'Password must be at least 8 characters' };
-  }
-  if (!/[A-Z]/.test(password)) {
-    return { valid: false, error: 'Password must contain at least one uppercase letter' };
-  }
-  if (!/[a-z]/.test(password)) {
-    return { valid: false, error: 'Password must contain at least one lowercase letter' };
-  }
-  if (!/[0-9]/.test(password)) {
-    return { valid: false, error: 'Password must contain at least one number' };
-  }
-  return { valid: true };
-}
+          if (authUser) {
+             await prisma.session.create({
+               data: {
+                 sessionToken: sessionId, // We use this internal ID as the token to track
+                 authUserId: authUser.id,
+                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                 userAgent,
+                 ipAddress: ip,
+                 deviceType,
+                 browser,
+                 os,
+                 country: location.country,
+                 city: location.city,
+                 latitude: location.latitude,
+                 longitude: location.longitude,
+               }
+             });
+          }
+        } catch (error) {
+          console.error("Error creating session record:", error);
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token.sessionId) {
+        // @ts-ignore
+        session.sessionId = token.sessionId;
+        
+        // Verify session is still active in DB (Revocation check)
+        try {
+          const dbSession = await prisma.session.findUnique({
+            where: { sessionToken: token.sessionId as string }
+          });
+          
+          if (!dbSession) {
+             // Session revoked
+             // returning null or empty session forces logout in client
+             return {} as any; 
+          }
+          
+          // Update last active (debounced/occasional)
+          // We can do this here or in middleware. Doing it here is safer for runtime.
+          const now = new Date();
+          if (dbSession.lastActivity.getTime() < now.getTime() - 5 * 60 * 1000) { // 5 min debounce
+             await prisma.session.update({
+               where: { id: dbSession.id },
+               data: { lastActivity: now }
+             });
+          }
+        } catch(e) {
+             console.error("Session verification failed", e);
+        }
+      }
+      return session;
+    },
+  },
+};

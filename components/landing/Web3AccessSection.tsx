@@ -43,10 +43,7 @@ export function Web3AccessSection() {
                     <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
                         Human Defi puede utilizar la información de contacto que nos proporciones para contactarte acerca de nuestros productos y servicios. Al hacer clic en “suscribirse”, aceptas recibir dichas comunicaciones.
                     </p>
-                    <div className="flex gap-2">
-                        <input type="email" placeholder="Email" className="bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white w-full" />
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">Suscribirse</button>
-                    </div>
+                    <SubscribeForm />
                 </div>
 
                 {/* News / Learn */}
@@ -60,6 +57,69 @@ export function Web3AccessSection() {
                 </div>
             </div>
 
+        </div>
+    );
+}
+
+function SubscribeForm() {
+    const [email, setEmail] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+    const [subscribed, setSubscribed] = React.useState(false);
+    
+    // Import toast dynamically or pass as prop if cleaner, but local import is fine
+    const { toast } = require('sonner'); 
+
+    const handleSubscribe = async () => {
+        if (!email || !email.includes('@')) return toast.error("Please enter a valid email");
+        
+        setLoading(true);
+        try {
+            const res = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                toast.success(data.message || "Subscribed successfully!");
+                setSubscribed(true);
+                setEmail('');
+            } else {
+                toast.error(data.error || "Failed to subscribe");
+            }
+        } catch (e) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (subscribed) {
+        return (
+            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 text-sm font-bold text-center">
+                ✅ Subscribed! Check your email.
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex gap-2">
+            <input 
+                type="email" 
+                placeholder="Email address" 
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={loading}
+                className="bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white w-full focus:border-blue-500 outline-none transition-colors"
+            />
+            <button 
+                onClick={handleSubscribe}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+                {loading ? '...' : 'Subscribe'}
+            </button>
         </div>
     );
 }

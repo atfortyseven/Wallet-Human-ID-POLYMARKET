@@ -10,6 +10,7 @@ import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit
 import { toast } from "sonner";
 import { useAccount } from 'wagmi';
 import { useGateState } from '@/components/layout/TitaniumGate';
+import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
 
 export function SiteHeader() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -105,6 +106,8 @@ export function SiteHeader() {
                             {/* App Mode Controls */}
                             {isAppMode && (
                                 <div className="flex items-center gap-3">
+                                    <NotificationsMenu />
+                                    
                                     {/* World ID Button */}
                                     <IDKitWidget
                                         app_id={app_id}

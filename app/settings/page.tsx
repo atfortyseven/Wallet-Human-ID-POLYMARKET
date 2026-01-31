@@ -13,6 +13,9 @@ import { HumanDefiFooter } from '@/components/landing/HumanDefiFooter';
 import { useSettings } from '@/src/context/SettingsContext';
 import { verifyBiometricOwnership } from '@/src/services/security/BiometricService';
 import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
+import { ContactsManager } from '@/components/contacts/ContactsManager';
+import { CloudSyncManager } from '@/components/settings/CloudSyncManager';
+import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
 
 export default function SettingsPage() {
     const {
@@ -223,7 +226,7 @@ export default function SettingsPage() {
                 );
 
             case 'contacts':
-                return <EmptyState icon={Users} label={t('placeholder_empty')} />;
+                return <ContactsManager />;
 
             case 'notifications':
                 return (
@@ -236,10 +239,10 @@ export default function SettingsPage() {
                 );
 
             case 'backup':
-                 return <EmptyState icon={Database} label="Sync with iCloud / Google Drive" subLabel="Cloud backup services coming soon" />;
+                 return <CloudSyncManager />;
 
             case 'walletconnect':
-                return <EmptyState icon={Link} label="No active sessions" />;
+                return <WalletConnectSessions />;
 
             case 'buy':
                 return <EmptyState icon={CreditCard} label="Payment Gateway" subLabel="MoonPay Integration Loading..." />;
@@ -288,34 +291,27 @@ export default function SettingsPage() {
             <main className="flex-grow p-4 md:p-8 relative z-10 max-w-7xl mx-auto w-full pt-20 md:pt-32">
                 <div className="flex flex-col md:flex-row gap-8 min-h-[600px]">
                     
-                    {/* Sidebar */}
-                    <aside className="w-full md:w-80 flex-shrink-0">
+                    {/* Sidebar / Topbar */}
+                    <aside className="w-full md:w-80 flex-shrink-0 relative z-20">
                         <div className="sticky top-32">
                            <div className="mb-8 px-4">
                                 <h1 className="text-4xl font-black tracking-tighter mb-2">Settings</h1>
                                 <p className="text-[#1F1F1F]/60 font-medium">Control your sovereign parameters.</p>
                            </div>
 
-                             <nav className="space-y-2">
+                            <nav className="flex md:flex-col overflow-x-auto pb-4 md:pb-0 gap-3 md:gap-2 scrollbar-hide snap-x">
                                 {SECTIONS.map((item) => (
                                     <button
                                         key={item.id}
                                         onClick={() => setActiveTab(item.id)}
-                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden
+                                        className={`flex-shrink-0 flex items-center gap-3 px-6 py-3 rounded-full text-sm font-bold transition-all group relative overflow-hidden whitespace-nowrap
                                             ${activeTab === item.id 
-                                                ? 'bg-[#1F1F1F] text-white shadow-xl scale-[1.02]' 
-                                                : 'bg-transparent text-[#1F1F1F]/60 hover:bg-white/40 hover:text-[#1F1F1F]'}
+                                                ? 'bg-[#1F1F1F] text-white shadow-lg' 
+                                                : 'bg-white/40 text-[#1F1F1F]/60 hover:bg-white/60'}
                                         `}
                                     >
-                                        <item.icon size={20} className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : 'group-hover:scale-110'}`} />
+                                        <item.icon size={18} className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : 'group-hover:scale-110'}`} />
                                         <span className="relative z-10">{item.label}</span>
-                                        {activeTab === item.id && (
-                                             <motion.div 
-                                                layoutId="activeTabIndicator"
-                                                className="absolute inset-0 bg-[#1F1F1F] z-0"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                             />
-                                        )}
                                     </button>
                                 ))}
                             </nav>

@@ -71,3 +71,73 @@ export async function sendVerificationEmail(email: string, code: string): Promis
     throw new Error('Failed to send verification email');
   }
 }
+
+/**
+ * Send welcome email to new subscribers
+ */
+export async function sendWelcomeEmail(email: string, name?: string): Promise<void> {
+  try {
+    await resend.emails.send({
+      from: 'HumanDefi <noreply@humanidfi.com>',
+      to: email,
+      subject: 'Welcome to the Human Upgrade',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #000000; color: #ffffff;">
+          <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td align="center" style="padding: 40px 0;">
+                <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #111111; border: 1px solid #333; border-radius: 16px; box-shadow: 0 0 20px rgba(0, 242, 234, 0.1);">
+                  <!-- Header -->
+                  <tr>
+                    <td style="padding: 40px 40px 20px; text-align: center; border-bottom: 1px solid #222;">
+                      <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -1px;">Human<span style="color: #00f2ea;">ID</span>.fi</h1>
+                    </td>
+                  </tr>
+                  
+                  <!-- Content -->
+                  <tr>
+                    <td style="padding: 40px;">
+                      <h2 style="margin: 0 0 20px; font-size: 22px; font-weight: 600; color: #ffffff;">Welcome ${name ? `, ${name}` : 'Human'},</h2>
+                      <p style="margin: 0 0 20px; font-size: 16px; color: #aaaaaa; line-height: 1.6;">
+                        You have successfully subscribed to the HumanDefi intelligence feed. You will now receive:
+                      </p>
+                      <ul style="color: #cccccc; line-height: 1.8; margin-bottom: 30px;">
+                        <li>🚀 Early access to protocol upgrades</li>
+                        <li>📊 Monthly yield & governance reports</li>
+                        <li>🔒 Security alerts and best practices</li>
+                      </ul>
+                      
+                      <div style="text-align: center; margin: 40px 0;">
+                        <a href="https://humanidfi.com" style="background-color: #00f2ea; color: #000000; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Access Dashboard</a>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="padding: 30px; text-align: center; border-top: 1px solid #222; background-color: #0a0a0a; border-radius: 0 0 16px 16px;">
+                      <p style="margin: 0; font-size: 12px; color: #555555;">
+                        You received this because you subscribed at humanidfi.com.<br>
+                        <a href="#" style="color: #777; text-decoration: underline;">Unsubscribe</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `
+    });
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
+    // Don't throw, just log
+  }
+}

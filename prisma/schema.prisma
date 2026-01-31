@@ -91,19 +91,35 @@ enum ZapStatus {
 // ----------------------------------------------------------------------------
 
 model Session {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
-  sessionToken  String   @unique
+  id            String    @id @default(cuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  authUserId    String?
+  authUser      AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  sessionToken String  @unique
+  accessToken  String?
+  refreshToken String?
+
   expiresAt     DateTime
   createdAt     DateTime @default(now())
   lastActivity  DateTime @default(now())
   ipAddress     String?
   userAgent     String?
   fingerprint   String? // [NEW] Browser fingerprint for session hijacking detection
-  isCompromised Boolean  @default(false) // [NEW] Flag for suspicious sessions
+  isCompromised Boolean @default(false) // [NEW] Flag for suspicious sessions
+
+  // [NEW] Enhanced Session Tracking
+  deviceType String? // mobile, desktop, tablet
+  browser    String? // Chrome, Firefox, Safari
+  os         String? // Windows, macOS, iOS, Android
+  country    String? // Spain, USA, etc
+  city       String? // Madrid, New York, etc
+  latitude   Float?
+  longitude  Float?
 
   @@index([userId])
+  @@index([authUserId])
   @@index([expiresAt])
   @@index([sessionToken])
   @@index([fingerprint])
@@ -472,6 +488,11 @@ model User {
   accounts         Account[]
   nextAuthSessions NextAuthSession[]
 
+  // [NEW] Phase 1 Relations
+  settings      UserSettings?
+  contacts      Contact[]
+  notifications Notification[]
+
   @@index([reputation])
 }
 
@@ -489,6 +510,10 @@ model AuthUser {
   updatedAt    DateTime @updatedAt
 
   verificationCodes VerificationCode[]
+  userSettings      UserSettings?
+  contacts          UserContact[]
+  notifications     UserNotification[]
+  sessions          Session[]
 
   @@index([email])
 }
@@ -505,4 +530,206 @@ model VerificationCode {
 
   @@index([userId, code])
   @@index([expiresAt])
+}
+
+// ============================================================================
+// PHASE 1: ADVANCED USER MANAGEMENT FEATURES
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// EMAIL SUBSCRIPTIONS SYSTEM
+// ----------------------------------------------------------------------------
+
+model EmailSubscriber {
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
+  // Subscription status
+  subscribed       Boolean @default(true)
+  unsubscribeToken String  @unique @default(cuid())
+
+  // Preferences
+  frequency String   @default("weekly") // daily, weekly, monthly
+  topics    String[] // ["updates", "news", "releases"]
+
+  // Timestamps
+  subscribedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+  @@index([subscribed])
+}
+
+// ----------------------------------------------------------------------------
+// NEWS & UPDATES SYSTEM
+// ----------------------------------------------------------------------------
+
+model NewsUpdate {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  content     String @db.Text
+  category    String // "feature", "update", "announcement", "defi-news", "web3-news"
+
+  // Media
+  imageUrl  String?
+  lottieUrl String?
+
+  // Metadata
+  author      String?
+  publishedAt DateTime @default(now())
+  featured    Boolean  @default(false)
+
+  // SEO
+  slug String   @unique
+  tags String[]
+
+  @@index([publishedAt])
+  @@index([category])
+  @@index([featured])
+}
+
+// ----------------------------------------------------------------------------
+// USER SETTINGS (Persistent)
+// ----------------------------------------------------------------------------
+
+model UserSettings {
+  id         String    @id @default(cuid())
+  userId     String?   @unique
+  authUserId String?   @unique
+  user       User?     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  authUser   AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Appearance
+  theme    String @default("light") // light, dark, auto
+  language String @default("es") // es, en, fr, etc
+
+  // Privacy
+  showProfile  Boolean @default(true)
+  showActivity Boolean @default(false)
+
+  // Notifications
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  transactionAlerts  Boolean @default(true)
+  marketingEmails    Boolean @default(false)
+
+  // Trading
+  defaultSlippage     Float   @default(0.5)
+  defaultGasPrice     String  @default("medium")
+  confirmTransactions Boolean @default(true)
+
+  // Backup
+  lastBackupAt    DateTime?
+  backupFrequency String    @default("weekly") // daily, weekly, monthly
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// CONTACTS MANAGEMENT
+// ----------------------------------------------------------------------------
+
+model Contact {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Contact Info
+  name          String
+  email         String?
+  walletAddress String?
+  ens           String?
+
+  // Metadata
+  notes    String?
+  tags     String[] // ["friend", "business", "vip"]
+  favorite Boolean  @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([walletAddress])
+  @@index([favorite])
+}
+
+model UserContact {
+  id         String   @id @default(cuid())
+  authUserId String
+  authUser   AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Contact Info
+  name          String
+  email         String?
+  walletAddress String?
+  ens           String?
+
+  // Metadata
+  notes    String?
+  tags     String[] // ["friend", "business", "vip"]
+  favorite Boolean  @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authUserId])
+  @@index([walletAddress])
+  @@index([favorite])
+}
+
+// ----------------------------------------------------------------------------
+// NOTIFICATIONS SYSTEM
+// ----------------------------------------------------------------------------
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Content
+  title   String
+  message String
+  type    String // "transaction", "market", "system", "social"
+
+  // Status
+  read     Boolean @default(false)
+  archived Boolean @default(false)
+
+  // Metadata
+  actionUrl String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+model UserNotification {
+  id         String   @id @default(cuid())
+  authUserId String
+  authUser   AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Content
+  title   String
+  message String
+  type    String // "transaction", "market", "system", "social"
+
+  // Status
+  read     Boolean @default(false)
+  archived Boolean @default(false)
+
+  // Metadata
+  actionUrl String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([authUserId, read])
+  @@index([authUserId, createdAt])
 }

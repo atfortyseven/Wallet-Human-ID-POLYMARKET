@@ -25,6 +25,7 @@ const SecurityGrowthSection = dynamic(() => import('@/components/landing/Securit
 const Web3AccessSection = dynamic(() => import('@/components/landing/Web3AccessSection').then(mod => mod.Web3AccessSection));
 const EcosystemSection = dynamic(() => import('@/components/ecosystem/EcosystemSection').then(mod => mod.EcosystemSection));
 const HumanDefiFooter = dynamic(() => import('@/components/landing/HumanDefiFooter').then(mod => mod.HumanDefiFooter));
+const EcosystemCarousel = dynamic(() => import('@/components/landing/EcosystemCarousel').then(mod => mod.EcosystemCarousel)); // [NEW]
 import { CommunityInfo } from '@/components/CommunityInfo';
 
 // Heavy Wallet - Only load when absolutely necessary
@@ -140,6 +141,9 @@ export default function Home() {
                         <div className="relative z-10 w-full pt-32 pb-10 optimize-visibility">
                             <Web3AccessSection />
                             
+                            {/* NEW: Interactive 15+ Lottie Carousel */}
+                            <EcosystemCarousel />
+
                             {/* ECOSYSTEM DEEP DIVE SECTION */}
                             <EcosystemSection />
                             

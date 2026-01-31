@@ -6,8 +6,9 @@ import { useSettings } from '@/src/context/SettingsContext';
 import {
     X, Settings, Shield, Zap, Database, Bell, Users,
     CreditCard, Beaker, Link, Info, MessageCircle, Lock,
-    Loader2
+    Loader2, Tablet
 } from 'lucide-react';
+import { ActiveSessions } from '../settings/ActiveSessions';
 import { toast } from 'sonner';
 import { verifyBiometricOwnership } from '@/src/services/security/BiometricService';
 import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
@@ -35,6 +36,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
     const SECTIONS = [
         { id: 'general', label: t('nav_general'), icon: Settings },
         { id: 'security', label: t('nav_security'), icon: Shield },
+        { id: 'sessions', label: 'Active Sessions', icon: Tablet }, // [NEW]
         { id: 'advanced', label: t('nav_advanced'), icon: Zap },
         { id: 'contacts', label: t('nav_contacts'), icon: Users },
         { id: 'notifications', label: t('nav_notifications'), icon: Bell },
@@ -194,6 +196,9 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                         </div>
                     </div>
                 );
+
+            case 'sessions':
+                return <ActiveSessions />;
 
             case 'advanced':
                 return <div className="space-y-4"><h3 className="text-white">RPC Configuration</h3><input disabled placeholder="https://mainnet.infura.io/v3..." className="w-full bg-black/20 p-3 rounded border border-white/10" /></div>;
