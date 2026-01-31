@@ -19,33 +19,18 @@ type TabType = 'tracker' | 'analytics' | 'alerts' | 'copytrading' | 'comparison'
 
 export default function VIPPage() {
   const { user, isLoaded } = useUser();
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true); // FORCE UNLOCKED 
   const [loading, setLoading] = useState(true);
   const [showPricing, setShowPricing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('tracker');
   const [watchedWallets, setWatchedWallets] = useState<WatchedWallet[]>([]);
 
-  // Check subscription status on mount
+  // Check subscription status on mount (Mocked for full access)
   useEffect(() => {
-    if (isLoaded && user) {
-      checkSubscriptionStatus();
-    } else if (isLoaded) {
+    if (isLoaded) {
       setLoading(false);
     }
-  }, [isLoaded, user]);
-
-  const checkSubscriptionStatus = async () => {
-    try {
-      const response = await fetch('/api/subscription/status');
-      const data = await response.json();
-      setIsPremium(data.isPremium || false);
-    } catch (error) {
-      console.error('Failed to check subscription:', error);
-      setIsPremium(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isLoaded]);
 
   const handleUpgrade = async () => {
     setShowPricing(true);
@@ -131,21 +116,7 @@ export default function VIPPage() {
               </p>
             </div>
 
-            {!isPremium && (
-              <button
-                onClick={handleUpgrade}
-                className="hidden md:block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-black text-lg hover:shadow-2xl transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <Sparkles className="group-hover:rotate-12 transition-transform" />
-                  Start Free Trial
-                  <Waves className="group-hover:-rotate-12 transition-transform" />
-                </div>
-                <div className="text-xs font-normal mt-1 opacity-90">
-                  7 days free • $19.99/mo after
-                </div>
-              </button>
-            )}
+            {/* Removed Upgrade Button for Full Access */}
           </div>
 
           {/* Premium Stats */}
@@ -291,45 +262,7 @@ export default function VIPPage() {
           )}
         </AnimatePresence>
 
-        {/* Sticky upgrade banner for free users */}
-        {!isPremium && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-4xl w-full mx-auto px-4"
-          >
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <Crown size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="text-white font-black text-lg">
-                      Unlock Professional Features
-                    </div>
-                    <div className="text-white/90 text-sm">
-                      AI insights • Copy trading • Unlimited alerts • 85% avg win rate
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-white text-xs line-through opacity-75">$49.99</div>
-                    <div className="text-white font-black text-2xl">$19.99/mo</div>
-                  </div>
-                  <button
-                    onClick={handleUpgrade}
-                    className="px-6 py-3 bg-white text-purple-600 rounded-xl font-black hover:bg-white/90 transition-all whitespace-nowrap"
-                  >
-                    Start Free Trial →
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Sticky upgrade banner removed */}
       </div>
 
       {/* Pricing Modal */}
