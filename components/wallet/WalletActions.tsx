@@ -114,8 +114,7 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
     const TABS = [
         { id: 'Tokens', label: 'Tokens' },
         { id: 'DeFi', label: 'DeFi' },
-        { id: 'NFT', label: 'NFT' },
-        { id: 'Feed', label: 'Feed' }
+        { id: 'NFT', label: 'NFT' }
     ];
 
     return (
@@ -292,17 +291,6 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
                              <ImageIcon size={24} />
                         </div>
                         <p className="font-medium">No NFTs in this wallet.</p>
-                    </div>
-                )}
-                 {activeTab === 'Feed' && (
-                    <div className="flex flex-col gap-10 pb-10">
-                        {/* Reusing Landing Page Components for the Feed - Scaled correctly */}
-                        <div className="scale-95 origin-top -mt-4 opacity-90 hover:opacity-100 transition-opacity duration-500">
-                            <FeatureCardsSection />
-                        </div>
-                        <div className="scale-95 origin-top -mt-10 opacity-90 hover:opacity-100 transition-opacity duration-500">
-                            <SecurityGrowthSection />
-                        </div>
                     </div>
                 )}
             </div>

@@ -23,6 +23,9 @@ export const ScrollLottie = ({ src, className, speed = 1 }: ScrollLottieProps) =
       autoplay: false, // ¡IMPORTANTE! No se reproduce solo
       loop: false,
       mode: "bounce", // Opcional: rebote suave
+      renderConfig: {
+        devicePixelRatio: 1, // Force 1x for performance
+      }
     });
 
     // Esperar a que cargue para poder manipular frames

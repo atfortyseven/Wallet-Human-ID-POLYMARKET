@@ -28,7 +28,7 @@ export function GPULottie({ src, width = 200, height = 200, className = "", onHo
             loop: true,
             autoplay: false, // Wait for visibility
             renderConfig: {
-                devicePixelRatio: window.devicePixelRatio || 1, // Retina support
+                devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2), // Cap at 2x for performance
             },
         });
 

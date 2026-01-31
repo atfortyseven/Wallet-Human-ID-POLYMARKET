@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Menu, X, ChevronDown, Globe, Settings as SettingsIcon, Vote, Wallet, ShieldCheck, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { SettingsModal } from '@/components/ui/SettingsModal';
+// SettingsModal import removed
 import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { toast } from "sonner";
 import { useAccount } from 'wagmi';
@@ -13,7 +13,7 @@ import { useGateState } from '@/components/layout/TitaniumGate';
 
 export function SiteHeader() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    // isSettingsOpen state removed
     
     // Auth Hooks
     const { isAuthenticated, login, isLoading: isAuthLoading } = useAuth();
@@ -88,13 +88,7 @@ export function SiteHeader() {
                                     <NavLink href="/desarrollador">Desarrollador</NavLink>
                                     <NavLink href="/wallet" icon={<Wallet size={16} />}>Wallet</NavLink>
                                     <NavLink href="/soporte">Soporte</NavLink>
-                                    <button 
-                                        onClick={() => setIsSettingsOpen(true)}
-                                        className="text-white/80 hover:text-white font-medium text-sm flex items-center gap-2 transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
-                                    >
-                                        <SettingsIcon size={16} />
-                                        <span>Settings</span>
-                                    </button>
+                                    <NavLink href="/settings" icon={<SettingsIcon size={16} />}>Settings</NavLink>
                                     <NavLink href="/funciones">Funciones</NavLink>
                                 </>
                             ) : (
@@ -182,12 +176,9 @@ export function SiteHeader() {
                                         <Wallet size={20} /> Wallet
                                     </Link>
                                     <Link href="/soporte" className="hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>Soporte</Link>
-                                    <button 
-                                        onClick={() => { setIsSettingsOpen(true); setIsMobileMenuOpen(false); }}
-                                        className="hover:text-blue-400 flex items-center gap-2 text-left"
-                                    >
+                                    <Link href="/settings" className="hover:text-blue-400 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                                         <SettingsIcon size={20} /> Settings
-                                    </button>
+                                    </Link>
                                     <Link href="/funciones" className="hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>Funciones</Link>
                                 </>
                             ) : (
@@ -209,11 +200,7 @@ export function SiteHeader() {
                 )}
             </header>
 
-            {/* Global Settings Modal */}
-            <SettingsModal 
-                isOpen={isSettingsOpen} 
-                onClose={() => setIsSettingsOpen(false)} 
-            />
+            {/* Global Settings Modal Removed - Now a persistent page */}
         </>
     );
 }
