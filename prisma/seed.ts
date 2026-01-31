@@ -13,7 +13,7 @@ async function main() {
         update: {},
         create: {
             walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
-            email: 'admin@humanid.fi',
+            email: 'admin@humanidfi.com',
             tier: IdentityTier.SOVEREIGN, // Nivel máximo
             reputation: 9000,
         },

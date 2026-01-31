@@ -8,7 +8,7 @@ export const Footer = () => {
 
                 {/* Brand */}
                 <div className="text-center md:text-left">
-                    <h5 className="text-xl font-bold text-white tracking-tight">Humanid.fi</h5>
+                    <h5 className="text-xl font-bold text-white tracking-tight">Humanidfi.com</h5>
                     <p className="text-xs text-[#888899] mt-2 font-mono">
                         Sovereign Intelligence & Financial Layer. <br />
                         Built on Base Sepolia.
@@ -40,7 +40,7 @@ export const Footer = () => {
             {/* Copyright */}
             <div className="border-t border-white/5 py-4 text-center">
                 <p className="text-[10px] text-[#444] font-mono uppercase">
-                    © 2024 Humanid.fi Org. All Rights Reserved. Non-Custodial Output.
+                    © {new Date().getFullYear()} Humanidfi.com Org. All Rights Reserved. Non-Custodial Output.
                 </p>
             </div>
         </footer>
