@@ -15,7 +15,7 @@ const config = {
 const alchemy = new Alchemy(config);
 const WHALE_THRESHOLD_USD = 50000; // $50k threshold for whale detection
 
-async function main() {
+export async function startWorker() {
   console.log("🐋 [Whale Worker] Background monitoring started on Base Mainnet...");
   
   let lastProcessedBlock = await alchemy.core.getBlockNumber();
@@ -27,6 +27,7 @@ async function main() {
       const currentBlock = await alchemy.core.getBlockNumber();
       
       if (currentBlock > lastProcessedBlock) {
+        // ... (logic remains same) ...
         console.log(`🔍 [Whale Worker] Processing blocks ${lastProcessedBlock + 1} to ${currentBlock}...`);
         
         const transfers = await alchemy.core.getAssetTransfers({
@@ -38,22 +39,16 @@ async function main() {
         });
 
         for (const tx of transfers.transfers) {
-          // Fetch token price or use a conservative estimated value for common tokens (ETH/USDC)
-          // For now, we simulate the USD calculation or fetch via Simple Price API
-          // To keep it simple and fast, we check if it's ETH > 15 (~$50k) or USDC > 50000
-          
           let usdValue = 0;
           if (tx.asset === "ETH") usdValue = (tx.value || 0) * 3300;
           else if (tx.asset === "USDC" || tx.asset === "USDT" || tx.asset === "DAI") usdValue = tx.value || 0;
           else {
-            // Generic token - assume $50k if value > 100000 (simplified)
             usdValue = (tx.value || 0) * 0.1; 
           }
 
           if (usdValue >= WHALE_THRESHOLD_USD) {
             console.log(`🌊 [Whale Worker] Detected Whale Move: ${usdValue.toFixed(2)} USD (${tx.asset})`);
             
-            // Save to database
             await prisma.whaleActivity.upsert({
               where: { transactionHash: tx.hash },
               update: {},
@@ -76,16 +71,19 @@ async function main() {
         lastProcessedBlock = currentBlock;
       }
       
-      // Wait 10 seconds before next poll
       await new Promise(resolve => setTimeout(resolve, 10000));
     } catch (error) {
       console.error("❌ [Whale Worker] Error in worker loop:", error);
-      await new Promise(resolve => setTimeout(resolve, 30000)); // Wait longer on error
+      await new Promise(resolve => setTimeout(resolve, 30000));
     }
   }
 }
 
-main().catch(err => {
-  console.error("💀 [Whale Worker] Fatal error:", err);
-  process.exit(1);
-});
+// Only run if called directly (CLI), otherwise let instrumentation call it
+if (require.main === module) {
+  startWorker().catch(err => {
+    console.error("💀 [Whale Worker] Fatal error:", err);
+    process.exit(1);
+  });
+}
+
