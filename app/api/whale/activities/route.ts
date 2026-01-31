@@ -3,10 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Alchemy, Network, AssetTransfersCategory, SortingOrder } from 'alchemy-sdk';
 
-// Configure Alchemy
+// Configure Alchemy with GetBlock RPC
 const config = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID || process.env.ALCHEMY_API_KEY,
   network: Network.BASE_MAINNET,
+  // Use GetBlock RPC endpoint for Base Mainnet
+  url: process.env.BASE_RPC_URL || undefined,
 };
 
 // HACK: Fix for Alchemy SDK "Referrer 'client' is not a valid URL" in Next.js Server
