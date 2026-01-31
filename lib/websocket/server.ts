@@ -94,7 +94,7 @@ async function startWhaleActivityMonitor() {
       });
 
       // Broadcast to relevant subscribers
-      activities.forEach(activity => {
+      for (const activity of activities) {
         const room = `wallet:${activity.walletAddress.toLowerCase()}`;
         io?.to(room).emit('whale-activity', {
           id: activity.id,
@@ -113,7 +113,37 @@ async function startWhaleActivityMonitor() {
           walletAddress: activity.walletAddress,
           ...activity,
         });
-      });
+
+        // ============================================
+        // [NEW] AUTOMATED TELEGRAM ROUTING
+        // ============================================
+        const subscribers = await prisma.userSettings.findMany({
+          where: {
+            telegramEnabled: true,
+            telegramChatId: { not: null },
+          }
+        });
+
+        const { formatWhaleAlertTelegram, sendTelegramMessage } = await import('../telegramBot');
+        
+        const messageText = formatWhaleAlertTelegram({
+          address: activity.walletAddress,
+          type: activity.type,
+          amount: Number(activity.usdValue),
+          token: activity.token,
+          txHash: activity.transactionHash,
+        });
+
+        for (const sub of subscribers) {
+          if (sub.telegramChatId) {
+            await sendTelegramMessage({
+              chatId: sub.telegramChatId,
+              text: messageText,
+              threadId: sub.telegramTopicId || undefined,
+            });
+          }
+        }
+      }
     } catch (error) {
       console.error('[WebSocket] Activity monitor error:', error);
     }

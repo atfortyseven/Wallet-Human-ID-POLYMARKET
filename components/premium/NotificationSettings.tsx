@@ -135,37 +135,81 @@ export default function NotificationSettings() {
     }
   };
 
-  // Load from localStorage on mount
+  const [loading, setLoading] = useState(true);
+
+  // Load from database on mount
   useEffect(() => {
-    const savedChannels = localStorage.getItem('vip_notification_channels');
-    const savedAlerts = localStorage.getItem('vip_alert_types');
-    
-    if (savedChannels) {
-      // Merge saved config with default structure (to keep icons/functions)
-      const parsed = JSON.parse(savedChannels);
-      setChannels(prev => prev.map(ch => {
-        const saved = parsed.find((p: any) => p.id === ch.id);
-        return saved ? { ...ch, enabled: saved.enabled, config: saved.config, status: saved.status } : ch;
-      }));
+    async function loadSettings() {
+      try {
+        const response = await fetch('/api/user/settings/notifications');
+        const data = await response.json();
+        
+        if (data.settings) {
+          const s = data.settings;
+          setChannels(prev => prev.map(ch => {
+            if (ch.id === 'telegram') {
+              return { 
+                ...ch, 
+                enabled: s.telegramEnabled || false, 
+                config: { 
+                  chatId: String(s.telegramChatId || ''), 
+                  topicId: String(s.telegramTopicId || ''),
+                  username: String(s.telegramUsername || '') 
+                },
+                status: s.telegramChatId ? 'connected' : 'disconnected'
+              } as NotificationChannel;
+            }
+            if (ch.id === 'email') {
+              return { 
+                ...ch, 
+                enabled: s.emailNotifications || false, 
+                config: { address: String(s.emailAddress || '') } 
+              } as NotificationChannel;
+            }
+            return ch;
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-    
-    if (savedAlerts) {
-      setAlertTypes(JSON.parse(savedAlerts));
-    }
+    loadSettings();
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem('vip_notification_channels', JSON.stringify(channels));
-    localStorage.setItem('vip_alert_types', JSON.stringify(alertTypes));
-    
-    // Show toast feedback (simulated)
-    const button = document.getElementById('save-settings-btn');
-    if (button) {
-      const originalText = button.innerHTML;
-      button.innerHTML = '✅ Saved Successfully!';
-      setTimeout(() => {
-        button.innerHTML = originalText;
-      }, 2000);
+  const handleSave = async () => {
+    const telegram = channels.find(c => c.id === 'telegram');
+    const email = channels.find(c => c.id === 'email');
+
+    try {
+      const response = await fetch('/api/user/settings/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegramEnabled: telegram?.enabled,
+          telegramChatId: telegram?.config.chatId,
+          telegramTopicId: telegram?.config.topicId,
+          telegramUsername: telegram?.config.username,
+          whaleThreshold: Number(alertTypes.whaleMovement.threshold),
+          emailNotifications: email?.enabled,
+        }),
+      });
+
+      if (response.ok) {
+        const button = document.getElementById('save-settings-btn');
+        if (button) {
+          const originalText = button.innerHTML;
+          button.innerHTML = '✅ Saved Successfully!';
+          setTimeout(() => {
+            button.innerHTML = originalText;
+          }, 2000);
+        }
+      } else {
+        throw new Error('Save failed');
+      }
+    } catch (error) {
+      alert('Failed to save settings to cloud.');
     }
   };
 

@@ -623,6 +623,13 @@ model UserSettings {
   pushNotifications  Boolean @default(true)
   transactionAlerts  Boolean @default(true)
   marketingEmails    Boolean @default(false)
+  
+  // Telegram Settings
+  telegramEnabled    Boolean @default(false)
+  telegramChatId     String?
+  telegramTopicId    String?
+  telegramUsername   String?
+  whaleThreshold     Float   @default(50000)
 
   // Trading
   defaultSlippage     Float   @default(0.5)
