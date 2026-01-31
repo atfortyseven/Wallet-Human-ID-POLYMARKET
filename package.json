@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "build:railway": "npx prisma generate && npx prisma migrate deploy && next build",
+    "build:railway": "prisma generate && next build",
     "build:contracts": "hardhat compile",
     "build:extension": "node scripts/extension-build.js",
-    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
+    "start": "prisma migrate deploy && next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "next lint",
     "audit": "slither . --print human-summary",
     "migrate:deploy": "prisma migrate deploy",
