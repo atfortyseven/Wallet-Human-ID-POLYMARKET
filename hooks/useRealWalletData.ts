@@ -3,41 +3,50 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { matchNewsToMarket } from '@/utils/news-matcher';
 import { NewsItem, Position, Transaction } from '@/types/wallet';
+import { useAuth } from '@/hooks/useAuth';
 
 // Dirección de Bridged USDC en Polygon
 const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 
 export const useRealWalletData = (recentNews: NewsItem[] = []) => {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected: isWeb3Connected } = useAccount();
+    const { isAuthenticated } = useAuth();
+    
+    // Unified connection state
+    const isConnected = isWeb3Connected || isAuthenticated;
+    
+    // Use real address if web3, or a placeholder/virtual address if only web2
+    // In a real implementation, we might fetch a generated wallet address from the backend for web2 users
+    const effectiveAddress = address || (isAuthenticated ? '0xVirtual...Human' : undefined);
 
     // 1. On-Chain Balance (Wagmi ya maneja su propio caché/reactividad)
     const { data: balanceData, isLoading: isBalanceLoading } = useBalance({
-        address,
+        address: effectiveAddress,
         token: USDC_ADDRESS,
         chainId: 137, // Polygon
         query: {
-            enabled: !!address, // Solo ejecutar si hay address
+            enabled: !!effectiveAddress, // Solo ejecutar si hay address
         }
     });
 
     // 2. Posiciones Off-Chain (Vía nuestro Proxy)
     const { data: positionsRaw, isLoading: isPositionsLoading } = useQuery({
-        queryKey: ['positions', address],
+        queryKey: ['positions', effectiveAddress],
         queryFn: async () => {
-            const { data } = await axios.get(`/api/wallet/positions?userAddress=${address}`);
+            const { data } = await axios.get(`/api/wallet/positions?userAddress=${effectiveAddress}`);
             return data;
         },
-        enabled: !!address,
+        enabled: !!effectiveAddress,
     });
 
     // 3. Historial (History) - Off-Chain
     const { data: historyRaw, isLoading: isHistoryLoading } = useQuery({
-        queryKey: ['history', address],
+        queryKey: ['history', effectiveAddress],
         queryFn: async () => {
-            const { data } = await axios.get(`/api/wallet/history?userAddress=${address}`);
+            const { data } = await axios.get(`/api/wallet/history?userAddress=${effectiveAddress}`);
             return data;
         },
-        enabled: !!address,
+        enabled: !!effectiveAddress,
     });
 
 
@@ -84,7 +93,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = []) => {
     const totalNetWorth = usdcBalance + portfolioValue;
 
     return {
-        address,
+        address: effectiveAddress,
         isConnected,
         usdcBalance: usdcBalance.toFixed(2),
         portfolioValue: portfolioValue.toFixed(2),

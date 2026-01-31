@@ -21,6 +21,7 @@ export default function SuperWallet({ recentNews = [] }: { recentNews?: any[] })
         address
     } = useRealWalletData(recentNews);
 
+    // Unified connection check (already handles both web3 and auth in the hook)
     if (!isConnected) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[80vh] bg-neutral-950 text-white p-6">
