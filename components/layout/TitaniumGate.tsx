@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IntroSequence } from '@/components/intro/IntroSequence';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -23,19 +23,42 @@ interface TitaniumGateProps {
 }
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
-    // ALWAYS start at INTRO - NO EXCEPTIONS
-    // Users MUST go through the full flow: INTRO -> AUTH -> APP
+    const { isAuthenticated, isLoading } = useAuth();
     const [state, setState] = useState<GateState>('INTRO');
     const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
+
+    useEffect(() => {
+        // Si el usuario ya está autenticado (tiene sesión activa), saltar directamente a APP
+        // La animación SOLO se muestra la primera vez antes del primer login
+        if (!isLoading) {
+            if (isAuthenticated) {
+                // Usuario tiene sesión activa = Saltar intro y auth
+                setState('APP');
+                setHasPlayedIntro(true);
+            } else {
+                // Usuario nuevo o sin sesión = Mostrar intro
+                setState('INTRO');
+            }
+        }
+    }, [isAuthenticated, isLoading]);
 
     const handleIntroComplete = () => {
         setHasPlayedIntro(true);
         setState('AUTH');
     };
 
+    // Mientras se verifica la sesión, mostrar un simple loader
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 bg-black flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full animate-ping" />
+            </div>
+        );
+    }
+
     return (
         <GateStateContext.Provider value={{ state, hasPlayedIntro }}>
-            {/* 1. INTRO SEQUENCE */}
+            {/* 1. INTRO SEQUENCE - Solo si NO está autenticado */}
             {state === 'INTRO' && (
                 <IntroSequence onComplete={handleIntroComplete} />
             )}
@@ -44,11 +67,6 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             {state === 'AUTH' && (
                 <>
                     <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
-                        {/* Renamed check to ensure import validity (it's imported as FluidBeigeBackground in page.tsx, likely need to move or import here if not passed). 
-                            Actually, TitaniumGate wraps page content. Page.tsx has the background inside APP state.
-                            TitaniumGate needs its own background for the AUTH state if page.tsx one is hidden.
-                            Let's assume FluidBeigeBackground is available or we use a simple beige div.
-                        */}
                         <div className="absolute inset-0 bg-[#F5F5DC]" /> 
                     </div>
                     <AuthModal onAuthenticated={() => setState('APP')} />

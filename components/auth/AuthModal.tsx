@@ -122,7 +122,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                     return;
                 }
 
-                localStorage.setItem('auth_token', data.token);
+                // No need to store token in localStorage - server sets httpOnly cookies
                 setIsLoading(false);
                 toast.success('Account created!');
                 onAuthenticated();
@@ -142,7 +142,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                     return;
                 }
 
-                localStorage.setItem('auth_token', data.token);
+                // No need to store token in localStorage - server sets httpOnly cookies
                 setIsLoading(false);
                 toast.success('Welcome back!');
                 onAuthenticated();

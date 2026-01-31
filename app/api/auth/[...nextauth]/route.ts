@@ -10,6 +10,20 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt" as const,
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+    updateAge: 24 * 60 * 60,  // Refresh session every 24 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: 'human.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: '/',
+      }
+    }
   },
   pages: {
     signIn: '/', // Redirect to home page with AuthModal

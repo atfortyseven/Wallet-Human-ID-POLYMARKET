@@ -41,10 +41,21 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Generate JWT
-    const token = createJWT(user.id, user.email);
+    // Generate access and refresh tokens
+    const userAgent = request.headers.get('user-agent') || '';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    
+    const { createAccessToken, createRefreshToken, setSessionCookies, generateFingerprint } = await import('@/lib/session');
+    const fingerprint = generateFingerprint(userAgent, ip);
+    
+    const accessToken = await createAccessToken(user.id, user.email, fingerprint);
+    const refreshToken = await createRefreshToken(user.id, user.email, fingerprint);
 
-    // Set HTTP-only cookie
+    // Set secure httpOnly cookies
+    await setSessionCookies(accessToken, refreshToken);
+
+    // Also set legacy auth_token for backward compatibility (will be removed later)
+    const token = createJWT(user.id, user.email);
     const cookieStore = await cookies();
     cookieStore.set('auth_token', token, {
       httpOnly: true,

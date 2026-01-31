@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { PrismaClient } from "@prisma/client";
+import { clearSessionCookies } from "@/lib/session";
 
 const JWT_SECRET = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-prod";
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("auth_token");
 
     if (token) {
@@ -30,8 +31,10 @@ export async function POST(request: NextRequest) {
         }
     }
 
-    // Clear auth cookie
-    cookies().set("auth_token", "", {
+    // Clear all session cookies (legacy + new dual-token system)
+    await clearSessionCookies();
+    
+    cookieStore.set("auth_token", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: 'lax',
