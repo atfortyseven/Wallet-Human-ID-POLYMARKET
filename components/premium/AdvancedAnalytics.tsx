@@ -59,55 +59,6 @@ export default function AdvancedAnalytics({ walletAddress, isPremium }: Advanced
     { date: 'Jan 31', value: portfolioData.totalValue, pnl: 0, activity: portfolioData.activity24h, risk: portfolioData.riskScore },
   ];
 
-  const tokenDistribution = [
-    { name: 'ETH', value: 45, color: '#627EEA' },
-    { name: 'USDC', value: 25, color: '#2775CA' },
-    { name: 'WBTC', value: 15, color: '#F7931A' },
-    { name: 'AAVE', value: 8, color: '#B6509E' },
-    { name: 'UNI', value: 5, color: '#FF007A' },
-    { name: 'Others', value: 2, color: '#8B8B8B' },
-  ];
-
-  const profitableTokens = [
-    { token: 'AAVE', profit: 245000, percentage: 125, trades: 8 },
-    { token: 'UNI', profit: 180000, percentage: 95, trades: 12 },
-    { token: 'LINK', profit: 125000, percentage: 68, trades: 6 },
-    { token: 'SNX', profit: -45000, percentage: -22, trades: 4 },
-    { token: 'CRV', profit: -18000, percentage: -8, trades: 3 },
-  ];
-
-  const riskMetrics = {
-    diversification: 72,
-    volatility: 45,
-    liquidityRisk: 28,
-    smartContractRisk: 15,
-    overallRisk: 40,
-  };
-
-  const aiInsights = [
-    {
-      type: 'bullish',
-      priority: 'high',
-      title: 'Strong Accumulation Pattern Detected',
-      description: 'Wallet has been consistently accumulating AAVE over the past 7 days. Historical data shows similar patterns preceded 40% price increases.',
-      confidence: 87,
-    },
-    {
-      type: 'warning',
-      priority: 'medium',
-      title: 'High Concentration Risk',
-      description: '45% of portfolio in ETH. Consider diversification to reduce volatility exposure.',
-      confidence: 92,
-    },
-    {
-      type: 'opportunity',
-      priority: 'high',
-      title: 'Optimal Exit Window Approaching',
-      description: 'UNI position up 95%. Historical profit-taking patterns suggest selling in next 48-72h.',
-      confidence: 78,
-    },
-  ];
-
   const formatValue = (val: number) => {
     if (val >= 1e9) return `$${(val / 1e9).toFixed(2)}B`;
     if (val >= 1e6) return `$${(val / 1e6).toFixed(2)}M`;
@@ -229,157 +180,42 @@ export default function AdvancedAnalytics({ walletAddress, isPremium }: Advanced
         </ResponsiveContainer>
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Token Distribution */}
-        <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1F1F1F]/10">
-          <h3 className="text-lg font-black text-[#1F1F1F] mb-4">Token Distribution</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={tokenDistribution}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={90}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {tokenDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(255,255,255,0.95)',
-                  border: '1px solid #1F1F1F20',
-                  borderRadius: '12px',
-                  padding: '8px',
-                }}
-                formatter={(value: any) => `${value}%`}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {tokenDistribution.map((token) => (
-              <div key={token.name} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: token.color }} />
-                <span className="text-xs font-bold text-[#1F1F1F]">{token.name}</span>
-                <span className="text-xs text-[#1F1F1F]/70 ml-auto">{token.value}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* FAKE DATA SECTIONS REMOVED - User requested only real blockchain data */}
+      {/*
+      Previously displayed here:
+      - Token Distribution pie chart (hardcoded percentages)
+      - Risk Analysis metrics (fake scores)
+      - Top Performing Tokens (fake P&L numbers)
+      - AI-Powered Insights (hardcoded marketing text)
+      
+      All removed to show only real data from blockchain.
+      */}
 
-        {/* Risk Analysis */}
-        <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1F1F1F]/10">
-          <h3 className="text-lg font-black text-[#1F1F1F] mb-4">Risk Analysis</h3>
-          <div className="space-y-4">
-            <RiskBar label="Diversification" value={riskMetrics.diversification} type="good" />
-            <RiskBar label="Volatility" value={riskMetrics.volatility} type="warning" />
-            <RiskBar label="Liquidity Risk" value={riskMetrics.liquidityRisk} type="good" />
-            <RiskBar label="Smart Contract Risk" value={riskMetrics.smartContractRisk} type="good" />
-            <div className="pt-4 border-t border-[#1F1F1F]/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-[#1F1F1F]">Overall Risk Score</span>
-                <span className={`text-2xl font-black ${
-                  riskMetrics.overallRisk < 30 ? 'text-green-600' :
-                  riskMetrics.overallRisk < 60 ? 'text-yellow-600' : 'text-red-600'
-                }`}>
-                  {riskMetrics.overallRisk}/100
-                </span>
-              </div>
-              <div className="h-3 bg-[#1F1F1F]/10 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${riskMetrics.overallRisk}%` }}
-                  transition={{ duration: 1, ease: 'easeOut' }}
-                  className={`h-full ${
-                    riskMetrics.overallRisk < 30 ? 'bg-green-600' :
-                    riskMetrics.overallRisk < 60 ? 'bg-yellow-600' : 'bg-red-600'
-                  }`}
-                />
-              </div>
+      {/* Real Data Notice */}
+      <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
+        <div className="flex items-start gap-3">
+          <Zap className="text-green-600 flex-shrink-0 mt-0.5" size={24} />
+          <div>
+            <h4 className="font-bold text-green-900 mb-2">✅ 100% Real Blockchain Data</h4>
+            <p className="text-sm text-green-800 mb-3">
+              All metrics shown above are fetched directly from **Base Mainnet** via Alchemy API. 
+              Values update automatically every 60 seconds.
+            </p>
+            <div className="bg-white rounded-lg p-3 mb-3">
+              <div className="text-xs font-bold text-green-900 mb-2">Real Data Sources:</div>
+              <ul className="text-xs text-green-800 space-y-1">
+                <li>• Total Value: ETH + Token balances from blockchain</li>
+                <li>• 24h Activity: Actual transaction count from last 24h</li>
+                <li>• Portfolio Chart: Based on current portfolio value</li>
+                <li>• Network: Base Mainnet (Chain ID: 8453)</li>
+              </ul>
+            </div>
+            <div className="text-xs text-green-700">
+              <strong>Note:</strong> Historical data is estimated based on current values. 
+              For accurate historical P&L, price data from CoinGecko would be needed.
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Profitable Tokens */}
-      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1F1F1F]/10">
-        <h3 className="text-lg font-black text-[#1F1F1F] mb-4">Top Performing Tokens</h3>
-        <div className="space-y-3">
-          {profitableTokens.map((token, index) => (
-            <motion.div
-              key={token.token}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-4 p-3 bg-white/50 rounded-xl"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-black">
-                {token.token[0]}
-              </div>
-              <div className="flex-1">
-                <div className="font-bold text-[#1F1F1F]">{token.token}</div>
-                <div className="text-xs text-[#1F1F1F]/60">{token.trades} trades</div>
-              </div>
-              <div className="text-right">
-                <div className={`font-black ${token.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {token.profit >= 0 ? '+' : ''}{formatValue(token.profit)}
-                </div>
-                <div className={`text-sm font-bold ${token.percentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {token.percentage >= 0 ? '+' : ''}{token.percentage}%
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* AI Insights */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Brain className="text-purple-600" />
-          <h3 className="text-lg font-black text-[#1F1F1F]">AI-Powered Insights</h3>
-          <span className="px-2 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded-full">
-            BETA
-          </span>
-        </div>
-        
-        {aiInsights.map((insight, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15 }}
-            className={`p-4 rounded-xl border-l-4 ${
-              insight.type === 'bullish' ? 'bg-green-50 border-green-500' :
-              insight.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
-              'bg-blue-50 border-blue-500'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                    insight.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
-                    {insight.priority.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-[#1F1F1F]/60">
-                    {insight.confidence}% confidence
-                  </span>
-                </div>
-                <h4 className="font-black text-[#1F1F1F] mb-1">{insight.title}</h4>
-                <p className="text-sm text-[#1F1F1F]/70">{insight.description}</p>
-              </div>
-              {insight.type === 'bullish' && <TrendingUp className="text-green-600" size={24} />}
-              {insight.type === 'warning' && <AlertTriangle className="text-yellow-600" size={24} />}
-              {insight.type === 'opportunity' && <Zap className="text-blue-600" size={24} />}
-            </div>
-          </motion.div>
-        ))}
       </div>
     </div>
   );
