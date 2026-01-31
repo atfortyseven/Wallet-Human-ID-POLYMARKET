@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -21,9 +20,13 @@ export default function SoportePage() {
         setIsSending(true);
 
         try {
-            // Mock submission for now (until API is ready)
-            // await fetch('/api/support', { method: 'POST', body: JSON.stringify({ message, section }) });
-            await new Promise(r => setTimeout(r, 1500)); // Simulate delay
+            const response = await fetch('/api/support', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, section }) 
+            });
+
+            if (!response.ok) throw new Error('Failed to send');
             
             setSent(true);
             toast.success("Message received by the Void.");
@@ -33,6 +36,7 @@ export default function SoportePage() {
             setTimeout(() => setSent(false), 3000);
 
         } catch (error) {
+            console.error(error);
             toast.error("Failed to transmit to the Void.");
         } finally {
             setIsSending(false);

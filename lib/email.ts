@@ -164,3 +164,62 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
     // Don't throw, just log
   }
 }
+
+/**
+ * Send support message to admin
+ */
+export async function sendSupportEmail(message: string, section: string, senderEmail?: string): Promise<void> {
+  const adminEmail = 'josejordan20222@gmail.com';
+  
+  try {
+    const result = await resend.emails.send({
+      from: 'HumanDefi Support <noreply@humanidfi.com>',
+      to: adminEmail,
+      replyTo: senderEmail || 'noreply@humanidfi.com',
+      subject: `[Support - ${section.toUpperCase()}] New Message from The Void`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+            .meta { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+            .message { background: #f9f9f9; padding: 20px; border-left: 4px solid #333; font-size: 1.1em; white-space: pre-wrap; }
+            .footer { margin-top: 30px; font-size: 0.8em; color: #888; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h2>New Support Message</h2>
+            </div>
+            
+            <div class="meta">
+              <p><strong>Category:</strong> ${section.toUpperCase()}</p>
+              <p><strong>From:</strong> ${senderEmail || 'Anonymous User'}</p>
+              <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+            </div>
+
+            <div class="message">
+              ${message}
+            </div>
+
+            <div class="footer">
+              <p>Sent via HumanDefi Support Interface</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+    
+    console.log(`[Email] Support message forwarded to ${adminEmail}`, result.data ? { id: result.data.id } : {});
+    
+  } catch (error: any) {
+    console.error(`[Email] Failed to forward support message:`, error?.message || error);
+    throw new Error(`Support email failed: ${error?.message || 'Unknown error'}`);
+  }
+}
