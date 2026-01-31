@@ -194,21 +194,6 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                 onSubmit={handleEmailSubmit}
                                 className="space-y-5"
                             >
-                                {/* PRIMARY: Google Sign-In */}
-                                <button 
-                                    type="button"
-                                    onClick={handleGoogleSignIn}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-200"
-                                >
-                                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6 bg-white rounded p-0.5" alt="Google" />
-                                    Continue with Google
-                                </button>
-
-                                <div className="relative py-3">
-                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200"></div></div>
-                                    <div className="relative flex justify-center text-xs uppercase font-bold"><span className="bg-white px-4 text-neutral-400">Or use email</span></div>
-                                </div>
-
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 ml-1">Email</label>
                                     <div className="relative group">
@@ -219,6 +204,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                             onChange={(e) => setEmail(e.target.value)}
                                             className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
                                             placeholder="name@example.com"
+                                            autoFocus
                                         />
                                         <Mail size={18} className="absolute right-4 top-4 text-neutral-400 group-focus-within:text-blue-500 transition-colors" />
                                     </div>
@@ -230,6 +216,20 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                     className="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-neutral-200"
                                 >
                                     {isLoading ? <Loader2 className="animate-spin" /> : "Continue"}
+                                </button>
+
+                                <div className="relative py-2">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200"></div></div>
+                                    <div className="relative flex justify-center text-xs uppercase font-bold"><span className="bg-white px-3 text-neutral-400">Or continue with</span></div>
+                                </div>
+
+                                <button 
+                                    type="button"
+                                    onClick={handleGoogleSignIn}
+                                    className="w-full bg-white border border-neutral-200 text-neutral-700 font-bold py-3.5 rounded-xl hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3"
+                                >
+                                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+                                    Google Account
                                 </button>
                             </motion.form>
                         )}
