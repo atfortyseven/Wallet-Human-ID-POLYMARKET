@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { generateVerificationCode } from '@/lib/auth';
 import { sendVerificationEmail } from '@/lib/email';
-
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +17,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create temporary user record (will be completed after verification)
-    const user = await prisma.authUser.create({
-      data: {
+    console.log(`[Auth] Attempting to send code to: ${email}`);
+
+    // Create or update AuthUser
+    // We use upsert to handle cases where the user might already exist but not be verified
+    const user = await prisma.authUser.upsert({
+      where: { email },
+      update: {},
+      create: {
         email,
-        passwordHash: '', // Will be set after verification
+        passwordHash: '',
         verified: false
       }
     });
@@ -41,7 +44,14 @@ export async function POST(request: NextRequest) {
     });
 
     // Send verification email
-    await sendVerificationEmail(email, code);
+    try {
+        await sendVerificationEmail(email, code);
+        console.log(`[Auth] Code sent successfully to: ${email}`);
+    } catch (emailError: any) {
+        console.error('[Auth] Failed to send email via Resend:', emailError?.message || emailError);
+        // We throw to catch it in the outer block and return 500
+        throw new Error(`Email sending failed: ${emailError?.message || 'Unknown error'}`);
+    }
 
     return NextResponse.json({
       success: true,
@@ -49,10 +59,10 @@ export async function POST(request: NextRequest) {
       userId: user.id
     });
 
-  } catch (error) {
-    console.error('Send code error:', error);
+  } catch (error: any) {
+    console.error('[Auth] Send code general error:', error);
     return NextResponse.json(
-      { error: 'Failed to send code' },
+      { error: error.message || 'Failed to send code' },
       { status: 500 }
     );
   }
