@@ -2,7 +2,7 @@
 
 import { HumanDefiFooter } from "@/components/landing/HumanDefiFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useLanguage } from '@/src/context/LanguageContext';
 
 export default function DeveloperPage() {
   const { t } = useLanguage();

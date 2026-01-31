@@ -1,8 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import { LanguageProvider } from '@/components/providers/LanguageProvider'
+import Providers from "@/components/Providers";
 import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -19,21 +18,14 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <LanguageProvider>
-              {children}
-              <Toaster position="top-right" />
-            </LanguageProvider>
-          </ThemeProvider>
-        </body>
-      </html>
+      <Providers>
+        <html lang="en" suppressHydrationWarning>
+          <body className={inter.className}>
+                {children}
+                <Toaster position="top-right" />
+          </body>
+        </html>
+      </Providers>
     </ClerkProvider>
   )
 }

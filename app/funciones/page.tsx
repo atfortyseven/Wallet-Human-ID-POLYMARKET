@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { HumanDefiFooter } from '@/components/landing/HumanDefiFooter';
 import { Shield, Zap, Globe, Lock, Coins, Vote } from 'lucide-react';
-import { useLanguage } from '@/components/providers/LanguageProvider';
+import { useLanguage } from '@/src/context/LanguageContext';
 
 export default function FuncionesPage() {
     const { t } = useLanguage();

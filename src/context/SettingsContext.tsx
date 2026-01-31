@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import { dictionary } from '@/src/lib/dictionary';
 
 // --- TYPES ---
@@ -95,8 +95,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         security: true
     });
 
-    // --- NEXT AUTH ---
-    const { data: session } = useSession();
+    // --- CLERK AUTH ---
+    const { user } = useUser();
+    const session = { user };
 
     // --- LOAD SETTINGS (Hybrid: Local + Cloud) ---
     useEffect(() => {

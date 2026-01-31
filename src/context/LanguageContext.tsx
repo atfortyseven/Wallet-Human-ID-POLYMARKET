@@ -40,9 +40,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return translations[language][key] || translations['en'][key] || key;
     };
 
-    if (!mounted) {
-        return <>{children}</>; // Render children without context initially to avoid hydration mismatch, or better yet, just render with default
-    }
+    // We must render the provider even if not mounted, otherwise components using useLanguage will fail during SSR/Build
+    // if (!mounted) {
+    //    return <>{children}</>; 
+    // }
 
     return (
         <LanguageContext.Provider value={{ language, setLanguage, t, toggleLanguage }}>

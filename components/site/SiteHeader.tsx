@@ -9,7 +9,7 @@ import { useAccount } from 'wagmi';
 import { useGateState } from '@/components/layout/TitaniumGate';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NotificationsMenu } from '@/components/notifications/NotificationsMenu';
-import { useLanguage } from '@/components/providers/LanguageProvider';
+import { useLanguage } from '@/src/context/LanguageContext';
 
 export function SiteHeader() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -1,15 +1,11 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { LanguageProvider } from "@/src/context/LanguageContext";
 import { State } from "wagmi";
 import { SettingsProvider } from "@/src/context/SettingsContext";
 import { AppProvider } from "@/components/AppContext";
-import dynamic from 'next/dynamic';
-
-const ClientWeb3Provider = dynamic(() => import('@/components/ClientWeb3Provider'), {
-    ssr: true // Enable SSR so context exists during build
-});
+import ClientWeb3Provider from '@/components/ClientWeb3Provider';
 
 export default function Providers({ children, initialState }: { children: React.ReactNode, initialState?: State }) {
     return (

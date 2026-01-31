@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 
 interface CSRFHook {
   token: string | null;
@@ -11,7 +11,8 @@ interface CSRFHook {
 }
 
 export function useCSRFToken(): CSRFHook {
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const session = { user };
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -126,7 +127,8 @@ interface PremiumGuard {
 }
 
 export function usePremiumGuard(): PremiumGuard {
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const session = { user };
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -251,7 +253,8 @@ export function logUserActivity(action: string) {
 // ============================================
 
 export function useAutoLogout(timeoutMinutes: number = 30) {
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const session = { user };
 
   useEffect(() => {
     if (!session) return;
