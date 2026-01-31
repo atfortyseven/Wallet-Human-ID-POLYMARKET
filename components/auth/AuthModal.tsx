@@ -214,7 +214,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                 </div>
 
                 <div className="p-10 pt-6">
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence mode="wait" initial={false}>
                         {/* Step 1: Email */}
                         {step === 'email' && (
                             <motion.form 

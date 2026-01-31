@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IntroSequence } from '@/components/intro/IntroSequence';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { SafeErrorBoundary } from '@/components/ui/SafeErrorBoundary';
 import { createContext, useContext } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -69,7 +70,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
                         <div className="absolute inset-0 bg-[#F5F5DC]" /> 
                     </div>
-                    <AuthModal onAuthenticated={() => setState('APP')} />
+                    <SafeErrorBoundary fallback={<div className="p-10 text-center text-red-600">Auth Error. Please Refresh.</div>}>
+                        <AuthModal onAuthenticated={() => setState('APP')} />
+                    </SafeErrorBoundary>
                 </>
             )}
 
@@ -82,7 +85,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     transition={{ duration: 1.5, ease: "easeOut" }}
                     className="relative z-10"
                 >
-                    {children}
+                    <SafeErrorBoundary>
+                        {children}
+                    </SafeErrorBoundary>
                 </motion.div>
             )}
         </GateStateContext.Provider>

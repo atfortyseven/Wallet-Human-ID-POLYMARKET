@@ -10,20 +10,32 @@ export default function GlobalError({
 }) {
     return (
         <html>
-            <body className="bg-black text-white flex items-center justify-center min-h-screen">
-                <div className="text-center p-8 space-y-4">
-                    <h2 className="text-3xl font-bold text-red-600">Critical System Error</h2>
-                    <p className="text-gray-400 font-mono">
-                        The integrity of the application has been compromised.
+            <body className="bg-neutral-900 text-white flex items-center justify-center min-h-screen font-sans">
+                <div className="text-center p-8 space-y-6 max-w-md">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
+                    
+                    <p className="text-neutral-400">
+                        We encountered an unexpected issue. Please try refreshing the page.
                     </p>
-                    <pre className="text-xs text-red-900/50 bg-black border border-red-900/20 p-4 rounded overflow-auto max-w-lg mx-auto">
-                        {error.message}
-                    </pre>
+
+                    {/* Only show technical details in development */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <pre className="text-xs text-left text-red-200 bg-red-900/20 p-4 rounded overflow-auto max-h-40 border border-red-500/20">
+                            {error.message}
+                        </pre>
+                    )}
+
                     <button
                         onClick={() => reset()}
-                        className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded"
+                        className="px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-neutral-200 transition-colors w-full"
                     >
-                        Reboot System
+                        Refresh Page
                     </button>
                 </div>
             </body>
