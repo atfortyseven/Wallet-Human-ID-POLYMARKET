@@ -23,17 +23,10 @@ interface TitaniumGateProps {
 }
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
-    // Always start at INTRO for the full cinematic experience
-    // BUT if already authenticated, we should respect that state
-    const { isAuthenticated, isLoading } = useAuth();
+    // ALWAYS start at INTRO - NO EXCEPTIONS
+    // Users MUST go through the full flow: INTRO -> AUTH -> APP
     const [state, setState] = useState<GateState>('INTRO');
     const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
-
-    React.useEffect(() => {
-        if (!isLoading && isAuthenticated && state !== 'APP') {
-            setState('APP');
-        }
-    }, [isAuthenticated, isLoading, state]);
 
     const handleIntroComplete = () => {
         setHasPlayedIntro(true);
