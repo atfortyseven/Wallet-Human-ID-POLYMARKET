@@ -66,51 +66,67 @@ export default function WhaleTracker({ isPremium: _propIsPremium, onUpgrade }: W
     }
   }, [isPremium]);
 
-  // Keep mock wallets for now as they are "Watched" list
-  useEffect(() => {
-    const mockWallets: WatchedWallet[] = [
+  // Initial "Watched" list skeletons
+  const INITIAL_WALLETS = [
       {
         id: '1',
         address: '0x28C6c06298d514Db089934071355E5743bf21d60',
         label: 'Binance Hot Wallet',
         tags: ['Exchange', 'Whale'],
-        isWhale: true,
-        isSmart: false,
-        totalValue: 1250000000,
-        change24h: 2.5,
-        lastActive: new Date(),
-        alertsEnabled: true
       },
       {
         id: '2',
-        address: '0xab5801a7d398351b8be11c439e05c5b3259aec9b',
-        label: 'Vitalik Buterin',
+        address: '0xab5801a7d398351b8be11c439e05c5b3259aec9b', // Vitalik's address (Example)
+        label: 'Vitalik Buterin', 
         tags: ['Founder', 'Smart Money'],
-        isWhale: true,
-        isSmart: true,
-        totalValue: 450000000,
-        change24h: -1.2,
-        lastActive: new Date(Date.now() - 3600000),
-        alertsEnabled: true
       },
       {
         id: '3',
-        address: '0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503',
-        label: 'DeFi Whale #47',
-        tags: ['DeFi', 'Whale', 'Yield Farmer'],
-        isWhale: true,
-        isSmart: true,
-        totalValue: 85000000,
-        change24h: 8.7,
-        lastActive: new Date(Date.now() - 1800000),
-        alertsEnabled: true
+        address: '0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503', // Random DeFi user
+        label: 'DeFi User',
+        tags: ['DeFi', 'Yield Farmer'],
       }
-    ];
+  ];
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+        const updatedWallets: WatchedWallet[] = [];
+
+        for (const w of INITIAL_WALLETS) {
+            try {
+                // Fetch real stats
+                const res = await fetch(`/api/whale/stats?address=${w.address}`);
+                const data = await res.json();
+                
+                updatedWallets.push({
+                    ...w,
+                    isWhale: data.isWhale || false,
+                    isSmart: data.totalValue > 1000000, 
+                    totalValue: data.totalValue || 0,
+                    change24h: (Math.random() * 10) - 5, // Change is hard to calc without history, simulate for now
+                    lastActive: new Date(),
+                    alertsEnabled: true
+                });
+
+            } catch (e) {
+                console.error("Error fetching wallet stats", w.address, e);
+                // Fallback if API fails
+                updatedWallets.push({
+                    ...w,
+                    isWhale: false,
+                    isSmart: false,
+                    totalValue: 0,
+                    change24h: 0,
+                    lastActive: new Date(),
+                    alertsEnabled: false
+                });
+            }
+        }
+        setWatchedWallets(updatedWallets);
+    };
 
     if (isPremium) {
-      setWatchedWallets(mockWallets);
-    } else {
-      setWatchedWallets(mockWallets.slice(0, 3));
+        fetchWalletData();
     }
   }, [isPremium]);
 
