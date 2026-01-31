@@ -11,7 +11,7 @@ import { useAppKitAccount, useAppKit } from '@reown/appkit/react';
 import { HumanDefiHeader } from '@/components/landing/HumanDefiHeader';
 import { LandingHero } from '@/components/landing/LandingHero';
 import FluidBeigeBackground from '@/components/layout/FluidBeigeBackground';
-import { TitaniumGate } from '@/components/layout/TitaniumGate';
+import { TitaniumGate, useGateState } from '@/components/layout/TitaniumGate';
 import { LenisProvider } from '@/components/creative/LenisProvider';
 import { LottieStack } from '@/components/creative/LottieStack';
 
@@ -54,6 +54,9 @@ export default function Home() {
     }
   }, []);
 
+  // Hook to check gate state
+  const gateState = useGateState();
+
   const handleStart = () => {
     setIsLoadingLobby(true);
     setTimeout(() => {
@@ -83,8 +86,8 @@ export default function Home() {
             ============================================ */}
             <div className="relative z-10 flex flex-col">
                 
-                {/* Header (Always Visible) */}
-                <HumanDefiHeader />
+                {/* Header (Only show after authentication) */}
+                {gateState === 'APP' && <HumanDefiHeader />}
 
                 {/* Loading Overlay */}
                 {isLoadingLobby && (

@@ -5,19 +5,23 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IntroSequence } from '@/components/intro/IntroSequence';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { createContext, useContext } from 'react';
+
+type GateState = 'INTRO' | 'AUTH' | 'APP';
+
+const GateStateContext = createContext<GateState>('INTRO');
+export const useGateState = () => useContext(GateStateContext);
 
 interface TitaniumGateProps {
     children: React.ReactNode;
 }
-
-type GateState = 'INTRO' | 'AUTH' | 'APP';
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
     // Always start at INTRO for the full cinematic experience
     const [state, setState] = useState<GateState>('INTRO');
 
     return (
-        <>
+        <GateStateContext.Provider value={state}>
             {/* 1. INTRO SEQUENCE */}
             {state === 'INTRO' && (
                 <IntroSequence onComplete={() => setState('AUTH')} />
@@ -50,6 +54,6 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     {children}
                 </motion.div>
             )}
-        </>
+        </GateStateContext.Provider>
     );
 }

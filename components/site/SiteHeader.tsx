@@ -9,6 +9,7 @@ import { SettingsModal } from '@/components/ui/SettingsModal';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { toast } from "sonner";
 import { useAccount } from 'wagmi';
+import { useGateState } from '@/components/layout/TitaniumGate';
 
 export function SiteHeader() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -55,6 +56,14 @@ export function SiteHeader() {
 
     // Determine if we are in "App Mode" (Logged in)
     const isAppMode = isConnected || isAuthenticated;
+    
+    // Check gate state to hide header during auth
+    const gateState = useGateState();
+    
+    // Don't render header during INTRO or AUTH states
+    if (gateState !== 'APP') {
+        return null;
+    }
 
     return (
         <>
@@ -75,7 +84,7 @@ export function SiteHeader() {
                         <nav className="hidden md:flex space-x-8 items-center">
                             {isAppMode ? (
                                 <>
-                                    <NavLink href="/feed" icon={<Globe size={16} />}>Feed</NavLink>
+                                    <NavLink href="/" icon={<Globe size={16} />}>Feed</NavLink>
                                     <NavLink href="/wallet" icon={<Wallet size={16} />}>Wallet</NavLink>
                                     <button 
                                         onClick={() => setIsSettingsOpen(true)}
@@ -162,7 +171,7 @@ export function SiteHeader() {
                         <div className="flex flex-col space-y-6 text-lg font-medium">
                             {isAppMode ? (
                                 <>
-                                    <Link href="/feed" className="hover:text-blue-400 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Link href="/" className="hover:text-blue-400 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                                         <Globe size={20} /> Feed
                                     </Link>
                                     <Link href="/wallet" className="hover:text-blue-400 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
