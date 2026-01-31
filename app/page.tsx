@@ -64,7 +64,8 @@ export default function Home() {
     }, 1000);
   };
 
-  const showLobby = isMounted && (isConnected || isAuthenticated);
+  // Always show the landing page - users can navigate to Wallet via the header menu
+  // const showLobby = isMounted && (isConnected || isAuthenticated);
 
   return (
     <TitaniumGate>
@@ -94,13 +95,8 @@ export default function Home() {
                    </div>
                 )}
 
-                {showLobby ? (
-                    <div key="lobby" className="pt-24 px-4 pb-20 min-h-screen animate-in fade-in duration-500">
-                        <WalletSection />
-                    </div>
-                ) : (
-                    <> {/* Added Fragment to wrap multiple top-level elements */}
-                    {/* SECTION 1: HERO (Critical for LCP - Largest Contentful Paint) */}
+                {/* Always show landing page - wallet access via menu */}
+                {/* SECTION 1: HERO (Critical for LCP - Largest Contentful Paint) */}
                     <section className="relative w-full h-[100dvh]">
                         <LandingHero onStart={handleStart} />
                     </section>
@@ -145,8 +141,6 @@ export default function Home() {
                             <HumanDefiFooter />
                         </div>
                     </section>
-                    </> // Added Fragment closing tag
-                )}
             </div>
         </main>
     </TitaniumGate>
