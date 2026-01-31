@@ -1,11 +1,20 @@
+-- CreateEnum
+CREATE TYPE "WalletTransactionType" AS ENUM ('SEND', 'RECEIVE', 'SWAP', 'CONTRACT', 'NFT_TRANSFER', 'STAKE', 'UNSTAKE');
+
+-- CreateEnum
+CREATE TYPE "WalletTransactionStatus" AS ENUM ('PENDING', 'CONFIRMED', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "WalletType" AS ENUM ('PRIMARY', 'DERIVED', 'IMPORTED', 'WATCH_ONLY', 'HARDWARE');
+
 -- AlterTable
-ALTER TABLE "AuthUser" ADD COLUMN "walletAddress" TEXT;
-ALTER TABLE "AuthUser" ADD COLUMN "encryptedMnemonic" TEXT;
-ALTER TABLE "AuthUser" ADD COLUMN "encryptedPrivateKey" TEXT;
-ALTER TABLE "AuthUser" ADD COLUMN "walletSalt" TEXT;
+ALTER TABLE "AuthUser" ADD COLUMN IF NOT EXISTS "walletAddress" TEXT;
+ALTER TABLE "AuthUser" ADD COLUMN IF NOT EXISTS "encryptedMnemonic" TEXT;
+ALTER TABLE "AuthUser" ADD COLUMN IF NOT EXISTS "encryptedPrivateKey" TEXT;
+ALTER TABLE "AuthUser" ADD COLUMN IF NOT EXISTS "walletSalt" TEXT;
 
 -- CreateTable
-CREATE TABLE "Transaction" (
+CREATE TABLE IF NOT EXISTS "Transaction" (
     "id" TEXT NOT NULL,
     "authUserId" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
@@ -26,7 +35,7 @@ CREATE TABLE "Transaction" (
 );
 
 -- CreateTable
-CREATE TABLE "AddressBookEntry" (
+CREATE TABLE IF NOT EXISTS "AddressBookEntry" (
     "id" TEXT NOT NULL,
     "authUserId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -43,7 +52,7 @@ CREATE TABLE "AddressBookEntry" (
 );
 
 -- CreateTable
-CREATE TABLE "Authenticator" (
+CREATE TABLE IF NOT EXISTS "Authenticator" (
     "id" TEXT NOT NULL,
     "credentialID" TEXT NOT NULL,
     "credentialPublicKey" TEXT NOT NULL,
@@ -59,7 +68,7 @@ CREATE TABLE "Authenticator" (
 );
 
 -- CreateTable
-CREATE TABLE "WalletAccount" (
+CREATE TABLE IF NOT EXISTS "WalletAccount" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "address" TEXT NOT NULL,
@@ -77,34 +86,49 @@ CREATE TABLE "WalletAccount" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AuthUser_walletAddress_key" ON "AuthUser"("walletAddress");
+CREATE UNIQUE INDEX IF NOT EXISTS "AuthUser_walletAddress_key" ON "AuthUser"("walletAddress");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transaction_hash_key" ON "Transaction"("hash");
-CREATE INDEX "Transaction_authUserId_timestamp_idx" ON "Transaction"("authUserId", "timestamp");
-CREATE INDEX "Transaction_hash_idx" ON "Transaction"("hash");
-CREATE INDEX "Transaction_chainId_idx" ON "Transaction"("chainId");
-CREATE INDEX "Transaction_type_idx" ON "Transaction"("type");
-CREATE INDEX "Transaction_status_idx" ON "Transaction"("status");
+CREATE UNIQUE INDEX IF NOT EXISTS "Transaction_hash_key" ON "Transaction"("hash");
+CREATE INDEX IF NOT EXISTS "Transaction_authUserId_timestamp_idx" ON "Transaction"("authUserId", "timestamp");
+CREATE INDEX IF NOT EXISTS "Transaction_hash_idx" ON "Transaction"("hash");
+CREATE INDEX IF NOT EXISTS "Transaction_chainId_idx" ON "Transaction"("chainId");
+CREATE INDEX IF NOT EXISTS "Transaction_type_idx" ON "Transaction"("type");
+CREATE INDEX IF NOT EXISTS "Transaction_status_idx" ON "Transaction"("status");
 
 -- CreateIndex
-CREATE INDEX "AddressBookEntry_authUserId_isFavorite_idx" ON "AddressBookEntry"("authUserId", "isFavorite");
-CREATE INDEX "AddressBookEntry_authUserId_label_idx" ON "AddressBookEntry"("authUserId", "label");
-CREATE UNIQUE INDEX "AddressBookEntry_authUserId_address_key" ON "AddressBookEntry"("authUserId", "address");
+CREATE INDEX IF NOT EXISTS "AddressBookEntry_authUserId_isFavorite_idx" ON "AddressBookEntry"("authUserId", "isFavorite");
+CREATE INDEX IF NOT EXISTS "AddressBookEntry_authUserId_label_idx" ON "AddressBookEntry"("authUserId", "label");
+CREATE UNIQUE INDEX IF NOT EXISTS "AddressBookEntry_authUserId_address_key" ON "AddressBookEntry"("authUserId", "address");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Authenticator_credentialID_key" ON "Authenticator"("credentialID");
-CREATE INDEX "Authenticator_userId_idx" ON "Authenticator"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Authenticator_credentialID_key" ON "Authenticator"("credentialID");
+CREATE INDEX IF NOT EXISTS "Authenticator_userId_idx" ON "Authenticator"("userId");
 
 -- CreateIndex
-CREATE INDEX "WalletAccount_userId_idx" ON "WalletAccount"("userId");
-CREATE UNIQUE INDEX "WalletAccount_userId_address_key" ON "WalletAccount"("userId", "address");
+CREATE INDEX IF NOT EXISTS "WalletAccount_userId_idx" ON "WalletAccount"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "WalletAccount_userId_address_key" ON "WalletAccount"("userId", "address");
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_authUserId_fkey" FOREIGN KEY ("authUserId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Transaction_authUserId_fkey') THEN
+        ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_authUserId_fkey" FOREIGN KEY ("authUserId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "Authenticator" ADD CONSTRAINT "Authenticator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Authenticator_userId_fkey') THEN
+        ALTER TABLE "Authenticator" ADD CONSTRAINT "Authenticator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "WalletAccount" ADD CONSTRAINT "WalletAccount_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'WalletAccount_userId_fkey') THEN
+        ALTER TABLE "WalletAccount" ADD CONSTRAINT "WalletAccount_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;

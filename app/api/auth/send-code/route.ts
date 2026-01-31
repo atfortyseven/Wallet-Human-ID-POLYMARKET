@@ -28,13 +28,6 @@ export async function POST(request: NextRequest) {
         email,
         passwordHash: '',
         verified: false
-      },
-      select: {
-        id: true,
-        email: true,
-        verified: true,
-        name: true,
-        // Exclude walletAddress to prevent schema mismatch error until migration runs
       }
     });
 
