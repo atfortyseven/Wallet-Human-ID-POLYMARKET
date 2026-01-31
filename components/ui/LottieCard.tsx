@@ -37,9 +37,9 @@ export default function LottieCard({
     <div 
       className={`
         group relative p-6 rounded-3xl 
-        bg-gradient-to-br from-white/5 to-white/[0.02]
+ 
+        bg-black
         border border-white/10
-        backdrop-blur-md
         hover:scale-[1.02] hover:border-white/20
         transition-all duration-300 ease-out
         cursor-pointer
@@ -50,10 +50,10 @@ export default function LottieCard({
       <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-all duration-500 pointer-events-none" />
       
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center">
+      <div className="relative z-10 flex flex-col items-center text-center justify-center h-full">
         
         {/* Lottie Animation */}
-        <div className={`${sizeClasses[lottieSize]} mb-4 flex items-center justify-center`}>
+        <div className={`${sizeClasses[lottieSize]} flex items-center justify-center scale-150`}>
           <LottieCanvas 
             src={lottieSrc}
             className="w-full h-full"
@@ -62,18 +62,7 @@ export default function LottieCard({
           />
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-black text-white mb-2 group-hover:text-indigo-200 transition-colors">
-          {title}
-        </h3>
-
-        {/* Subtitle */}
-        {subtitle && (
-          <p className="text-sm text-white/60 mb-4 leading-relaxed">
-            {subtitle}
-          </p>
-        )}
-
+        {/* Text removed as per user request */}
         {/* Additional content */}
         {children && (
           <div className="mt-4 w-full">
