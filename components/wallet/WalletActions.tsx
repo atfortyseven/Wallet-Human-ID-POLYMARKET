@@ -189,7 +189,7 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
                     <div className="px-4">
                         {!isConnected ? (
                              <div className="text-center py-16 text-neutral-400 text-sm">
-                                <p>Connect wallet to view tokens.</p>
+                                <p>Wallet connection required for token details.</p>
                             </div>
                         ) : isLoadingTokens ? (
                             <div className="flex justify-center py-20">
@@ -254,7 +254,7 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
                                     <div key={idx} className="bg-white border border-neutral-200 rounded-2xl p-4 hover:shadow-lg transition-all group">
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex items-center gap-2">
-                                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${pos.outcome === 'YES' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${pos.outcome === 'YES' ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}`}>
                                                     {pos.outcome}
                                                 </span>
                                                 <h4 className="font-bold text-sm text-neutral-900 line-clamp-1">{pos.marketTitle}</h4>
@@ -267,7 +267,7 @@ export function WalletActions({ positions = [], history = [] }: WalletActionsPro
                                                 <div className="font-mono font-bold text-neutral-900">${pos.value?.toFixed(2)}</div>
                                             </div>
                                             <div className="text-right">
-                                                <div className={`text-xs font-bold ${pos.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                <div className={`text-xs font-bold ${pos.pnl >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
                                                      {pos.pnl >= 0 ? '+' : ''}{pos.pnl?.toFixed(2)} ({pos.pnlPercent?.toFixed(1)}%)
                                                 </div>
                                                 <div className="text-[10px] text-neutral-400">{pos.shares?.toFixed(1)} Shares</div>

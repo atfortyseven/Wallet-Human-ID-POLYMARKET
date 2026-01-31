@@ -86,8 +86,7 @@ export default function Home() {
             ============================================ */}
             <div className="relative z-10 flex flex-col">
                 
-                {/* Header (Only show after authentication) */}
-                {gateState === 'APP' && <HumanDefiHeader />}
+                {/* HumanDefiHeader removed - SiteHeader is used globally in layout.tsx */}
 
                 {/* Loading Overlay */}
                 {isLoadingLobby && (

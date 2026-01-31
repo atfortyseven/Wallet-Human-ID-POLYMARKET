@@ -122,7 +122,7 @@ export function SiteHeader() {
                                                 disabled={isVerifying || isAuthenticated}
                                                 className={`p-2.5 rounded-full border transition-all ${
                                                     isAuthenticated
-                                                    ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400'
+                                                    ? 'bg-blue-500/10 border-blue-500/50 text-blue-400'
                                                     : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'
                                                 }`}
                                                 title={isAuthenticated ? "Verified Human" : "Verify World ID"}
@@ -146,7 +146,7 @@ export function SiteHeader() {
                             >
                                 {isConnected ? (
                                     <>
-                                        <span className="w-2 h-2 rounded-full bg-emerald-400 block" />
+                                        <span className="w-2 h-2 rounded-full bg-blue-400 block" />
                                         {address?.slice(0,6)}...{address?.slice(-4)}
                                     </>
                                 ) : "CONNECT"}

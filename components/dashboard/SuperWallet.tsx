@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Wallet, TrendingUp, Zap, Loader2 } from 'lucide-react';
-import { AccountSwitcher } from '@/components/wallet/AccountSwitcher';
 import { NetworkSelector } from '@/components/wallet/NetworkSelector';
 import { WalletActions } from '@/components/wallet/WalletActions';
 import { useRealWalletData } from '@/hooks/useRealWalletData';

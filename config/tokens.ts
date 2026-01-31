@@ -16,3 +16,19 @@ export const getUsdcAddress = (chainId: number): Address | undefined => {
 };
 
 export const WLD_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS || '0xdc6f18f83959cd25095c2453192f16d08b496666') as `0x${string}`;
+
+export const TOKENS_BY_CHAIN: Record<number, any[]> = {
+    [mainnet.id]: [
+        { symbol: 'USDC', name: 'USD Coin', address: USDC_ADDRESSES[mainnet.id], decimals: 6 },
+    ],
+    [base.id]: [
+        { symbol: 'USDC', name: 'USD Coin', address: USDC_ADDRESSES[base.id], decimals: 6 },
+    ],
+    [84532]: [
+        { symbol: 'USDC', name: 'USD Coin', address: USDC_ADDRESSES[84532], decimals: 6 },
+    ]
+};
+
+export const getSupportedTokens = (chainId: number) => {
+    return TOKENS_BY_CHAIN[chainId] || [];
+};
