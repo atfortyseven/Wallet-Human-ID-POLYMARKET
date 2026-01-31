@@ -8,4 +8,4 @@ cmds = ["npm install --prefer-offline --no-audit"]
 cmds = ["npx prisma generate", "next build"]
 
 [start]
-cmd = "npx prisma migrate deploy && npm start"
+cmd = "npm start"
