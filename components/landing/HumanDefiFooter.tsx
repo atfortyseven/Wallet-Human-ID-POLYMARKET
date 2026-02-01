@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react';
-import { Github, Twitter, Youtube, Instagram, Rss } from 'lucide-react';
+import React, { useState } from 'react';
+import { Github, Twitter, Youtube, Instagram, Rss, Send, Loader2, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { useLanguage } from '@/src/context/LanguageContext';
 
 // Custom icons for brands not in Lucide (Discord, TikTok, Reddit)
@@ -70,13 +71,42 @@ export function HumanDefiFooter() {
             title: t('footer.about'),
             links: [
                 { name: t('footer.security'), href: "#" },
-                { name: t('footer.support'), href: "/soporte" },
+                { name: t('footer.support' as any), href: "/soporte" },
                 { name: t('footer.blog'), href: "#" },
                 { name: t('footer.careers'), href: "#" },
                 { name: t('footer.contact'), href: "#" }
             ]
         }
     ];
+
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [subscribed, setSubscribed] = useState(false);
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) return;
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/newsletter/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            setSubscribed(true);
+            toast.success(data.message || 'Successfully subscribed!');
+            setEmail('');
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to subscribe');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const socialLinks = [
         { icon: <Twitter size={24} />, href: "https://x.com/antonioestt?t=R2chzvH1IOt18jYNM8epVw&s=09" },
@@ -93,6 +123,61 @@ export function HumanDefiFooter() {
         <footer className="w-full bg-black/40 backdrop-blur-xl border-t border-white/10 py-16 px-4 mt-20 relative z-10">
             
             <div className="max-w-7xl mx-auto mb-16">
+                
+                {/* NEWSLETTER SECTION */}
+                <div className="mb-12 p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                        <div className="text-center md:text-left">
+                            <h3 className="text-2xl font-bold text-white mb-2">
+                                {t('footer.newsletter_title' as any) || "Mantente Actualizado"}
+                            </h3>
+                            <p className="text-gray-400 max-w-md text-sm">
+                                {t('footer.newsletter_desc' as any) || "Recibe las últimas actualizaciones del ecosistema Human, lanzamientos y alertas directamente en tu correo."}
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <input 
+                                type="email" 
+                                placeholder="tu@correo.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={loading || subscribed}
+                                className="bg-black/40 border border-white/10 rounded-xl px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors w-full sm:w-80 disabled:opacity-50"
+                                required
+                            />
+                            <button 
+                                type="submit" 
+                                disabled={loading || subscribed}
+                                className={`
+                                    flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all
+                                    ${subscribed 
+                                        ? 'bg-green-500 text-white cursor-default' 
+                                        : 'bg-white text-black hover:bg-gray-200 active:scale-95'
+                                    }
+                                    disabled:opacity-80
+                                `}
+                            >
+                                {loading ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                ) : subscribed ? (
+                                    <>
+                                        <CheckCircle size={18} />
+                                        <span>Suscrito</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Suscribirse</span>
+                                        <Send size={16} />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                  {/* Language & Social Media Row */}
                  <div className="flex flex-wrap items-center gap-4">
                     <span className="text-xl font-bold text-white mr-4 uppercase tracking-widest">{t('footer.lang_name')}</span>
