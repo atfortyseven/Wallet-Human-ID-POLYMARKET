@@ -78,8 +78,8 @@ export function SiteHeader() {
                     `}
                 >
                     {/* LOGO */}
-                    <div className="flex-1 flex justify-start items-center gap-1">
-                        <Link href="/" className="flex items-center gap-2 group">
+                    <div className="w-[180px] lg:w-[250px] flex justify-start items-center gap-1">
+                        <Link href="/" className="flex items-center gap-2 group relative z-50 pointer-events-auto">
                             <span className="text-xl font-black tracking-tight text-gray-900 font-sans group-hover:text-black transition-colors">
                                 Human DeFi
                             </span>
@@ -87,14 +87,14 @@ export function SiteHeader() {
                     </div>
 
                     {/* DESKTOP NAV */}
-                    <nav className="hidden xl:flex items-center gap-1 justify-center">
+                    <nav className="flex-1 hidden xl:flex items-center gap-1 justify-center relative z-50 pointer-events-auto">
                         {navLinks.map((link) => (
                             <div key={link.href} className="relative group">
                                 <Link 
                                     href={link.href}
-                                    className={`px-5 py-2 text-[14px] font-black transition-all rounded-lg tracking-widest uppercase font-sans whitespace-nowrap flex items-center gap-2 ${
+                                    className={`relative z-10 px-5 py-2 text-[14px] font-black transition-all rounded-lg tracking-widest uppercase font-sans whitespace-nowrap flex items-center gap-2 ${
                                         link.isVIP 
-                                            ? 'bg-black text-white border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105 hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] z-10 relative' 
+                                            ? 'bg-black text-white border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105 hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]' 
                                             : 'text-gray-800 hover:text-black hover:bg-gray-100/50'
                                     }`}
                                 >
@@ -124,20 +124,20 @@ export function SiteHeader() {
                     </nav>
 
                     {/* RIGHT ACTIONS */}
-                    <div className="hidden md:flex flex-1 justify-end items-center gap-4">
+                    <div className="hidden md:flex w-[350px] lg:w-[500px] justify-end items-center gap-4 relative z-50 pointer-events-auto">
                         {/* Grouped Icons: Bell, Settings, Language */}
                         <div className="flex items-center gap-4 pr-6 border-r border-gray-200">
                              <div className="scale-110">
                                 <NotificationsMenu />
                              </div>
                              
-                             <Link href="/settings" className="p-2.5 rounded-full hover:bg-black/5 transition-colors group">
+                             <Link href="/settings" className="p-2.5 rounded-full hover:bg-black/5 transition-colors group relative z-10">
                                 <Settings size={22} className="text-gray-400 group-hover:text-black transition-colors" />
                              </Link>
 
                              <button 
                                 onClick={toggleLanguage}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-black/5 transition-all group"
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-black/5 transition-all group relative z-10"
                                 title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
                             >
                                 <Globe size={22} className="text-gray-400 group-hover:text-black transition-colors" />
@@ -151,6 +151,7 @@ export function SiteHeader() {
                         <button 
                             onClick={() => open()}
                             className="
+                                relative z-10
                                 bg-black text-white 
                                 px-8 py-3 rounded-full 
                                 font-black text-[11px] tracking-[0.2em] uppercase
