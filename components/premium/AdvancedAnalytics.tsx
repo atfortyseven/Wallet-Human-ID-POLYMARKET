@@ -123,8 +123,8 @@ export default function AdvancedAnalytics({ walletAddress, isPremium }: Advanced
 
       {/* TradingView Price Chart */}
       <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1F1F1F]/10">
-        <h3 className="text-lg font-black text-[#1F1F1F] mb-4">ETH Price Chart</h3>
-        <TradingViewChart symbol="ETH" days={7} height={350} />
+        <h3 className="text-lg font-black text-[#1F1F1F] mb-4">ETH Price Chart (Live Binance)</h3>
+        <TradingViewChart symbol="ETHUSDT" height={350} />
       </div>
 
       {/* Main Chart */}

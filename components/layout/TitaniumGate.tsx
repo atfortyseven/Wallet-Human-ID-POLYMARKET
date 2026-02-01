@@ -85,8 +85,8 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 {state === 'APP' && (
                     <motion.div 
                         key="app"
-                        initial={{ opacity: 0, filter: 'blur(10px)' }}
-                        animate={{ opacity: 1, filter: 'blur(0px)' }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="relative z-10"
                     >

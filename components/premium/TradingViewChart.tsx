@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { createChart, IChartApi, ISeriesApi, CandlestickData, Time, CandlestickSeries } from 'lightweight-charts';
-import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { createChart, IChartApi, ISeriesApi, CandlestickData, Time, CandlestickSeries, ColorType } from 'lightweight-charts';
+import { TrendingUp, TrendingDown, Activity, Wifi } from 'lucide-react';
 
 interface TradingViewChartProps {
-  symbol: string;
-  days?: number;
+  symbol: string; // e.g., "ETHUSDT"
+  days?: number; // Not strictly used for WS, but kept for interface compatibility
   height?: number;
 }
 
@@ -18,24 +18,27 @@ interface PriceStats {
   low24h: number;
 }
 
-export default function TradingViewChart({ symbol, days = 7, height = 400 }: TradingViewChartProps) {
+export default function TradingViewChart({ symbol = "ETHUSDT", height = 400 }: TradingViewChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PriceStats | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initial Data Load & Chart Setup
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Create chart
+    // 1. Initialize Chart
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height,
       layout: {
-        background: { color: 'transparent' },
+        background: { type: ColorType.Solid, color: 'transparent' },
         textColor: '#1F1F1F',
       },
       grid: {
@@ -44,18 +47,18 @@ export default function TradingViewChart({ symbol, days = 7, height = 400 }: Tra
       },
       timeScale: {
         timeVisible: true,
-        secondsVisible: false,
+        secondsVisible: true,
         borderColor: 'rgba(31, 31, 31, 0.1)',
       },
       rightPriceScale: {
         borderColor: 'rgba(31, 31, 31, 0.1)',
       },
+      crosshair: {
+        mode: 1, // Magnet mode
+      }
     });
 
-    chartRef.current = chart;
-
-    // Add candlestick series
-    const candlestickSeries = chart.addSeries(CandlestickSeries, {
+    const series = chart.addSeries(CandlestickSeries, {
       upColor: '#22c55e',
       downColor: '#ef4444',
       borderUpColor: '#22c55e',
@@ -64,109 +67,145 @@ export default function TradingViewChart({ symbol, days = 7, height = 400 }: Tra
       wickDownColor: '#ef4444',
     });
 
-    candlestickSeriesRef.current = candlestickSeries;
+    chartRef.current = chart;
+    candlestickSeriesRef.current = series;
 
-    // Handle resize
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
+    // 2. Fetch Initial History (REST API)
+    const loadHistory = async () => {
+      try {
+        setLoading(true);
+        // Fetch 500 candles of 1m interval for history context
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=1m&limit=500`);
+        const data = await res.json();
+        
+        if (!Array.isArray(data)) throw new Error("Invalid data from Binance");
+
+        const formattedData: CandlestickData[] = data.map((d: any) => ({
+          time: (d[0] / 1000) as Time,
+          open: parseFloat(d[1]),
+          high: parseFloat(d[2]),
+          low: parseFloat(d[3]),
+          close: parseFloat(d[4]),
+        }));
+
+        series.setData(formattedData);
+        
+        // Initial stats
+        const last = formattedData[formattedData.length - 1];
+        const first = formattedData[0];
+        setStats({
+          current: last.close,
+          change24h: last.close - first.close, // Approx for this view
+          changePercent: ((last.close - first.close) / first.close) * 100,
+          high24h: Math.max(...formattedData.map(d => d.high)),
+          low24h: Math.min(...formattedData.map(d => d.low))
         });
+
+        setLoading(false);
+      } catch (err) {
+        console.error("History fetch failed:", err);
+        setError("Failed to load historical data");
+        setLoading(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    loadHistory();
 
-    // Fetch data
-    fetchPriceData();
+    const handleResize = () => {
+      if (chartContainerRef.current) {
+        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+      }
+    };
+    window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
-  }, [symbol, days]);
+  }, [symbol, height]);
 
-  const fetchPriceData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // WebSocket Connection (Real-time updates)
+  useEffect(() => {
+    // Subscribe to 1s klines for ultra-fast updates
+    const wsUrl = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_1m`;
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
 
-      const response = await fetch(`/api/prices/historical?symbol=${symbol}&days=${days}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch price data');
+    ws.onopen = () => {
+      setIsConnected(true);
+      console.log("Connected to Binance WS");
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.e === 'kline') {
+        const k = message.k;
+        const candle: CandlestickData = {
+          time: (k.t / 1000) as Time,
+          open: parseFloat(k.o),
+          high: parseFloat(k.h),
+          low: parseFloat(k.l),
+          close: parseFloat(k.c),
+        };
+
+        // Update chart series
+        if (candlestickSeriesRef.current) {
+          candlestickSeriesRef.current.update(candle);
+        }
+
+        // Update stats live
+        setStats(prev => {
+          if (!prev) return null;
+          const change = parseFloat(k.c) - parseFloat(k.o); // Show change of current candle or keep 24h
+          // For a better UX, we'd fetch 24h ticker separately, but let's update current price
+          return {
+            ...prev,
+            current: parseFloat(k.c),
+            // We keep daily stats static-ish or update smoothly if we had the ticker stream
+          };
+        });
       }
+    };
 
-      const data = await response.json();
+    ws.onerror = (e) => {
+      console.error("WS Error:", e);
+      setIsConnected(false);
+    };
 
-      if (!data.data || data.data.length === 0) {
-        throw new Error('No price data available');
-      }
+    ws.onclose = () => {
+      setIsConnected(false);
+    };
 
-      // Transform data for TradingView
-      const chartData: CandlestickData[] = data.data.map((point: any) => ({
-        time: Math.floor(point.timestamp / 1000) as Time,
-        open: point.open,
-        high: point.high,
-        low: point.low,
-        close: point.close,
-      }));
-
-      // Set data to chart
-      if (candlestickSeriesRef.current) {
-        candlestickSeriesRef.current.setData(chartData);
-      }
-
-      // Calculate stats
-      const firstPoint = data.data[0];
-      const lastPoint = data.data[data.data.length - 1];
-      const change24h = lastPoint.close - firstPoint.close;
-      const changePercent = (change24h / firstPoint.close) * 100;
-      const high24h = Math.max(...data.data.map((p: any) => p.high));
-      const low24h = Math.min(...data.data.map((p: any) => p.low));
-
-      setStats({
-        current: data.currentPrice || lastPoint.close,
-        change24h,
-        changePercent,
-        high24h,
-        low24h,
-      });
-
-      setLoading(false);
-    } catch (err) {
-      console.error('Chart fetch error:', err);
-      setError('Failed to load chart data');
-      setLoading(false);
-    }
-  };
+    return () => {
+      ws.close();
+    };
+  }, [symbol]);
 
   return (
     <div className="space-y-4">
       {/* Stats Header */}
-      {stats && !loading && (
+      {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
-            label="Current Price"
+            label="Live Price (Binance)"
             value={`$${stats.current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            icon={<div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />}
+          />
+           <StatCard // Placeholder for 24h as we only stream Klines
+            label="Approx 24h Change"
+            value={`${stats.changePercent >= 0 ? '+' : ''}${stats.changePercent.toFixed(2)}%`}
+            icon={stats.changePercent >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+            trend={stats.changePercent >= 0 ? 'up' : 'down'}
+          />
+           <StatCard
+            label="High"
+            value={`$${stats.high24h.toLocaleString(undefined, { minimumFractionDigits: 0 })}`}
             icon={<Activity size={16} />}
           />
-          <StatCard
-            label="24h Change"
-            value={`${stats.changePercent >= 0 ? '+' : ''}${stats.changePercent.toFixed(2)}%`}
-            subValue={`$${Math.abs(stats.change24h).toFixed(2)}`}
-            icon={stats.change24h >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-            trend={stats.change24h >= 0 ? 'up' : 'down'}
-          />
-          <StatCard
-            label="24h High"
-            value={`$${stats.high24h.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            icon={<TrendingUp size={16} />}
-          />
-          <StatCard
-            label="24h Low"
-            value={`$${stats.low24h.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            icon={<TrendingDown size={16} />}
+           <StatCard
+            label="Low"
+            value={`$${stats.low24h.toLocaleString(undefined, { minimumFractionDigits: 0 })}`}
+            icon={<Activity size={16} />}
           />
         </div>
       )}
@@ -180,61 +219,35 @@ export default function TradingViewChart({ symbol, days = 7, height = 400 }: Tra
         )}
 
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-red-50 rounded-2xl z-10">
-            <div className="text-center">
-              <p className="text-red-600 font-bold">{error}</p>
-              <button
-                onClick={fetchPriceData}
-                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700"
-              >
-                Retry
-              </button>
+            <div className="absolute inset-0 flex items-center justify-center bg-red-50 z-10">
+                <p className="text-red-500 font-bold">{error}</p>
             </div>
-          </div>
         )}
-
+        
         <div ref={chartContainerRef} />
-      </div>
-
-      {/* Chart Info */}
-      <div className="flex items-center justify-between text-xs text-[#1F1F1F]/70">
-        <span>Symbol: {symbol}</span>
-        <span>Timeframe: {days}D</span>
-        <span>Powered by CoinGecko</span>
+        
+        {/* Connection Status Indicator */}
+        <div className="absolute top-6 right-6 flex items-center gap-2 px-2 py-1 bg-white/80 rounded-md shadow-sm border border-gray-100">
+            <Wifi size={14} className={isConnected ? "text-green-500" : "text-gray-400"} />
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                {isConnected ? 'LIVE FEED' : 'CONNECTING...'}
+            </span>
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ 
-  label, 
-  value, 
-  subValue, 
-  icon, 
-  trend 
-}: { 
-  label: string;
-  value: string;
-  subValue?: string;
-  icon: React.ReactNode;
-  trend?: 'up' | 'down';
-}) {
+function StatCard({ label, value, icon, trend }: { label: string; value: string; icon: React.ReactNode; trend?: 'up' | 'down' }) {
   return (
     <div className="p-3 bg-white/50 backdrop-blur-sm rounded-xl border border-[#1F1F1F]/10">
       <div className="flex items-center gap-2 mb-1 text-[#1F1F1F]/70">
         {icon}
         <span className="text-xs font-bold uppercase">{label}</span>
       </div>
-      <div className={`text-lg font-black ${
-        trend === 'up' ? 'text-green-600' : 
-        trend === 'down' ? 'text-red-600' : 
-        'text-[#1F1F1F]'
-      }`}>
+      <div className={`text-lg font-black ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-[#1F1F1F]'}`}>
         {value}
       </div>
-      {subValue && (
-        <div className="text-xs text-[#1F1F1F]/50 mt-0.5">{subValue}</div>
-      )}
     </div>
   );
 }

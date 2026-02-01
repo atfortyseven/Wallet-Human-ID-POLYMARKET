@@ -63,7 +63,7 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className={`fixed top-6 left-0 right-0 z-50 transition-all duration-300 pointer-events-none flex justify-center px-4`}>
+            <header className={`fixed top-6 left-0 right-0 z-[100] transition-all duration-300 pointer-events-none flex justify-center px-4`}>
                 <motion.div 
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}

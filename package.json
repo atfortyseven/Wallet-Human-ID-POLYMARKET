@@ -17,7 +17,7 @@
     "check-migration": "ts-node scripts/check-migration-status.ts",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "worker": "tsx scripts/whale-worker.ts"
+    "worker": "ts-node scripts/whale-worker.ts"
   },
   "engines": {
     "node": ">=22.11.0"
