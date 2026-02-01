@@ -20,16 +20,26 @@ export interface SecurityHeaders {
 
 /**
  * Generates a cryptographically secure nonce for CSP
+ * Compatible with Edge Runtime (no Node.js crypto)
  */
 export function generateNonce(): string {
-  if (typeof window !== 'undefined' && window.crypto) {
-    const array = new Uint8Array(16);
-    window.crypto.getRandomValues(array);
-    return Buffer.from(array).toString('base64');
+  // Use Web Crypto API (works in both browser and Edge Runtime)
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  
+  // Convert to base64 manually (Buffer not available in Edge)
+  let binary = '';
+  for (let i = 0; i < array.length; i++) {
+    binary += String.fromCharCode(array[i]);
   }
-  // Fallback for server-side
-  const crypto = require('crypto');
-  return crypto.randomBytes(16).toString('base64');
+  
+  // Base64 encode
+  if (typeof btoa !== 'undefined') {
+    return btoa(binary);
+  }
+  
+  // Fallback for environments without btoa
+  return Buffer.from(array).toString('base64');
 }
 
 /**

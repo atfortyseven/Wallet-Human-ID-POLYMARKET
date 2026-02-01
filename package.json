@@ -17,7 +17,13 @@
     "check-migration": "ts-node scripts/check-migration-status.ts",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "worker": "ts-node scripts/whale-worker.ts"
+    "worker": "ts-node scripts/whale-worker.ts",
+    "whale:start": "pm2 start ecosystem.config.json",
+    "whale:stop": "pm2 stop whale-monitor",
+    "whale:restart": "pm2 restart whale-monitor",
+    "whale:logs": "pm2 logs whale-monitor",
+    "whale:status": "pm2 status whale-monitor",
+    "whale:keepalive": "bash scripts/keep-whale-alive.sh"
   },
   "engines": {
     "node": ">=22.11.0"

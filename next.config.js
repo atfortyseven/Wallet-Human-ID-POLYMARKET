@@ -37,9 +37,6 @@ const nextConfig = {
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
-    experimental: {
-        instrumentationHook: true,
-    },
 
     typescript: {
         ignoreBuildErrors: true

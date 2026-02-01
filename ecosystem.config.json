@@ -1,0 +1,33 @@
+{
+  "apps": [
+    {
+      "name": "whale-monitor",
+      "script": "./scripts/whale-worker.ts",
+      "interpreter": "ts-node",
+      "instances": 1,
+      "exec_mode": "fork",
+      "watch": false,
+      "autorestart": true,
+      "max_restarts": 50,
+      "min_uptime": "10s",
+      "restart_delay": 5000,
+      "error_file": "./logs/whale-monitor-error.log",
+      "out_file": "./logs/whale-monitor-out.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+      "merge_logs": true,
+      "env": {
+        "NODE_ENV": "production",
+        "ALCHEMY_API_KEY": "",
+        "TELEGRAM_BOT_TOKEN": ""
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      },
+      "max_memory_restart": "500M",
+      "kill_timeout": 5000,
+      "listen_timeout": 10000,
+      "cron_restart": "0 4 * * *",
+      "exp_backoff_restart_delay": 100
+    }
+  ]
+}
