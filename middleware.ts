@@ -1,7 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getSecurityHeaders, generateNonce } from '@/lib/security/csp-config'
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -22,31 +21,36 @@ const isPublicRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, request: NextRequest) => {
-  // Generate unique nonce for this request
-  const nonce = generateNonce()
-  
-  // Get security headers
-  const isDev = process.env.NODE_ENV === 'development'
-  const securityHeaders = getSecurityHeaders(nonce, isDev)
-  
   // Create response
   const response = NextResponse.next()
   
-  // Apply security headers
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value)
-  })
+  // Apply critical security headers (without CSP nonce for now)
+  const isDev = process.env.NODE_ENV === 'development'
   
-  // Additional security headers
+  // Simplified security headers without nonce
+  response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload')
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none')
+  response.headers.set('X-DNS-Prefetch-Control', 'off')
   
-  // Remove sensitive headers that leak information
+  // Permissions policy
+  response.headers.set('Permissions-Policy', [
+    'geolocation=()',
+    'microphone=()',
+    'camera=()',
+    'payment=(self)',
+    'usb=()',
+    'magnetometer=()',
+    'gyroscope=()',
+    'accelerometer=()'
+  ].join(', '))
+  
+  // Remove sensitive headers
   response.headers.delete('X-Powered-By')
   response.headers.delete('Server')
-  
-  // Set nonce in response for use in document
-  response.headers.set('X-Nonce', nonce)
   
   // Protect non-public routes
   if (!isPublicRoute(request)) {
