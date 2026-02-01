@@ -80,7 +80,7 @@ export function SiteHeader() {
                     {/* LOGO */}
                     <div className="flex-1 flex justify-start items-center gap-1">
                         <Link href="/" className="flex items-center gap-2 group">
-                            <span className="text-xl font-bold tracking-tight text-gray-900 font-sans group-hover:text-black transition-colors">
+                            <span className="text-xl font-black tracking-tight text-gray-900 font-sans group-hover:text-black transition-colors">
                                 Human DeFi
                             </span>
                         </Link>
@@ -89,18 +89,37 @@ export function SiteHeader() {
                     {/* DESKTOP NAV */}
                     <nav className="hidden xl:flex items-center gap-1 justify-center">
                         {navLinks.map((link) => (
-                            <Link 
-                                key={link.href} 
-                                href={link.href}
-                                className={`px-5 py-2 text-[14px] font-black transition-all rounded-lg tracking-widest uppercase font-sans whitespace-nowrap flex items-center gap-2 ${
-                                    link.isVIP 
-                                        ? 'bg-black text-white border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105 hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]' 
-                                        : 'text-gray-800 hover:text-black hover:bg-gray-100/50'
-                                }`}
-                            >
-                                {link.isVIP && <Crown size={16} className="text-[#D4AF37]" />}
-                                {link.name}
-                            </Link>
+                            <div key={link.href} className="relative group">
+                                <Link 
+                                    href={link.href}
+                                    className={`px-5 py-2 text-[14px] font-black transition-all rounded-lg tracking-widest uppercase font-sans whitespace-nowrap flex items-center gap-2 ${
+                                        link.isVIP 
+                                            ? 'bg-black text-white border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105 hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] z-10 relative' 
+                                            : 'text-gray-800 hover:text-black hover:bg-gray-100/50'
+                                    }`}
+                                >
+                                    {link.isVIP && <Crown size={16} className="text-[#D4AF37]" />}
+                                    {link.isVIP ? "HERRAMIENTA DE PAGO" : link.name}
+                                </Link>
+                                
+                                {/* Stickers for VIP Button */}
+                                {link.isVIP && (
+                                    <>
+                                        {/* Rocket - Left/Bottom */}
+                                        <img 
+                                            src="/models/5ec47565-dec1-46e9-ab91-67e1e759705e.png" 
+                                            alt="Rocket"
+                                            className="absolute -left-8 -bottom-6 w-12 h-12 object-contain pointer-events-none z-20 drop-shadow-md transform -rotate-12 group-hover:scale-110 transition-transform duration-300"
+                                        />
+                                        {/* Star - Right/Top */}
+                                        <img 
+                                            src="/models/421ed50f-ed5f-45e1-bbdb-575b26e45707.png" 
+                                            alt="Star"
+                                            className="absolute -right-6 -top-5 w-10 h-10 object-contain pointer-events-none z-20 drop-shadow-md transform rotate-12 group-hover:rotate-45 transition-transform duration-300"
+                                        />
+                                    </>
+                                )}
+                            </div>
                         ))}
                     </nav>
 

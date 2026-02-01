@@ -131,10 +131,20 @@ export default function VIPPage() {
       {/* Premium Background Effect */}
       <FloatingImmersiveBackground density="low" kittenCount={2} />
       
-      <div className="absolute inset-0 pointer-events-none opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500 rounded-full blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-500 rounded-full blur-[150px]" />
+      {/* WHALE BACKGROUND - SOFT & IMMERSIVE */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* The Whale Image with Radial Mask to hide edges */}
+        <div 
+            className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 w-[80vw] h-[80vw] md:w-[600px] md:h-[600px] bg-contain bg-center bg-no-repeat opacity-40 blur-2xl"
+            style={{
+                backgroundImage: 'url(/models/photo_2026-01-31_23-41-05.jpg)',
+                maskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
+                WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 70%)'
+            }}
+        />
+        {/* Additional tint/blur layers */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full blur-[150px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
@@ -146,7 +156,7 @@ export default function VIPPage() {
         >
           {/* Centered Badge */}
           <div className="flex justify-center mb-10">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-black border border-[#D4AF37] rounded-full text-[#D4AF37] font-black tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.15)]">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-black border border-[#D4AF37] rounded-full text-[#D4AF37] font-black tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.15)] z-20 relative">
               <Crown size={22} />
               <span className="text-sm uppercase">THE IMMERSIVE WHALE ALERT</span>
               {isPremium && <Sparkles size={18} className="animate-pulse" />}
@@ -154,15 +164,10 @@ export default function VIPPage() {
           </div>
 
           {/* Centered Title - Stately & Bold */}
-          <h1 className="text-6xl md:text-8xl font-black text-[#1F1F1F] mb-6 leading-none tracking-tighter uppercase">
-            INTELIGENCIA SOBERANA
-            <div className="flex justify-center items-center gap-4 my-2">
-              <div className="h-[2px] w-20 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
-              <span className="text-2xl font-light tracking-[0.5em] text-[#1F1F1F]/40">&</span>
-              <div className="h-[2px] w-20 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
-            </div>
+          <h1 className="text-5xl md:text-7xl font-black text-[#1F1F1F] mb-6 leading-tight tracking-tighter uppercase relative z-20">
+            INFORMATE CON LAS MEJORES SEÑALES <br/>
             <span className="bg-gradient-to-b from-[#1F1F1F] to-[#D4AF37] bg-clip-text text-transparent">
-              SINCRO ESTRATÉGICA
+               CON NUESTRA QUERIDA BALLENA
             </span>
           </h1>
 
@@ -182,7 +187,7 @@ export default function VIPPage() {
 
 
         {/* Tab Navigation */}
-        <div className="mb-6">
+        <div className="mb-6 relative z-20">
           <div className="flex gap-2 bg-white/50 p-2 rounded-2xl overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => (
               <button

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ImmersiveKittens } from '@/components/immersive/ImmersiveKittens';
 import { ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -18,6 +19,7 @@ export function LandingHero({ onStart }: Props) {
         offset: ["start start", "end start"]
     });
     const { t } = useLanguage();
+    const router = useRouter();
 
     // Parallax effects for the cats
     const yLeft = useTransform(scrollYProgress, [0, 1], [0, 100]);
@@ -67,7 +69,7 @@ export function LandingHero({ onStart }: Props) {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.8, type: "spring" }}
-                    onClick={onStart}
+                    onClick={() => router.push('/wallet')}
                     className="
                         group relative px-10 py-4 bg-[#2E1A57] rounded-full text-white font-bold text-lg md:text-xl
                         overflow-hidden transition-all hover:scale-105 hover:bg-[#3d2270] hover:shadow-xl
