@@ -99,34 +99,45 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const { user } = useUser();
     const session = { user };
 
-    // --- LOAD SETTINGS (Hybrid: Local + Cloud) ---
+    // --- SYNC STATES ---
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [syncError, setSyncError] = useState<string | null>(null);
+    const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
+
+    // --- LOAD SETTINGS (Using Sync Service) ---
     useEffect(() => {
         const loadSettings = async () => {
-            // 1. Load from LocalStorage first (instant)
-            const savedSettings = localStorage.getItem('humanid_settings_v2');
-            if (savedSettings) {
-                try {
-                    const parsed = JSON.parse(savedSettings);
-                    applySettings(parsed);
-                } catch (e) { console.error("Failed to parse local settings", e); }
-            }
+            setIsSyncing(true);
+            setSyncError(null);
 
-            // 2. If logged in, fetch from Cloud (authoritative)
-            if (session?.user?.email) {
+            try {
+                // Import service dynamically to avoid SSR issues
+                const { settingsSyncService } = await import('@/lib/settings-sync');
+                
+                // Load settings from service (handles local + cloud)
+                const settings = await settingsSyncService.loadSettings();
+                
+                if (settings) {
+                    // Apply loaded settings
+                    applySettings(settings);
+                    setLastSyncAt(new Date());
+                }
+            } catch (error: any) {
+                console.error('Failed to load settings:', error);
+                setSyncError(error.message);
+                
+                // Fallback to localStorage
                 try {
-                    const res = await fetch('/api/user/settings');
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.settings && Object.keys(data.settings).length > 0) {
-                            applySettings(data.settings);
-                            // Merge with local storage for offline support
-                             localStorage.setItem('humanid_settings_v2', JSON.stringify({
-                                 ...JSON.parse(savedSettings || '{}'),
-                                 ...data.settings
-                             }));
-                        }
+                    const local = localStorage.getItem('humanid_settings_v3');
+                    if (local) {
+                        const parsed = JSON.parse(local);
+                        applySettings(parsed);
                     }
-                } catch (e) { console.error("Failed to sync cloud settings", e); }
+                } catch (e) {
+                    console.error('Failed to load from localStorage:', e);
+                }
+            } finally {
+                setIsSyncing(false);
             }
         };
 
@@ -140,6 +151,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (parsed.searchEngine) setSearchEngine(parsed.searchEngine);
         if (parsed.hideBalances !== undefined) setHideBalances(parsed.hideBalances);
         if (parsed.privacyMode !== undefined) setPrivacyMode(parsed.privacyMode);
+        if (parsed.strictMode !== undefined) setStrictMode(parsed.strictMode);
         if (parsed.humanMetrics !== undefined) setHumanMetrics(parsed.humanMetrics);
         if (parsed.testNetsEnabled !== undefined) setTestNetsEnabled(parsed.testNetsEnabled);
         if (parsed.ipfsGateway) setIpfsGateway(parsed.ipfsGateway);
@@ -149,34 +161,53 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (parsed.notifications) setNotifications(parsed.notifications);
     };
 
-    // --- AUTO SAVE (Debounced Cloud Sync) ---
+    // --- AUTO SAVE (Using Sync Service with Optimistic Updates) ---
     useEffect(() => {
-        const settingsToSave = {
-            currency, language, searchEngine,
-            hideBalances, privacyMode, humanMetrics,
-            testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled,
-            contacts, notifications
-        };
-        
-        // Always save to local
-        localStorage.setItem('humanid_settings_v2', JSON.stringify(settingsToSave));
+        const saveSettings = async () => {
+            const settingsToSave = {
+                currency, language, searchEngine,
+                hideBalances, privacyMode, strictMode, humanMetrics,
+                testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled,
+                contacts, notifications
+            };
 
-        // Save to cloud if logged in (Debounce 2s)
-        if (session?.user?.email) {
-            const timeoutId = setTimeout(async () => {
-                try {
-                    await fetch('/api/user/settings', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(settingsToSave)
-                    });
-                } catch (e) {
-                    console.error("Cloud save failed", e);
-                }
-            }, 2000);
-            return () => clearTimeout(timeoutId);
-        }
-    }, [currency, language, searchEngine, hideBalances, privacyMode, humanMetrics, testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled, contacts, notifications, session]);
+            // Always save to localStorage immediately (optimistic)
+            try {
+                localStorage.setItem('humanid_settings_v3', JSON.stringify(settingsToSave));
+            } catch (e) {
+                console.error('Failed to save to localStorage:', e);
+            }
+
+            // Save to cloud if logged in (with retry logic via service)
+            if (session?.user?.email) {
+                const timeoutId = setTimeout(async () => {
+                    setIsSyncing(true);
+                    setSyncError(null);
+
+                    try {
+                        const { settingsSyncService } = await import('@/lib/settings-sync');
+                        const result = await settingsSyncService.saveSettings(settingsToSave as any);
+                        
+                        if (result.success) {
+                            setLastSyncAt(new Date());
+                            setSyncError(null);
+                        } else {
+                            setSyncError(result.error || 'Sync failed');
+                        }
+                    } catch (error: any) {
+                        console.error('Cloud save failed:', error);
+                        setSyncError(error.message);
+                    } finally {
+                        setIsSyncing(false);
+                    }
+                }, 2000);
+
+                return () => clearTimeout(timeoutId);
+            }
+        };
+
+        saveSettings();
+    }, [currency, language, searchEngine, hideBalances, privacyMode, strictMode, humanMetrics, testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled, contacts, notifications, session]);
 
     // --- FUNCTIONS ---
     const toggleHideBalances = () => setHideBalances(prev => !prev);

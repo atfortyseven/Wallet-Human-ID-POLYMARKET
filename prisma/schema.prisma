@@ -610,13 +610,19 @@ model UserSettings {
   user       User?     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
   authUser   AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
 
-  // Appearance
-  theme    String @default("light") // light, dark, auto
-  language String @default("es") // es, en, fr, etc
+  // Appearance & UI
+  theme        String @default("light") // light, dark, auto
+  language     String @default("es") // es, en, fr, pt
+  currency     String @default("USD") // USD, EUR, GBP, JPY, MXN
+  searchEngine String @default("Google") // Google, DuckDuckGo, Brave
 
-  // Privacy
-  showProfile  Boolean @default(true)
-  showActivity Boolean @default(false)
+  // Privacy & Security
+  showProfile   Boolean @default(true)
+  showActivity  Boolean @default(false)
+  hideBalances  Boolean @default(false) // Mask balances with ****
+  privacyMode   Boolean @default(true) // Block 3rd party trackers
+  strictMode    Boolean @default(false) // Whitelist-only transactions
+  humanMetrics  Boolean @default(false) // Send anonymous usage data
 
   // Notifications
   emailNotifications Boolean @default(true)
@@ -636,17 +642,67 @@ model UserSettings {
   defaultGasPrice     String  @default("medium")
   confirmTransactions Boolean @default(true)
 
-  // [NEW] Smart Wallet Security
+  // Smart Wallet Security
   walletStealthMode         Boolean @default(false)
   requirePasswordForSigning Boolean @default(true)
   autoLockDuration          Int     @default(15) // minutes
+
+  // Advanced Settings
+  testNetsEnabled  Boolean @default(false)
+  ipfsGateway      String  @default("https://ipfs.io/ipfs/")
+  customRPC        String?
+  stateLogsEnabled Boolean @default(false)
+
+  // Contacts (JSON array)
+  contacts Json @default("[]") // Array of {id, name, address, memo}
+
+  // Notifications granular (JSON object)
+  notificationsConfig Json @default("{\"governance\":true,\"transactional\":true,\"security\":true}")
 
   // Backup
   lastBackupAt    DateTime?
   backupFrequency String    @default("weekly") // daily, weekly, monthly
 
+  // Sync & Versioning
+  version      Int      @default(1) // Optimistic locking version
+  lastSyncAt   DateTime @default(now())
+  syncHash     String?  // MD5 hash for change detection
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  history UserSettingsHistory[]
+
+  @@index([authUserId, lastSyncAt])
+  @@index([version])
+}
+
+// ----------------------------------------------------------------------------
+// USER SETTINGS HISTORY (Audit Trail)
+// ----------------------------------------------------------------------------
+
+model UserSettingsHistory {
+  id           String   @id @default(cuid())
+  settingsId   String
+  settings     UserSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+  authUserId   String
+  
+  // Change tracking
+  field        String?  // Field that changed (null if multiple)
+  previousValue Json?   // Previous value
+  newValue      Json?   // New value
+  fullSnapshot  Json    // Complete settings snapshot
+  
+  // Metadata
+  changeType   String   // 'UPDATE', 'CREATE', 'BULK_UPDATE'
+  changedAt    DateTime @default(now())
+  ipAddress    String?
+  userAgent    String?
+  
+  @@index([authUserId, changedAt])
+  @@index([settingsId, changedAt])
+  @@index([field])
 }
 
 // ----------------------------------------------------------------------------
